@@ -1,0 +1,11 @@
+# Compiled executable
+railway.exe
+
+# Other build outputs
+*.o
+*.obj
+*.exe
+
+# IDE and editor files
+.vscode/
+.vs/
