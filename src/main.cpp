@@ -1,3 +1,4 @@
+
 #include "TrainData.h"
 #include "TrainSearch.h"
 
@@ -9,6 +10,7 @@ int main() {
     std::string source;
     std::string destination;
     std::string journeyDate;
+    std::string errorMessage;
 
     std::cout << "===== Railway Reservation System =====\n";
 
@@ -21,12 +23,28 @@ int main() {
     std::cout << "Enter journey date (YYYY-MM-DD): ";
     std::getline(std::cin, journeyDate);
 
+    if (source.find_first_not_of(" \t") == std::string::npos ||
+        destination.find_first_not_of(" \t") == std::string::npos) {
+        std::cout << "\nError: Source and destination cannot be empty.\n";
+        return 1;
+    }
+
+    if (!isValidDate(journeyDate)) {
+        std::cout << "\nError: Invalid journey date. "
+                     "Please use YYYY-MM-DD format and enter a valid date.\n";
+        return 1;
+    }
+
     const std::vector<Train> trains =
-        loadTrains("data/trains.dat", journeyDate);
+        loadTrains("data/trains.dat", journeyDate, errorMessage);
+
+    if (!errorMessage.empty()) {
+        std::cout << "\nError: " << errorMessage << '\n';
+        return 1;
+    }
 
     if (trains.empty()) {
-        std::cout << "\nNo train records found for that date, "
-                     "or the data file could not be opened.\n";
+        std::cout << "\nNo train records found for the selected date.\n";
         return 0;
     }
 
