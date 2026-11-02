@@ -1,9 +1,10 @@
-﻿#include "SeatInventory.h"
+#include "SeatInventory.h"
 
 #include <algorithm>
 #include <cctype>
 #include <string>
 
+// Removes leading/trailing spaces and converts input to lowercase.
 static std::string normalizeClass(const std::string& travelClass) {
     std::string result = travelClass;
 
@@ -33,6 +34,8 @@ static std::string normalizeClass(const std::string& travelClass) {
     return result;
 }
 
+// Returns available seats for the selected class.
+// Returns -1 for an invalid class.
 int getAvailableSeats(
     const Train& train,
     const std::string& travelClass
@@ -62,4 +65,28 @@ int getAvailableSeats(
     }
 
     return -1;
+}
+
+// Validates a requested number of seats/passengers.
+SeatRequestResult validateSeatRequest(
+    int availableSeats,
+    int requestedSeats
+) {
+    if (availableSeats < 0) {
+        return SeatRequestResult::INVALID_AVAILABILITY;
+    }
+
+    if (requestedSeats <= 0) {
+        return SeatRequestResult::INVALID_REQUEST;
+    }
+
+    if (requestedSeats > MAX_PASSENGERS_PER_BOOKING) {
+        return SeatRequestResult::EXCEEDS_MAX_PASSENGERS;
+    }
+
+    if (requestedSeats > availableSeats) {
+        return SeatRequestResult::EXCEEDS_AVAILABLE_SEATS;
+    }
+
+    return SeatRequestResult::VALID;
 }
