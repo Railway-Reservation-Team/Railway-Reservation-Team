@@ -2,10 +2,12 @@
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
+#include "FareCalculator.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 int main() {
 
@@ -37,7 +39,7 @@ int main() {
         return 1;
     }
 
-    // 3. Get and validate journey date
+    // 3. Validate journey date
     std::cout << "Enter journey date (YYYY-MM-DD): ";
     std::getline(std::cin, journeyDate);
 
@@ -72,9 +74,12 @@ int main() {
     // 6. Display matching trains
     std::cout << "\n========== MATCHING TRAINS ==========\n";
 
-    for (const Train& train : results) {
+    for (size_t i = 0; i < results.size(); ++i) {
 
-        std::cout << "\nTrain Number: " << train.trainNumber
+        const Train& train = results[i];
+
+        std::cout << "\nTrain Option: " << i + 1
+                  << "\nTrain Number: " << train.trainNumber
                   << "\nTrain Name: " << train.trainName
                   << "\nSource: " << train.source
                   << "\nDestination: " << train.destination
@@ -97,7 +102,24 @@ int main() {
                   << " | Seats: " << train.chairCarSeatsAvailable << '\n';
     }
 
-    // 7. Validate passenger name
+    // 7. Select train
+    int trainChoice;
+
+    std::cout << "\nSelect train option (1-" << results.size() << "): ";
+
+    if (!(std::cin >> trainChoice) ||
+        trainChoice < 1 ||
+        trainChoice > static_cast<int>(results.size())) {
+
+        std::cout << "\nError: Invalid train selection.\n";
+        return 1;
+    }
+
+    const Train& selectedTrain = results[trainChoice - 1];
+
+    std::cin.ignore(10000, '\n');
+
+    // 8. Passenger details
     std::cout << "\n========== PASSENGER DETAILS ==========\n";
 
     std::cout << "Enter passenger name: ";
@@ -108,7 +130,7 @@ int main() {
         return 1;
     }
 
-    // 8. Validate passenger count
+    // 9. Validate passenger count
     std::string seatInput;
 
     std::cout << "Enter number of passengers (1-6): ";
@@ -119,14 +141,95 @@ int main() {
         return 1;
     }
 
-    // 9. Display validated details
-    std::cout << "\n========== VALIDATION SUCCESSFUL ==========\n";
+    // 10. Select travel class
+    int classChoice;
 
-    std::cout << "Passenger Name: " << passengerName << '\n';
-    std::cout << "Number of Passengers: " << seats << '\n';
+    std::cout << "\n========== SELECT TRAVEL CLASS ==========\n";
+    std::cout << "1. Sleeper\n";
+    std::cout << "2. AC 3-Tier\n";
+    std::cout << "3. AC 2-Tier\n";
+    std::cout << "4. Chair Car\n";
 
-    std::cout << "\nInput validation completed successfully!\n";
-    std::cout << "Train search completed successfully!\n";
+    std::cout << "Enter your class choice (1-4): ";
+
+    if (!(std::cin >> classChoice) ||
+        classChoice < 1 || classChoice > 4) {
+
+        std::cout << "\nError: Invalid travel class selection.\n";
+        return 1;
+    }
+
+    std::string travelClass;
+
+    switch (classChoice) {
+        case 1:
+            travelClass = "Sleeper";
+            break;
+        case 2:
+            travelClass = "AC 3-Tier";
+            break;
+        case 3:
+            travelClass = "AC 2-Tier";
+            break;
+        case 4:
+            travelClass = "Chair Car";
+            break;
+    }
+
+    // 11. Check seat availability
+    int availableSeats = 0;
+
+    switch (classChoice) {
+        case 1:
+            availableSeats = selectedTrain.sleeperSeatsAvailable;
+            break;
+        case 2:
+            availableSeats = selectedTrain.ac3TierSeatsAvailable;
+            break;
+        case 3:
+            availableSeats = selectedTrain.ac2TierSeatsAvailable;
+            break;
+        case 4:
+            availableSeats = selectedTrain.chairCarSeatsAvailable;
+            break;
+    }
+
+    if (availableSeats < seats) {
+        std::cout << "\nError: Not enough seats available.\n";
+        return 1;
+    }
+
+    // 12. Calculate ticket fare
+    try {
+
+        double totalFare = FareCalculator::calculateFare(
+            selectedTrain,
+            travelClass,
+            seats
+        );
+
+        // 13. Display fare details
+        std::cout << "\n========== FARE DETAILS ==========\n";
+
+        std::cout << "Passenger Name: " << passengerName << '\n';
+        std::cout << "Train Name: " << selectedTrain.trainName << '\n';
+        std::cout << "Travel Class: " << travelClass << '\n';
+        std::cout << "Number of Passengers: " << seats << '\n';
+        std::cout << "Fare Per Passenger: Rs. "
+                  << (totalFare / seats) << '\n';
+
+        std::cout << "Total Ticket Fare: Rs. "
+                  << totalFare << '\n';
+
+        std::cout << "\nFare calculated successfully!\n";
+
+    }
+    catch (const std::exception& e) {
+        std::cout << "\nError: " << e.what() << '\n';
+        return 1;
+    }
+
+    std::cout << "\nTrain search completed successfully!\n";
 
     return 0;
 }
