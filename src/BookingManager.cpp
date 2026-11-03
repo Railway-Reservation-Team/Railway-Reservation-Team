@@ -2,6 +2,7 @@
 #include "TrainData.h"
 
 #include <fstream>
+#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <random>
@@ -10,11 +11,42 @@
 #include <cstdio>
 #include <string>
 #include <cctype>
+#include <fcntl.h>
+#include <sys/file.h>
+#include <unistd.h>
 
 namespace BookingManager {
 
 static const std::string BOOKING_FILE = "data/bookings.dat";
 static const std::string TRAIN_FILE = "data/trains.dat";
+
+class BookingFileLock {
+    int fd;
+
+public:
+    BookingFileLock()
+        : fd(open("data/bookings.lock", O_CREAT | O_RDWR, 0666)) {
+        if (fd >= 0 && flock(fd, LOCK_EX) != 0) {
+            close(fd);
+            fd = -1;
+        }
+    }
+
+    ~BookingFileLock() {
+        if (fd >= 0) {
+            flock(fd, LOCK_UN);
+            close(fd);
+        }
+    }
+
+    bool isLocked() const {
+        return fd >= 0;
+    }
+
+    BookingFileLock(const BookingFileLock&) = delete;
+    BookingFileLock& operator=(const BookingFileLock&) = delete;
+};
+
 
 // Encode special characters so passenger details remain safe in pipe-separated records.
 std::string encodeField(const std::string& value) {
@@ -96,7 +128,45 @@ bool generateUniquePNR(std::string& pnr) {
     return false;
 }
 
+
+bool validatePNR(const std::string& pnr) {
+    if (pnr.size() != 10) {
+        return false;
+    }
+
+    for (unsigned char digit : pnr) {
+        if (!std::isdigit(digit)) {
+            return false;
+        }
+    }
+
+    std::ifstream file(BOOKING_FILE);
+
+    if (!file.is_open()) {
+        return false;
+    }
+
+    std::string line;
+
+    while (std::getline(file, line)) {
+        std::size_t separator = line.find('|');
+
+        if (separator != std::string::npos &&
+            line.substr(0, separator) == pnr) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool findBooking(const std::string& requestedPNR, Booking& booking) {
+    if (requestedPNR.size() != 10 ||
+        !std::all_of(requestedPNR.begin(), requestedPNR.end(),
+            [](unsigned char c) { return std::isdigit(c); })) {
+        return false;
+    }
+
     std::ifstream file(BOOKING_FILE);
 
     if (!file.is_open()) {
@@ -125,7 +195,7 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
             booking.trainNumber = fields[1];
             booking.journeyDate = fields[2];
             booking.travelClass = fields[3];
-            booking.passengerDetails = fields[4];
+            booking.passengerDetails = decodeField(fields[4]);
             booking.passengerCount = std::stoi(fields[5]);
             booking.totalFare = std::stod(fields[6]);
             booking.status = fields[7];
@@ -163,6 +233,13 @@ bool createBooking(
             errorMessage = "Invalid passenger name, age or gender.";
             return false;
         }
+    }
+
+    BookingFileLock bookingLock;
+
+    if (!bookingLock.isLocked()) {
+        errorMessage = "Could not lock booking data.";
+        return false;
     }
 
     if (!generateUniquePNR(pnr)) {
