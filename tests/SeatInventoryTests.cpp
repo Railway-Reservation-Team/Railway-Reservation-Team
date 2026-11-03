@@ -2,14 +2,12 @@
 
 #include <iostream>
 #include <string>
+#include <chrono>
 
 int passed = 0;
 int failed = 0;
 
-void check(
-    const std::string& testName,
-    bool condition
-) {
+void check(const std::string& testName, bool condition) {
     if (condition) {
         std::cout << "[PASS] " << testName << '\n';
         ++passed;
@@ -22,6 +20,9 @@ void check(
 int main() {
     Train train;
 
+    train.trainNumber = "12627";
+    train.journeyDate = "2026-11-01";
+
     train.sleeperSeatsAvailable = 0;
     train.ac3TierSeatsAvailable = 65;
     train.ac2TierSeatsAvailable = 35;
@@ -29,7 +30,7 @@ int main() {
 
     std::cout << "\n===== SEAT INVENTORY UNIT TESTS =====\n\n";
 
-    // 1. Seat availability tests
+    // 1. Availability tests
     std::cout << "--- Availability Tests ---\n";
 
     check("Sleeper availability is zero",
@@ -44,7 +45,7 @@ int main() {
     check("Chair Car availability",
           getAvailableSeats(train, "Chair Car") == 40);
 
-    // 2. Class normalization tests
+    // 2. Normalization tests
     std::cout << "\n--- Class Normalization Tests ---\n";
 
     check("Lowercase class name",
@@ -74,8 +75,8 @@ int main() {
     check("Empty class returns -1",
           getAvailableSeats(train, "") == -1);
 
-    // 4. Valid seat request tests
-    std::cout << "\n--- Valid Seat Request Tests ---\n";
+    // 4. Seat request tests
+    std::cout << "\n--- Seat Request Tests ---\n";
 
     check("One seat request accepted",
           validateSeatRequest(65, 1) == SeatRequestResult::VALID);
@@ -85,9 +86,6 @@ int main() {
 
     check("Exact available seat count accepted",
           validateSeatRequest(6, 6) == SeatRequestResult::VALID);
-
-    // 5. Invalid seat request tests
-    std::cout << "\n--- Invalid Seat Request Tests ---\n";
 
     check("Zero seats rejected",
           validateSeatRequest(65, 0) == SeatRequestResult::INVALID_REQUEST);
@@ -103,7 +101,7 @@ int main() {
           validateSeatRequest(65, 7) ==
               SeatRequestResult::EXCEEDS_MAX_PASSENGERS);
 
-    check("Zero available seats rejects positive request",
+    check("Zero availability rejects positive request",
           validateSeatRequest(0, 1) ==
               SeatRequestResult::EXCEEDS_AVAILABLE_SEATS);
 
@@ -111,19 +109,140 @@ int main() {
           validateSeatRequest(-1, 1) ==
               SeatRequestResult::INVALID_AVAILABILITY);
 
-    // 6. Boundary tests
-    std::cout << "\n--- Boundary Tests ---\n";
+    // 5. Soft-lock tests
+    std::cout << "\n--- Soft Lock Tests ---\n";
 
-    check("Exactly six passengers accepted",
-          validateSeatRequest(6, MAX_PASSENGERS_PER_BOOKING) ==
-              SeatRequestResult::VALID);
+    SeatInventoryManager inventory;
 
-    check("Seven passengers rejected",
-          validateSeatRequest(7, MAX_PASSENGERS_PER_BOOKING + 1) ==
-              SeatRequestResult::EXCEEDS_MAX_PASSENGERS);
+    auto startTime = std::chrono::steady_clock::now();
+
+    SeatHoldResponse firstHold =
+        inventory.holdSeats(train, "3A", 3, startTime);
+
+    check("Valid seat hold created",
+          firstHold.result == SeatHoldResult::SUCCESS);
+
+    check("Hold has an ID",
+          !firstHold.holdId.empty());
+
+    check("Availability decreases after hold",
+          inventory.getLiveAvailableSeats(
+              train, "AC 3-Tier", startTime
+          ) == 62);
+
+    check("Active hold count is one",
+          inventory.getActiveHoldCount(startTime) == 1);
+
+    Train limitedTrain = train;
+limitedTrain.trainNumber = "LIMITED";
+limitedTrain.ac3TierSeatsAvailable = 5;
+
+SeatHoldResponse limitedHold =
+    inventory.holdSeats(limitedTrain, "3A", 3, startTime);
+
+check("Second hold cannot exceed remaining availability",
+      limitedHold.result == SeatHoldResult::SUCCESS &&
+      inventory.holdSeats(
+          limitedTrain, "3A", 3, startTime
+      ).result == SeatHoldResult::EXCEEDS_AVAILABLE_SEATS);
+
+    check("Invalid class cannot be held",
+          inventory.holdSeats(train, "First Class", 1, startTime).result ==
+              SeatHoldResult::INVALID_CLASS);
+
+    check("Seven passengers cannot be held",
+          inventory.holdSeats(train, "3A", 7, startTime).result ==
+              SeatHoldResult::EXCEEDS_MAX_PASSENGERS);
+
+    // 6. Hold release tests
+    std::cout << "\n--- Hold Release Tests ---\n";
+
+    check("Manual hold release succeeds",
+          inventory.releaseHold(firstHold.holdId));
+
+    check("Availability restored after release",
+          inventory.getLiveAvailableSeats(
+              train, "3A", startTime
+          ) == 65);
+
+    check("Released hold cannot be released twice",
+          !inventory.releaseHold(firstHold.holdId));
+
+    // 7. Expiry tests
+    std::cout << "\n--- Hold Expiry Tests ---\n";
+
+    SeatHoldResponse expiryHold =
+        inventory.holdSeats(train, "3A", 4, startTime);
+
+    auto fourMinutesLater =
+        startTime + std::chrono::minutes(4);
+
+    check("Hold remains active before five minutes",
+          inventory.getLiveAvailableSeats(
+              train, "3A", fourMinutesLater
+          ) == 61);
+
+    auto fiveMinutesLater =
+        startTime + std::chrono::minutes(5);
+
+    check("Hold expires after five minutes",
+          inventory.getLiveAvailableSeats(
+              train, "3A", fiveMinutesLater
+          ) == 65);
+
+    check("Expired hold is removed",
+          inventory.getActiveHoldCount(fiveMinutesLater) == 0);
+
+    check("Expired hold cannot be released",
+          !inventory.releaseHold(expiryHold.holdId));
+
+    // 8. Confirmation tests
+    std::cout << "\n--- Hold Confirmation Tests ---\n";
+
+    SeatHoldResponse confirmationHold =
+        inventory.holdSeats(train, "3A", 5, startTime);
+
+    check("Valid hold can be confirmed",
+          inventory.confirmHold(
+              train, confirmationHold.holdId, startTime
+          ));
+
+    check("Confirmed seats reduce train availability",
+          train.ac3TierSeatsAvailable == 60);
+
+    check("Confirmed hold is removed",
+          inventory.getActiveHoldCount(startTime) == 0);
+
+    check("Confirmation cannot be repeated",
+          !inventory.confirmHold(
+              train, confirmationHold.holdId, startTime
+          ));
+
+    // 9. Separate train/date inventory tests
+    std::cout << "\n--- Train and Date Isolation Tests ---\n";
+
+    Train anotherTrain = train;
+    anotherTrain.trainNumber = "12027";
+
+    SeatHoldResponse anotherHold =
+        inventory.holdSeats(anotherTrain, "3A", 2, startTime);
+
+    check("Hold on another train does not affect first train",
+          inventory.getLiveAvailableSeats(
+              train, "3A", startTime
+          ) == 60);
+
+    check("Hold affects its own train",
+          inventory.getLiveAvailableSeats(
+              anotherTrain, "3A", startTime
+          ) == 58);
+
+    check("Hold release on another train succeeds",
+          inventory.releaseHold(anotherHold.holdId));
 
     // Final summary
     std::cout << "\n===== TEST SUMMARY =====\n";
+
     std::cout << "Total tests: " << passed + failed << '\n';
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';
