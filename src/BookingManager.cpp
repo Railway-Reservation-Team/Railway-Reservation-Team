@@ -10,11 +10,42 @@
 #include <cstdio>
 #include <string>
 #include <cctype>
+#include <fcntl.h>
+#include <sys/file.h>
+#include <unistd.h>
 
 namespace BookingManager {
 
 static const std::string BOOKING_FILE = "data/bookings.dat";
 static const std::string TRAIN_FILE = "data/trains.dat";
+
+class BookingFileLock {
+    int fd;
+
+public:
+    BookingFileLock()
+        : fd(open("data/bookings.lock", O_CREAT | O_RDWR, 0666)) {
+        if (fd >= 0 && flock(fd, LOCK_EX) != 0) {
+            close(fd);
+            fd = -1;
+        }
+    }
+
+    ~BookingFileLock() {
+        if (fd >= 0) {
+            flock(fd, LOCK_UN);
+            close(fd);
+        }
+    }
+
+    bool isLocked() const {
+        return fd >= 0;
+    }
+
+    BookingFileLock(const BookingFileLock&) = delete;
+    BookingFileLock& operator=(const BookingFileLock&) = delete;
+};
+
 
 // Encode special characters so passenger details remain safe in pipe-separated records.
 std::string encodeField(const std::string& value) {
@@ -163,6 +194,13 @@ bool createBooking(
             errorMessage = "Invalid passenger name, age or gender.";
             return false;
         }
+    }
+
+    BookingFileLock bookingLock;
+
+    if (!bookingLock.isLocked()) {
+        errorMessage = "Could not lock booking data.";
+        return false;
     }
 
     if (!generateUniquePNR(pnr)) {

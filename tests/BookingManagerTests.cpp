@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 #include <cctype>
+#include <thread>
+#include <set>
 
 namespace fs = std::filesystem;
 
@@ -111,6 +113,49 @@ int main() {
 
     test("Second booking receives a different PNR",
          secondCreated && secondPNR != pnr);
+
+    // Concurrent booking and PNR collision test
+    const int threadCount = 12;
+
+    std::vector<std::string> concurrentPNRs(threadCount);
+    std::vector<int> concurrentResults(threadCount, 0);
+    std::vector<std::thread> workers;
+
+    for (int i = 0; i < threadCount; ++i) {
+        workers.emplace_back([&, i]() {
+            std::string threadError;
+
+            concurrentResults[i] =
+                BookingManager::createBooking(
+                    train,
+                    "Sleeper",
+                    passengers,
+                    2400,
+                    concurrentPNRs[i],
+                    threadError
+                ) ? 1 : 0;
+        });
+    }
+
+    for (auto& worker : workers) {
+        worker.join();
+    }
+
+    int successfulBookings = 0;
+    std::set<std::string> uniquePNRs;
+
+    for (int i = 0; i < threadCount; ++i) {
+        successfulBookings += concurrentResults[i];
+        if (concurrentResults[i]) {
+            uniquePNRs.insert(concurrentPNRs[i]);
+        }
+    }
+
+    test("All concurrent bookings succeed",
+         successfulBookings == threadCount);
+
+    test("Concurrent bookings receive unique PNRs",
+         uniquePNRs.size() == static_cast<std::size_t>(threadCount));
 
     std::cout << "\n========== PNR TEST SUMMARY ==========\n";
     std::cout << "Passed: " << passed << '\n';
