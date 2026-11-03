@@ -1,4 +1,6 @@
 #include "BookingManager.h"
+
+#include <algorithm>
 #include "TrainData.h"
 
 #include <fstream>
@@ -135,6 +137,15 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
     return false;
 }
 
+std::string normalizeName(std::string name) {
+    std::transform(name.begin(), name.end(), name.begin(),
+        [](unsigned char ch) {
+            return static_cast<char>(std::tolower(ch));
+        });
+
+    return name;
+}
+
 std::vector<Booking> getBookingHistory(
     const std::string& passengerName) {
 
@@ -179,7 +190,7 @@ std::vector<Booking> getBookingHistory(
                 std::string name =
                     decodeField(passenger.substr(0, firstComma));
 
-                if (name == passengerName) {
+                if (normalizeName(name) == normalizeName(passengerName)) {
                     found = true;
                     break;
                 }

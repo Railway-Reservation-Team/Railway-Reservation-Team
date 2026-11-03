@@ -269,6 +269,7 @@ int bookTicket() {
 
 int main() {
     std::string input;
+    std::string errorMessage;
     int choice = 0;
 
     while (true) {
@@ -280,16 +281,9 @@ int main() {
 
         if (!std::getline(std::cin, input)) break;
 
-        try {
-            std::size_t position = 0;
-            choice = std::stoi(input, &position);
-
-            if (position != input.size()) {
-                std::cout << "Invalid choice. Try again.\n";
-                continue;
-            }
-        } catch (...) {
-            std::cout << "Invalid choice. Try again.\n";
+        if (!Validation::parseMenuChoice(
+                input, 1, 3, choice, errorMessage)) {
+            std::cout << "Error: " << errorMessage << '\n';
             continue;
         }
 
@@ -303,8 +297,6 @@ int main() {
             case 3:
                 std::cout << "Thank you for using Railway Reservation System!\n";
                 return 0;
-            default:
-                std::cout << "Invalid choice. Please select 1-3.\n";
         }
     }
 

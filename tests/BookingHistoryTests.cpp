@@ -2,13 +2,25 @@
 
 #include <iostream>
 #include <fstream>
-#include <cstdio>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 int main() {
+    fs::path originalPath = fs::current_path();
+    fs::path testPath =
+        fs::temp_directory_path() / "railway_history_tests";
+
+    fs::remove_all(testPath);
+    fs::create_directories(testPath / "data");
+    fs::current_path(testPath);
+
     std::ofstream file("data/bookings.dat");
 
     if (!file) {
         std::cout << "FAIL: Cannot create test booking file\n";
+        fs::current_path(originalPath);
+        fs::remove_all(testPath);
         return 1;
     }
 
@@ -36,6 +48,12 @@ int main() {
 
     check(history.size() == 2, "Retrieve multiple bookings");
 
+    auto lowercaseHistory =
+        BookingManager::getBookingHistory("dinesh");
+
+    check(lowercaseHistory.size() == 2,
+          "Passenger name matching ignores case");
+
     check(
         history.size() >= 1 &&
         history[0].pnr == "1234567890" &&
@@ -60,10 +78,11 @@ int main() {
 
     check(empty.empty(), "Handle empty passenger name");
 
-    std::remove("data/bookings.dat");
-
     std::cout << "\nPassed: " << passed
               << "\nFailed: " << failed << '\n';
+
+    fs::current_path(originalPath);
+    fs::remove_all(testPath);
 
     return failed == 0 ? 0 : 1;
 }
