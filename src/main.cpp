@@ -4,6 +4,7 @@
 #include "Validation.h"
 #include "FareCalculator.h"
 #include "Booking.h"
+#include "Payment.h"
 
 #include <iostream>
 #include <string>
@@ -201,7 +202,7 @@ int main() {
         return 1;
     }
 
-    // 12. Calculate fare and confirm booking
+    // 12. Calculate fare
     try {
 
         double totalFare = FareCalculator::calculateFare(
@@ -210,7 +211,32 @@ int main() {
             seats
         );
 
-        // 13. Create booking
+        // 13. Process payment BEFORE saving the booking.
+        std::string paymentMethod;
+        std::string paymentStatus;
+
+        std::cout << "\n========== PAYMENT PROCESSING ==========\n";
+
+        bool paymentSuccessful = processPayment(
+            totalFare,
+            paymentMethod,
+            paymentStatus
+        );
+
+        if (!paymentSuccessful) {
+            std::cout << "\n========================================\n";
+            std::cout << "          BOOKING NOT CONFIRMED\n";
+            std::cout << "========================================\n";
+            std::cout << "Payment Status: " << paymentStatus << '\n';
+            std::cout << "Payment failed. No booking was saved.\n";
+
+            return 1;
+        }
+
+        std::cout << "\nPayment Status: SUCCESS\n";
+        std::cout << "Payment Method: " << paymentMethod << '\n';
+
+        // 14. Create booking only after successful payment.
         Booking booking;
 
         booking.pnr = generateUniquePNR();
@@ -224,13 +250,15 @@ int main() {
         booking.numberOfPassengers = seats;
         booking.totalFare = totalFare;
 
-        // 14. Save booking
+        // 15. Save booking
         if (!saveBooking(booking, errorMessage)) {
             std::cout << "\nBooking failed: " << errorMessage << '\n';
+            std::cout << "Payment was successful, but booking was not saved.\n";
+            std::cout << "Manual payment reversal may be required.\n";
             return 1;
         }
 
-        // 15. Display booking confirmation
+        // 16. Display booking confirmation
         std::cout << std::fixed << std::setprecision(2);
 
         std::cout << "\n========================================\n";
@@ -245,6 +273,7 @@ int main() {
         std::cout << "Destination: " << booking.destination << '\n';
         std::cout << "Journey Date: " << booking.journeyDate << '\n';
         std::cout << "Travel Class: " << booking.travelClass << '\n';
+
         std::cout << "Number of Passengers: "
                   << booking.numberOfPassengers << '\n';
 
@@ -252,6 +281,8 @@ int main() {
                   << (booking.totalFare / booking.numberOfPassengers) << '\n';
 
         std::cout << "Total Fare: Rs. " << booking.totalFare << '\n';
+        std::cout << "Payment Method: " << paymentMethod << '\n';
+        std::cout << "Payment Status: " << paymentStatus << '\n';
 
         std::cout << "========================================\n";
         std::cout << "Your booking details are saved successfully.\n";
