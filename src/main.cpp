@@ -4,6 +4,7 @@
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "ETicketGenerator.h"
 
 #include <iostream>
 #include <string>
@@ -11,6 +12,63 @@
 #include <exception>
 
 int main() {
+    std::string menuChoice;
+
+    std::cout << "===== Railway Reservation System =====\n"
+              << "1. Book a Ticket\n"
+              << "2. Generate E-Ticket\n"
+              << "3. Display E-Ticket Details\n"
+              << "4. Exit\n"
+              << "Enter your choice: ";
+
+    if (!std::getline(std::cin, menuChoice)) return 1;
+
+    if (menuChoice == "2") {
+        std::string pnr;
+        std::string ticketPath;
+        std::string errorMessage;
+
+        std::cout << "Enter PNR: ";
+        if (!std::getline(std::cin, pnr)) return 1;
+
+        if (ETicketGenerator::generateETicket(
+                pnr, ticketPath, errorMessage)) {
+            std::cout << "\nE-Ticket generated successfully!\n"
+                      << "Saved at: " << ticketPath << '\n';
+            return 0;
+        }
+
+        std::cout << "E-Ticket generation failed: "
+                  << errorMessage << '\n';
+        return 1;
+    }
+
+    if (menuChoice == "3") {
+        std::string pnr;
+        std::string errorMessage;
+
+        std::cout << "Enter PNR: ";
+        if (!std::getline(std::cin, pnr)) return 1;
+
+        if (ETicketGenerator::displayETicket(pnr, errorMessage)) {
+            return 0;
+        }
+
+        std::cout << "E-Ticket display failed: "
+                  << errorMessage << '\n';
+        return 1;
+    }
+
+    if (menuChoice == "4") {
+        std::cout << "Thank you!\n";
+        return 0;
+    }
+
+    if (menuChoice != "1") {
+        std::cout << "Invalid choice.\n";
+        return 1;
+    }
+
     std::string source;
     std::string destination;
     std::string journeyDate;
@@ -23,7 +81,6 @@ int main() {
 
     std::cout << "===== Railway Reservation System =====\n";
 
-    // 1. Validate source station
     while (true) {
         std::cout << "Enter source station: ";
         if (!std::getline(std::cin, source)) return 1;
@@ -34,7 +91,6 @@ int main() {
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 2. Validate destination station
     while (true) {
         std::cout << "Enter destination station: ";
         if (!std::getline(std::cin, destination)) return 1;
@@ -45,7 +101,6 @@ int main() {
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 3. Validate journey date
     while (true) {
         std::cout << "Enter journey date (YYYY-MM-DD): ";
         if (!std::getline(std::cin, journeyDate)) return 1;
@@ -56,7 +111,6 @@ int main() {
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 4. Load trains
     const std::vector<Train> trains =
         loadTrains("data/trains.dat", journeyDate, errorMessage);
 
@@ -70,7 +124,6 @@ int main() {
         return 0;
     }
 
-    // 5. Search trains
     const std::vector<Train> results =
         searchTrains(trains, source, destination, journeyDate);
 
@@ -79,7 +132,6 @@ int main() {
         return 0;
     }
 
-    // 6. Display matching trains
     std::cout << "\n========== MATCHING TRAINS ==========\n";
 
     for (size_t i = 0; i < results.size(); ++i) {
@@ -101,7 +153,6 @@ int main() {
                   << " | Seats: " << train.chairCarSeatsAvailable << '\n';
     }
 
-    // 7. Validate train selection
     while (true) {
         std::cout << "\nSelect train option (1-"
                   << results.size() << "): ";
@@ -118,7 +169,6 @@ int main() {
 
     const Train selectedTrain = results[trainChoice - 1];
 
-    // 8. Validate passenger count
     while (true) {
         std::cout << "\nEnter number of passengers (1-6): ";
 
@@ -130,7 +180,6 @@ int main() {
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 9. Collect individual passenger details
     std::vector<Passenger> passengers;
 
     if (!PassengerDetails::collectPassengerDetails(
@@ -139,7 +188,6 @@ int main() {
         return 1;
     }
 
-    // 10. Validate travel class selection
     std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
               << "1. Sleeper\n"
               << "2. AC 3-Tier\n"
@@ -180,14 +228,12 @@ int main() {
             break;
     }
 
-    // 11. Check seat availability
     if (availableSeats < seats) {
         std::cout << "Error: Not enough seats available. Only "
                   << availableSeats << " seats remain.\n";
         return 1;
     }
 
-    // 12. Calculate fare and display booking details
     try {
         const double totalFare =
             FareCalculator::calculateFare(
@@ -213,7 +259,6 @@ int main() {
                       << "\nGender: " << passengers[i].gender << '\n';
         }
 
-        // 13. Confirm booking
         std::string confirmation;
 
         std::cout << "\nConfirm booking? (Y/N): ";
@@ -224,7 +269,6 @@ int main() {
             return 0;
         }
 
-        // 14. Create booking and generate unique PNR
         std::string pnr;
 
         if (!BookingManager::createBooking(
@@ -239,7 +283,6 @@ int main() {
             return 1;
         }
 
-        // 15. Display confirmation
         std::cout << "\n========== BOOKING CONFIRMED ==========\n"
                   << "PNR: " << pnr
                   << "\nTrain: " << selectedTrain.trainName
