@@ -7,6 +7,8 @@
 #include <vector>
 #include <iomanip>
 #include <filesystem>
+#include <iostream>
+#include <cctype>
 
 namespace {
 
@@ -178,6 +180,41 @@ bool generateETicket(
     }
 
     ticket.close();
+    return true;
+}
+
+bool displayETicket(
+    const std::string& pnr,
+    std::string& errorMessage) {
+
+    errorMessage.clear();
+
+    if (pnr.size() != 10) {
+        errorMessage = "Invalid PNR format.";
+        return false;
+    }
+
+    for (unsigned char c : pnr) {
+        if (!std::isdigit(c)) {
+            errorMessage = "Invalid PNR format.";
+            return false;
+        }
+    }
+
+    std::ifstream ticket("tickets/ETicket_" + pnr + ".txt");
+
+    if (!ticket.is_open()) {
+        errorMessage = "E-ticket not found. Generate the ticket first.";
+        return false;
+    }
+
+    std::cout << ticket.rdbuf();
+
+    if (ticket.bad()) {
+        errorMessage = "Failed to read e-ticket.";
+        return false;
+    }
+
     return true;
 }
 
