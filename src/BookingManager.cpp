@@ -16,7 +16,6 @@ namespace BookingManager {
 static const std::string BOOKING_FILE = "data/bookings.dat";
 static const std::string TRAIN_FILE = "data/trains.dat";
 
-// Encode special characters so passenger details remain safe in pipe-separated records.
 std::string encodeField(const std::string& value) {
     std::ostringstream result;
     const char* hex = "0123456789ABCDEF";
@@ -114,8 +113,6 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
             fields.push_back(field);
         }
 
-        // Current booking format:
-        // PNR|Train|Date|Class|PassengerDetails|Count|Fare|Status
         if (fields.size() != 8 || fields[0] != requestedPNR) {
             continue;
         }
@@ -136,6 +133,80 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
     }
 
     return false;
+}
+
+std::vector<Booking> getBookingHistory(
+    const std::string& passengerName) {
+
+    std::vector<Booking> history;
+    std::ifstream file(BOOKING_FILE);
+    std::string line;
+
+    if (!file.is_open() || passengerName.empty()) {
+        return history;
+    }
+
+    while (std::getline(file, line)) {
+        std::stringstream stream(line);
+        std::vector<std::string> fields;
+        std::string field;
+
+        while (std::getline(stream, field, '|')) {
+            fields.push_back(field);
+        }
+
+        if (fields.size() != 8) {
+            continue;
+        }
+
+        try {
+            std::stringstream passengerStream(fields[4]);
+            std::string passenger;
+            bool found = false;
+
+            while (std::getline(passengerStream, passenger, ';')) {
+                std::size_t firstComma = passenger.find(',');
+                std::size_t secondComma =
+                    firstComma == std::string::npos
+                    ? std::string::npos
+                    : passenger.find(',', firstComma + 1);
+
+                if (firstComma == std::string::npos ||
+                    secondComma == std::string::npos) {
+                    continue;
+                }
+
+                std::string name =
+                    decodeField(passenger.substr(0, firstComma));
+
+                if (name == passengerName) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                continue;
+            }
+
+            Booking booking;
+            booking.pnr = fields[0];
+            booking.trainNumber = fields[1];
+            booking.journeyDate = fields[2];
+            booking.travelClass = fields[3];
+            booking.passengerDetails = decodeField(fields[4]);
+            booking.passengerCount = std::stoi(fields[5]);
+            booking.totalFare = std::stod(fields[6]);
+            booking.status = fields[7];
+
+            history.push_back(booking);
+
+        } catch (...) {
+            continue;
+        }
+    }
+
+    return history;
 }
 
 bool createBooking(
@@ -288,31 +359,29 @@ bool createBooking(
                       << encodeField(passengers[i].gender);
     }
 
-    bool saved = false;
+    std::ofstream bookingFile(BOOKING_FILE, std::ios::app);
 
-    {
-        std::ofstream bookings(BOOKING_FILE, std::ios::app);
-
-        if (bookings.is_open()) {
-            bookings << pnr << '|'
-                     << selectedTrain.trainNumber << '|'
-                     << selectedTrain.journeyDate << '|'
-                     << travelClass << '|'
-                     << passengerData.str() << '|'
-                     << passengers.size() << '|'
-                     << std::fixed << std::setprecision(2) << totalFare
-                     << "|Confirmed\n";
-
-            saved = static_cast<bool>(bookings);
-        }
+    if (!bookingFile.is_open()) {
+        std::ofstream rollback(TRAIN_FILE, std::ios::trunc);
+        rollback << originalContent.str();
+        errorMessage = "Could not open booking file.";
+        return false;
     }
 
-    if (!saved) {
-        std::ofstream restore(TRAIN_FILE, std::ios::trunc);
-        restore << originalContent.str();
-        restore.close();
+    bookingFile << pnr << '|'
+                << selectedTrain.trainNumber << '|'
+                << selectedTrain.journeyDate << '|'
+                << travelClass << '|'
+                << passengerData.str() << '|'
+                << passengers.size() << '|'
+                << std::fixed << std::setprecision(2) << totalFare << '|'
+                << "Confirmed" << '\n';
 
-        errorMessage = "Could not save booking. Seat allocation rolled back.";
+    if (!bookingFile) {
+        bookingFile.close();
+        std::ofstream rollback(TRAIN_FILE, std::ios::trunc);
+        rollback << originalContent.str();
+        errorMessage = "Failed to save booking.";
         return false;
     }
 
