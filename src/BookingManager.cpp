@@ -1,3 +1,4 @@
+
 #include "BookingManager.h"
 #include "TrainData.h"
 
@@ -8,8 +9,52 @@
 #include <iomanip>
 #include <cmath>
 #include <cstdio>
+#include <string>
 
 namespace BookingManager {
+
+// Check whether a PNR already exists in the booking records.
+bool isPNRUsed(const std::string& candidate) {
+    std::ifstream bookings("data/bookings.dat");
+
+    if (!bookings)
+        return false;
+
+    std::string line;
+
+    while (std::getline(bookings, line)) {
+        std::size_t separator = line.find('|');
+
+        if (separator != std::string::npos &&
+            line.substr(0, separator) == candidate) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Generate a unique 10-digit PNR.
+bool generateUniquePNR(std::string& pnr) {
+    std::random_device rd;
+    std::mt19937_64 generator(rd());
+
+    std::uniform_int_distribution<unsigned long long> distribution(
+        1000000000ULL, 9999999999ULL
+    );
+
+    // Retry if a generated PNR already exists.
+    for (int attempt = 0; attempt < 1000; ++attempt) {
+        std::string candidate = std::to_string(distribution(generator));
+
+        if (!isPNRUsed(candidate)) {
+            pnr = candidate;
+            return true;
+        }
+    }
+
+    return false;
+}
 
 bool createBooking(
     const Train& selectedTrain,
@@ -29,7 +74,14 @@ bool createBooking(
         return false;
     }
 
+    // Generate a unique PNR before changing seat inventory.
+    if (!generateUniquePNR(pnr)) {
+        errorMessage = "Could not generate a unique PNR. Booking rejected.";
+        return false;
+    }
+
     std::ifstream input("data/trains.dat");
+
     if (!input) {
         errorMessage = "Cannot open train data.";
         return false;
@@ -40,9 +92,11 @@ bool createBooking(
     bool found = false;
 
     while (std::getline(input, line)) {
-        if (line.empty()) continue;
+        if (line.empty())
+            continue;
 
         Train train;
+
         if (!parseTrainRecord(line, train)) {
             errorMessage = "Invalid train record found.";
             return false;
@@ -63,7 +117,8 @@ bool createBooking(
                 available = &train.chairCarSeatsAvailable;
 
             if (!available || *available < passengerCount) {
-                errorMessage = "Invalid class or insufficient seats. Booking rejected.";
+                errorMessage =
+                    "Invalid class or insufficient seats. Booking rejected.";
                 return false;
             }
 
@@ -73,6 +128,7 @@ bool createBooking(
 
         trains.push_back(train);
     }
+
     input.close();
 
     if (!found) {
@@ -108,11 +164,14 @@ bool createBooking(
 
     {
         std::ofstream temp("data/trains.tmp");
+
         if (!temp) {
             errorMessage = "Cannot create temporary train data.";
             return false;
         }
+
         temp << updatedData.str();
+
         if (!temp) {
             errorMessage = "Failed to write updated train data.";
             return false;
@@ -125,20 +184,14 @@ bool createBooking(
         return false;
     }
 
-    std::random_device rd;
-    std::mt19937_64 generator(rd());
-    std::uniform_int_distribution<unsigned long long> distribution(
-        1000000000ULL, 9999999999ULL
-    );
-
-    pnr = std::to_string(distribution(generator));
-
     std::ofstream bookings("data/bookings.dat", std::ios::app);
 
     if (!bookings) {
         std::ofstream restore("data/trains.dat", std::ios::trunc);
         restore << originalContent.str();
-        errorMessage = "Booking file unavailable. Seat allocation rolled back.";
+
+        errorMessage =
+            "Booking file unavailable. Seat allocation rolled back.";
         return false;
     }
 
@@ -151,11 +204,14 @@ bool createBooking(
              << std::fixed << std::setprecision(2) << totalFare
              << "|Confirmed\n";
 
+    bookings.close();
+
     if (!bookings) {
-        bookings.close();
         std::ofstream restore("data/trains.dat", std::ios::trunc);
         restore << originalContent.str();
-        errorMessage = "Could not save booking. Seat allocation rolled back.";
+
+        errorMessage =
+            "Could not save booking. Seat allocation rolled back.";
         return false;
     }
 
