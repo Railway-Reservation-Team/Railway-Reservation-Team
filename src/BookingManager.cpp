@@ -2,6 +2,7 @@
 #include "TrainData.h"
 
 #include <fstream>
+#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <random>
@@ -127,7 +128,45 @@ bool generateUniquePNR(std::string& pnr) {
     return false;
 }
 
+
+bool validatePNR(const std::string& pnr) {
+    if (pnr.size() != 10) {
+        return false;
+    }
+
+    for (unsigned char digit : pnr) {
+        if (!std::isdigit(digit)) {
+            return false;
+        }
+    }
+
+    std::ifstream file(BOOKING_FILE);
+
+    if (!file.is_open()) {
+        return false;
+    }
+
+    std::string line;
+
+    while (std::getline(file, line)) {
+        std::size_t separator = line.find('|');
+
+        if (separator != std::string::npos &&
+            line.substr(0, separator) == pnr) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool findBooking(const std::string& requestedPNR, Booking& booking) {
+    if (requestedPNR.size() != 10 ||
+        !std::all_of(requestedPNR.begin(), requestedPNR.end(),
+            [](unsigned char c) { return std::isdigit(c); })) {
+        return false;
+    }
+
     std::ifstream file(BOOKING_FILE);
 
     if (!file.is_open()) {

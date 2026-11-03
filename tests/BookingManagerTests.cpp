@@ -75,6 +75,27 @@ int main() {
 
     test("Booking retrieved using PNR", retrieved);
 
+    test("Valid existing PNR accepted",
+         BookingManager::validatePNR(pnr));
+
+    test("Short PNR rejected",
+         !BookingManager::validatePNR("12345"));
+
+    test("Long PNR rejected",
+         !BookingManager::validatePNR("12345678901"));
+
+    test("Alphabetic PNR rejected",
+         !BookingManager::validatePNR("12345ABCDE"));
+
+    test("Special characters in PNR rejected",
+         !BookingManager::validatePNR("12345@7890"));
+
+    test("Unknown 10-digit PNR rejected",
+         !BookingManager::validatePNR("9999999999"));
+
+    test("Empty PNR rejected",
+         !BookingManager::validatePNR(""));
+
     test("Retrieved train number is correct",
          retrieved && booking.trainNumber == "12627");
 
