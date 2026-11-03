@@ -4,6 +4,7 @@
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "SeatInventory.h"
 
 #include <iostream>
 #include <string>
@@ -166,24 +167,41 @@ int main() {
             travelClass = "Sleeper";
             availableSeats = selectedTrain.sleeperSeatsAvailable;
             break;
+
         case 2:
             travelClass = "AC 3-Tier";
             availableSeats = selectedTrain.ac3TierSeatsAvailable;
             break;
+
         case 3:
             travelClass = "AC 2-Tier";
             availableSeats = selectedTrain.ac2TierSeatsAvailable;
             break;
+
         case 4:
             travelClass = "Chair Car";
             availableSeats = selectedTrain.chairCarSeatsAvailable;
             break;
     }
 
-    // 11. Check seat availability
-    if (availableSeats < seats) {
-        std::cout << "Error: Not enough seats available. Only "
-                  << availableSeats << " seats remain.\n";
+    // 11. Validate seat availability and passenger count
+    SeatRequestResult result = validateSeatRequest(availableSeats, seats);
+
+    if (result != SeatRequestResult::VALID) {
+        if (result == SeatRequestResult::INVALID_REQUEST) {
+            std::cout << "Error: Invalid passenger count.\n";
+        }
+        else if (result == SeatRequestResult::EXCEEDS_MAX_PASSENGERS) {
+            std::cout << "Error: Maximum 6 passengers allowed.\n";
+        }
+        else if (result == SeatRequestResult::EXCEEDS_AVAILABLE_SEATS) {
+            std::cout << "Error: Only " << availableSeats
+                      << " seats are available.\n";
+        }
+        else {
+            std::cout << "Error: Invalid seat availability.\n";
+        }
+
         return 1;
     }
 
