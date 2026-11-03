@@ -4,6 +4,7 @@
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "ETicketGenerator.h"
 
 #include <iostream>
 #include <string>
@@ -11,6 +12,46 @@
 #include <exception>
 
 int main() {
+    std::string menuChoice;
+
+    std::cout << "===== Railway Reservation System =====\n"
+              << "1. Book a Ticket\n"
+              << "2. Generate E-Ticket\n"
+              << "3. Exit\n"
+              << "Enter your choice: ";
+
+    if (!std::getline(std::cin, menuChoice)) return 1;
+
+    if (menuChoice == "2") {
+        std::string pnr;
+        std::string ticketPath;
+        std::string errorMessage;
+
+        std::cout << "Enter PNR: ";
+        if (!std::getline(std::cin, pnr)) return 1;
+
+        if (ETicketGenerator::generateETicket(
+                pnr, ticketPath, errorMessage)) {
+            std::cout << "\nE-Ticket generated successfully!\n"
+                      << "Saved at: " << ticketPath << '\n';
+            return 0;
+        }
+
+        std::cout << "E-Ticket generation failed: "
+                  << errorMessage << '\n';
+        return 1;
+    }
+
+    if (menuChoice == "3") {
+        std::cout << "Thank you!\n";
+        return 0;
+    }
+
+    if (menuChoice != "1") {
+        std::cout << "Invalid choice.\n";
+        return 1;
+    }
+
     std::string source;
     std::string destination;
     std::string journeyDate;
