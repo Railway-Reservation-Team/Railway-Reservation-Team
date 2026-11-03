@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 #include <iomanip>
-#include <cstdio>
+#include <windows.h>
 
 namespace Cancellation {
 
@@ -16,6 +16,14 @@ const std::string BOOKING_FILE = "data/bookings.dat";
 const std::string TRAIN_FILE = "data/trains.dat";
 const std::string CANCELLATION_FILE = "data/cancellations.dat";
 
+// These capacities are assumptions based on your sample trains.dat.
+// Confirm them with your team before final submission.
+const int MAX_SLEEPER_SEATS = 100;
+const int MAX_AC3_SEATS = 80;
+const int MAX_AC2_SEATS = 60;
+const int MAX_CHAIR_CAR_SEATS = 50;
+
+// Read all records from a file.
 bool readLines(
     const std::string& filename,
     std::vector<std::string>& lines,
@@ -36,21 +44,28 @@ bool readLines(
         }
     }
 
+    if (file.bad()) {
+        errorMessage = "Error reading file: " + filename;
+        return false;
+    }
+
+    file.close();
     return true;
 }
 
+// Write records using a temporary file and safe Windows replacement.
 bool writeLines(
     const std::string& filename,
     const std::vector<std::string>& lines,
     std::string& errorMessage
 ) {
-    std::string tempFile = filename + ".tmp";
+    const std::string tempFile = filename + ".tmp";
 
     {
         std::ofstream file(tempFile, std::ios::trunc);
 
         if (!file.is_open()) {
-            errorMessage = "Cannot create temporary file.";
+            errorMessage = "Cannot create temporary file: " + tempFile;
             return false;
         }
 
@@ -58,23 +73,38 @@ bool writeLines(
             file << line << '\n';
         }
 
+        file.flush();
+
         if (!file.good()) {
+            file.close();
+            DeleteFileA(tempFile.c_str());
             errorMessage = "Failed to write temporary file.";
             return false;
         }
+
+        file.close();
     }
 
-    // Replace the original file with the updated file.
-    std::remove(filename.c_str());
+    if (!MoveFileExA(
+            tempFile.c_str(),
+            filename.c_str(),
+            MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
 
-    if (std::rename(tempFile.c_str(), filename.c_str()) != 0) {
-        errorMessage = "Could not update file: " + filename;
+        DWORD windowsError = GetLastError();
+
+        DeleteFileA(tempFile.c_str());
+
+        errorMessage =
+            "Could not safely update file: " + filename +
+            ". Windows error: " + std::to_string(windowsError);
+
         return false;
     }
 
     return true;
 }
 
+// Cancel a confirmed booking and calculate refund.
 bool cancelBooking(
     const std::string& pnr,
     double& refundAmount,
@@ -105,11 +135,12 @@ bool cancelBooking(
         return false;
     }
 
-    // 3. Calculate refund: 80% refund, 20% charge.
+    // 3. Calculate refund.
+    // Confirm the 80% refund rule with your team.
     refundAmount = booking.totalFare * 0.80;
     cancellationCharge = booking.totalFare * 0.20;
 
-    // 4. Read existing booking records.
+    // 4. Read booking records.
     std::vector<std::string> bookingLines;
 
     if (!readLines(BOOKING_FILE, bookingLines, errorMessage)) {
@@ -129,7 +160,8 @@ bool cancelBooking(
 
         if (fields.size() == 8 && fields[0] == pnr) {
             if (fields[7] != "Confirmed") {
-                errorMessage = "Booking is no longer eligible for cancellation.";
+                errorMessage =
+                    "Booking is no longer eligible for cancellation.";
                 return false;
             }
 
@@ -179,22 +211,35 @@ bool cancelBooking(
         }
 
         int* availableSeats = nullptr;
+        int maximumSeats = 0;
 
         if (booking.travelClass == "Sleeper") {
             availableSeats = &train.sleeperSeatsAvailable;
+            maximumSeats = MAX_SLEEPER_SEATS;
         }
         else if (booking.travelClass == "AC 3-Tier") {
             availableSeats = &train.ac3TierSeatsAvailable;
+            maximumSeats = MAX_AC3_SEATS;
         }
         else if (booking.travelClass == "AC 2-Tier") {
             availableSeats = &train.ac2TierSeatsAvailable;
+            maximumSeats = MAX_AC2_SEATS;
         }
         else if (booking.travelClass == "Chair Car") {
             availableSeats = &train.chairCarSeatsAvailable;
+            maximumSeats = MAX_CHAIR_CAR_SEATS;
         }
 
         if (availableSeats == nullptr) {
             errorMessage = "Invalid travel class in booking.";
+            return false;
+        }
+
+        // 6. Validate seat restoration.
+        if (booking.passengerCount > maximumSeats ||
+            *availableSeats > maximumSeats - booking.passengerCount) {
+            errorMessage =
+                "Seat restoration exceeds maximum capacity.";
             return false;
         }
 
@@ -226,47 +271,80 @@ bool cancelBooking(
     }
 
     if (!trainUpdated) {
-        errorMessage = "Train record for this booking was not found.";
+        errorMessage =
+            "Train record for this booking was not found.";
         return false;
     }
 
-    // 6. Save updated train availability.
+    // 7. Read existing cancellation records.
+    std::vector<std::string> cancellationLines;
+
+    std::ifstream cancellationInput(CANCELLATION_FILE);
+
+    if (cancellationInput.is_open()) {
+        std::string line;
+
+        while (std::getline(cancellationInput, line)) {
+            if (!line.empty()) {
+                cancellationLines.push_back(line);
+            }
+        }
+
+        if (cancellationInput.bad()) {
+            cancellationInput.close();
+            errorMessage = "Could not read cancellation records.";
+            return false;
+        }
+
+        // Important: close before replacing the same file on Windows.
+        cancellationInput.close();
+    }
+
+    // 8. Prepare cancellation record.
+    std::ostringstream cancellationRecord;
+
+    cancellationRecord
+        << std::fixed << std::setprecision(2)
+        << pnr << '|'
+        << booking.trainNumber << '|'
+        << booking.journeyDate << '|'
+        << booking.travelClass << '|'
+        << booking.passengerCount << '|'
+        << booking.totalFare << '|'
+        << cancellationCharge << '|'
+        << refundAmount;
+
+    cancellationLines.push_back(cancellationRecord.str());
+
+    // 9. Save cancellation record.
+    if (!writeLines(
+            CANCELLATION_FILE,
+            cancellationLines,
+            errorMessage)) {
+        refundAmount = 0.0;
+        cancellationCharge = 0.0;
+        return false;
+    }
+
+    // 10. Update train availability.
     if (!writeLines(TRAIN_FILE, trainLines, errorMessage)) {
+        errorMessage +=
+            " Cancellation record was saved, but train data was not updated.";
+        refundAmount = 0.0;
+        cancellationCharge = 0.0;
         return false;
     }
 
-    // 7. Save cancelled booking status.
+    // 11. Update booking status.
     if (!writeLines(BOOKING_FILE, bookingLines, errorMessage)) {
-        errorMessage += " Train availability may need recovery.";
+        errorMessage +=
+            " Train availability was updated, but booking status was not updated. Manual recovery may be required.";
+        refundAmount = 0.0;
+        cancellationCharge = 0.0;
         return false;
-    }
-
-    // 8. Record cancellation and refund details.
-    {
-        std::ofstream file(CANCELLATION_FILE, std::ios::app);
-
-        if (!file.is_open()) {
-            errorMessage = "Booking cancelled, but cancellation record could not be saved.";
-            return false;
-        }
-
-        file << std::fixed << std::setprecision(2)
-             << pnr << '|'
-             << booking.trainNumber << '|'
-             << booking.journeyDate << '|'
-             << booking.travelClass << '|'
-             << booking.passengerCount << '|'
-             << booking.totalFare << '|'
-             << cancellationCharge << '|'
-             << refundAmount << '\n';
-
-        if (!file.good()) {
-            errorMessage = "Booking cancelled, but refund record could not be saved.";
-            return false;
-        }
     }
 
     return true;
 }
 
-}
+} // namespace Cancellation
