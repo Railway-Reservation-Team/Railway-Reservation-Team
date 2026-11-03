@@ -1,235 +1,193 @@
-
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
 #include "FareCalculator.h"
+#include "BookingManager.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include <stdexcept>
+#include <iomanip>
+#include <limits>
 
 int main() {
-
-    std::string source;
-    std::string destination;
-    std::string journeyDate;
-    std::string passengerName;
-    std::string errorMessage;
-
+    std::string source, destination, journeyDate;
+    std::string passengerName, errorMessage;
     int seats = 0;
 
     std::cout << "===== Railway Reservation System =====\n";
 
-    // 1. Get source station
     std::cout << "Enter source station: ";
     std::getline(std::cin, source);
 
     if (source.find_first_not_of(" \t") == std::string::npos) {
-        std::cout << "\nError: Source station cannot be empty.\n";
+        std::cout << "Error: Source cannot be empty.\n";
         return 1;
     }
 
-    // 2. Get destination station
     std::cout << "Enter destination station: ";
     std::getline(std::cin, destination);
 
     if (destination.find_first_not_of(" \t") == std::string::npos) {
-        std::cout << "\nError: Destination station cannot be empty.\n";
+        std::cout << "Error: Destination cannot be empty.\n";
         return 1;
     }
 
-    // 3. Validate journey date
     std::cout << "Enter journey date (YYYY-MM-DD): ";
     std::getline(std::cin, journeyDate);
 
     if (!Validation::isValidDate(journeyDate, errorMessage)) {
-        std::cout << "\nError: " << errorMessage << '\n';
+        std::cout << "Error: " << errorMessage << '\n';
         return 1;
     }
 
-    // 4. Load train records
     const std::vector<Train> trains =
         loadTrains("data/trains.dat", journeyDate, errorMessage);
 
     if (!errorMessage.empty()) {
-        std::cout << "\nError: " << errorMessage << '\n';
+        std::cout << "Error: " << errorMessage << '\n';
         return 1;
     }
 
-    if (trains.empty()) {
-        std::cout << "\nNo train records found for the selected date.\n";
-        return 0;
-    }
-
-    // 5. Search trains
     const std::vector<Train> results =
         searchTrains(trains, source, destination, journeyDate);
 
     if (results.empty()) {
-        std::cout << "\nNo trains found for the selected route and date.\n";
+        std::cout << "No trains found for this route and date.\n";
         return 0;
     }
 
-    // 6. Display matching trains
     std::cout << "\n========== MATCHING TRAINS ==========\n";
 
     for (size_t i = 0; i < results.size(); ++i) {
-
-        const Train& train = results[i];
+        const Train& t = results[i];
 
         std::cout << "\nTrain Option: " << i + 1
-                  << "\nTrain Number: " << train.trainNumber
-                  << "\nTrain Name: " << train.trainName
-                  << "\nSource: " << train.source
-                  << "\nDestination: " << train.destination
-                  << "\nJourney Date: " << train.journeyDate
-                  << "\nDeparture: " << train.departureTime
-                  << "\nArrival: " << train.arrivalTime
-                  << "\nDuration: " << train.journeyDuration
-                  << "\n\nClass-wise fares and available seats:\n";
-
-        std::cout << "Sleeper: Rs. " << train.sleeperFare
-                  << " | Seats: " << train.sleeperSeatsAvailable << '\n';
-
-        std::cout << "AC 3-Tier: Rs. " << train.ac3TierFare
-                  << " | Seats: " << train.ac3TierSeatsAvailable << '\n';
-
-        std::cout << "AC 2-Tier: Rs. " << train.ac2TierFare
-                  << " | Seats: " << train.ac2TierSeatsAvailable << '\n';
-
-        std::cout << "Chair Car: Rs. " << train.chairCarFare
-                  << " | Seats: " << train.chairCarSeatsAvailable << '\n';
+                  << "\nTrain Number: " << t.trainNumber
+                  << "\nTrain Name: " << t.trainName
+                  << "\nSource: " << t.source
+                  << "\nDestination: " << t.destination
+                  << "\nJourney Date: " << t.journeyDate
+                  << "\nSleeper: Rs. " << t.sleeperFare
+                  << " | Seats: " << t.sleeperSeatsAvailable
+                  << "\nAC 3-Tier: Rs. " << t.ac3TierFare
+                  << " | Seats: " << t.ac3TierSeatsAvailable
+                  << "\nAC 2-Tier: Rs. " << t.ac2TierFare
+                  << " | Seats: " << t.ac2TierSeatsAvailable
+                  << "\nChair Car: Rs. " << t.chairCarFare
+                  << " | Seats: " << t.chairCarSeatsAvailable << '\n';
     }
 
-    // 7. Select train
-    int trainChoice;
-
+    int choice;
     std::cout << "\nSelect train option (1-" << results.size() << "): ";
 
-    if (!(std::cin >> trainChoice) ||
-        trainChoice < 1 ||
-        trainChoice > static_cast<int>(results.size())) {
-
-        std::cout << "\nError: Invalid train selection.\n";
+    if (!(std::cin >> choice) ||
+        choice < 1 || choice > static_cast<int>(results.size())) {
+        std::cout << "Error: Invalid train selection.\n";
         return 1;
     }
 
-    const Train& selectedTrain = results[trainChoice - 1];
+    const Train selectedTrain = results[choice - 1];
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::cin.ignore(10000, '\n');
-
-    // 8. Passenger details
-    std::cout << "\n========== PASSENGER DETAILS ==========\n";
-
-    std::cout << "Enter passenger name: ";
+    std::cout << "\nEnter passenger name: ";
     std::getline(std::cin, passengerName);
 
     if (!Validation::isValidPassengerName(passengerName, errorMessage)) {
-        std::cout << "\nError: " << errorMessage << '\n';
+        std::cout << "Error: " << errorMessage << '\n';
         return 1;
     }
 
-    // 9. Validate passenger count
     std::string seatInput;
-
     std::cout << "Enter number of passengers (1-6): ";
     std::getline(std::cin, seatInput);
 
     if (!Validation::parseSeatCount(seatInput, seats, errorMessage)) {
-        std::cout << "\nError: " << errorMessage << '\n';
+        std::cout << "Error: " << errorMessage << '\n';
         return 1;
     }
 
-    // 10. Select travel class
     int classChoice;
+    std::cout << "\n1. Sleeper\n2. AC 3-Tier\n3. AC 2-Tier\n4. Chair Car\n";
+    std::cout << "Select travel class: ";
 
-    std::cout << "\n========== SELECT TRAVEL CLASS ==========\n";
-    std::cout << "1. Sleeper\n";
-    std::cout << "2. AC 3-Tier\n";
-    std::cout << "3. AC 2-Tier\n";
-    std::cout << "4. Chair Car\n";
-
-    std::cout << "Enter your class choice (1-4): ";
-
-    if (!(std::cin >> classChoice) ||
-        classChoice < 1 || classChoice > 4) {
-
-        std::cout << "\nError: Invalid travel class selection.\n";
+    if (!(std::cin >> classChoice) || classChoice < 1 || classChoice > 4) {
+        std::cout << "Error: Invalid class selection.\n";
         return 1;
     }
 
     std::string travelClass;
-
-    switch (classChoice) {
-        case 1:
-            travelClass = "Sleeper";
-            break;
-        case 2:
-            travelClass = "AC 3-Tier";
-            break;
-        case 3:
-            travelClass = "AC 2-Tier";
-            break;
-        case 4:
-            travelClass = "Chair Car";
-            break;
-    }
-
-    // 11. Check seat availability
     int availableSeats = 0;
 
     switch (classChoice) {
         case 1:
+            travelClass = "Sleeper";
             availableSeats = selectedTrain.sleeperSeatsAvailable;
             break;
         case 2:
+            travelClass = "AC 3-Tier";
             availableSeats = selectedTrain.ac3TierSeatsAvailable;
             break;
         case 3:
+            travelClass = "AC 2-Tier";
             availableSeats = selectedTrain.ac2TierSeatsAvailable;
             break;
         case 4:
+            travelClass = "Chair Car";
             availableSeats = selectedTrain.chairCarSeatsAvailable;
             break;
     }
 
     if (availableSeats < seats) {
-        std::cout << "\nError: Not enough seats available.\n";
+        std::cout << "Error: Not enough seats available. Booking rejected.\n";
         return 1;
     }
 
-    // 12. Calculate ticket fare
     try {
+        const double totalFare =
+            FareCalculator::calculateFare(selectedTrain, travelClass, seats);
 
-        double totalFare = FareCalculator::calculateFare(
-            selectedTrain,
-            travelClass,
-            seats
-        );
+        std::cout << "\n========== FARE DETAILS ==========\n"
+                  << "Passenger: " << passengerName
+                  << "\nTravel Class: " << travelClass
+                  << "\nPassengers: " << seats
+                  << "\nFare Per Passenger: Rs. " << totalFare / seats
+                  << "\nTotal Fare: Rs. " << totalFare << '\n';
 
-        // 13. Display fare details
-        std::cout << "\n========== FARE DETAILS ==========\n";
+        char confirm;
+        std::cout << "\nConfirm booking? (Y/N): ";
+        std::cin >> confirm;
 
-        std::cout << "Passenger Name: " << passengerName << '\n';
-        std::cout << "Train Name: " << selectedTrain.trainName << '\n';
-        std::cout << "Travel Class: " << travelClass << '\n';
-        std::cout << "Number of Passengers: " << seats << '\n';
-        std::cout << "Fare Per Passenger: Rs. "
-                  << (totalFare / seats) << '\n';
+        if (confirm != 'Y' && confirm != 'y') {
+            std::cout << "Booking cancelled by user. No seats allocated.\n";
+            return 0;
+        }
 
-        std::cout << "Total Ticket Fare: Rs. "
-                  << totalFare << '\n';
+        std::string pnr;
 
-        std::cout << "\nFare calculated successfully!\n";
+        if (!BookingManager::createBooking(
+                selectedTrain, travelClass, passengerName,
+                seats, totalFare, pnr, errorMessage)) {
+            std::cout << "Booking failed: " << errorMessage << '\n';
+            return 1;
+        }
 
+        std::cout << "\n========== BOOKING CONFIRMED ==========\n"
+                  << "PNR: " << pnr
+                  << "\nTrain: " << selectedTrain.trainName
+                  << "\nTrain Number: " << selectedTrain.trainNumber
+                  << "\nJourney Date: " << journeyDate
+                  << "\nPassenger: " << passengerName
+                  << "\nTravel Class: " << travelClass
+                  << "\nSeats Allocated: " << seats
+                  << "\nTotal Fare: Rs. " << totalFare
+                  << "\nBooking Status: Confirmed\n"
+                  << "\nYour seats have been successfully allocated.\n";
     }
     catch (const std::exception& e) {
-        std::cout << "\nError: " << e.what() << '\n';
+        std::cout << "Booking error: " << e.what() << '\n';
         return 1;
     }
-
-    std::cout << "\nTrain search completed successfully!\n";
 
     return 0;
 }
