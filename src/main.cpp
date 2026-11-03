@@ -3,11 +3,13 @@
 #include "TrainSearch.h"
 #include "Validation.h"
 #include "FareCalculator.h"
+#include "Booking.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <iomanip>
 
 int main() {
 
@@ -199,7 +201,7 @@ int main() {
         return 1;
     }
 
-    // 12. Calculate ticket fare
+    // 12. Calculate fare and confirm booking
     try {
 
         double totalFare = FareCalculator::calculateFare(
@@ -208,28 +210,57 @@ int main() {
             seats
         );
 
-        // 13. Display fare details
-        std::cout << "\n========== FARE DETAILS ==========\n";
+        // 13. Create booking
+        Booking booking;
 
-        std::cout << "Passenger Name: " << passengerName << '\n';
-        std::cout << "Train Name: " << selectedTrain.trainName << '\n';
-        std::cout << "Travel Class: " << travelClass << '\n';
-        std::cout << "Number of Passengers: " << seats << '\n';
+        booking.pnr = generateUniquePNR();
+        booking.passengerName = passengerName;
+        booking.trainNumber = selectedTrain.trainNumber;
+        booking.trainName = selectedTrain.trainName;
+        booking.source = selectedTrain.source;
+        booking.destination = selectedTrain.destination;
+        booking.journeyDate = selectedTrain.journeyDate;
+        booking.travelClass = travelClass;
+        booking.numberOfPassengers = seats;
+        booking.totalFare = totalFare;
+
+        // 14. Save booking
+        if (!saveBooking(booking, errorMessage)) {
+            std::cout << "\nBooking failed: " << errorMessage << '\n';
+            return 1;
+        }
+
+        // 15. Display booking confirmation
+        std::cout << std::fixed << std::setprecision(2);
+
+        std::cout << "\n========================================\n";
+        std::cout << "       BOOKING CONFIRMED SUCCESSFULLY\n";
+        std::cout << "========================================\n";
+
+        std::cout << "PNR Number: " << booking.pnr << '\n';
+        std::cout << "Passenger Name: " << booking.passengerName << '\n';
+        std::cout << "Train Number: " << booking.trainNumber << '\n';
+        std::cout << "Train Name: " << booking.trainName << '\n';
+        std::cout << "Source: " << booking.source << '\n';
+        std::cout << "Destination: " << booking.destination << '\n';
+        std::cout << "Journey Date: " << booking.journeyDate << '\n';
+        std::cout << "Travel Class: " << booking.travelClass << '\n';
+        std::cout << "Number of Passengers: "
+                  << booking.numberOfPassengers << '\n';
+
         std::cout << "Fare Per Passenger: Rs. "
-                  << (totalFare / seats) << '\n';
+                  << (booking.totalFare / booking.numberOfPassengers) << '\n';
 
-        std::cout << "Total Ticket Fare: Rs. "
-                  << totalFare << '\n';
+        std::cout << "Total Fare: Rs. " << booking.totalFare << '\n';
 
-        std::cout << "\nFare calculated successfully!\n";
+        std::cout << "========================================\n";
+        std::cout << "Your booking details are saved successfully.\n";
 
     }
     catch (const std::exception& e) {
         std::cout << "\nError: " << e.what() << '\n';
         return 1;
     }
-
-    std::cout << "\nTrain search completed successfully!\n";
 
     return 0;
 }
