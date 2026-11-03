@@ -118,19 +118,141 @@ int main() {
 
     const Train selectedTrain = results[trainChoice - 1];
 
-    // 8. Validate passenger count
+    std::string travelClass;
+    int availableSeats = 0;
+
+    // 8. Validate passenger count and selected class availability
     while (true) {
-        std::cout << "\nEnter number of passengers (1-6): ";
+        while (true) {
+            std::cout << "\nEnter number of passengers (1-6): ";
 
-        if (!std::getline(std::cin, input)) return 1;
+            if (!std::getline(std::cin, input)) return 1;
 
-        if (Validation::parseSeatCount(input, seats, errorMessage))
+            if (Validation::parseSeatCount(input, seats, errorMessage))
+                break;
+
+            std::cout << "Error: " << errorMessage << " Try again.\n";
+        }
+
+        // 9. Select travel class
+        std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
+                  << "1. Sleeper\n"
+                  << "2. AC 3-Tier\n"
+                  << "3. AC 2-Tier\n"
+                  << "4. Chair Car\n";
+
+        while (true) {
+            std::cout << "Select travel class (1-4): ";
+
+            if (!std::getline(std::cin, input)) return 1;
+
+            if (Validation::parseMenuChoice(
+                    input, 1, 4, classChoice, errorMessage))
+                break;
+
+            std::cout << "Error: " << errorMessage << " Try again.\n";
+        }
+
+        switch (classChoice) {
+            case 1:
+                travelClass = "Sleeper";
+                availableSeats = selectedTrain.sleeperSeatsAvailable;
+                break;
+            case 2:
+                travelClass = "AC 3-Tier";
+                availableSeats = selectedTrain.ac3TierSeatsAvailable;
+                break;
+            case 3:
+                travelClass = "AC 2-Tier";
+                availableSeats = selectedTrain.ac2TierSeatsAvailable;
+                break;
+            case 4:
+                travelClass = "Chair Car";
+                availableSeats = selectedTrain.chairCarSeatsAvailable;
+                break;
+        }
+
+        if (availableSeats >= seats)
             break;
 
-        std::cout << "Error: " << errorMessage << " Try again.\n";
+        std::cout << "\nError: Only " << availableSeats
+                  << " seats are available in " << travelClass
+                  << ". You requested " << seats << " seats.\n";
+
+        std::cout << "1. Enter passenger count again\n"
+                  << "2. Select travel class again\n"
+                  << "3. Cancel booking\n";
+
+        int retryChoice = 0;
+
+        while (true) {
+            std::cout << "Choose an option (1-3): ";
+
+            if (!std::getline(std::cin, input)) return 1;
+
+            if (Validation::parseMenuChoice(
+                    input, 1, 3, retryChoice, errorMessage))
+                break;
+
+            std::cout << "Error: " << errorMessage << " Try again.\n";
+        }
+
+        if (retryChoice == 1)
+            continue;
+
+        if (retryChoice == 2) {
+            // Keep the requested passenger count and select another class.
+            while (true) {
+                std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
+                          << "1. Sleeper\n"
+                          << "2. AC 3-Tier\n"
+                          << "3. AC 2-Tier\n"
+                          << "4. Chair Car\n";
+
+                std::cout << "Select travel class (1-4): ";
+
+                if (!std::getline(std::cin, input)) return 1;
+
+                if (Validation::parseMenuChoice(
+                        input, 1, 4, classChoice, errorMessage))
+                    break;
+
+                std::cout << "Error: " << errorMessage << " Try again.\n";
+            }
+
+            switch (classChoice) {
+                case 1:
+                    travelClass = "Sleeper";
+                    availableSeats = selectedTrain.sleeperSeatsAvailable;
+                    break;
+                case 2:
+                    travelClass = "AC 3-Tier";
+                    availableSeats = selectedTrain.ac3TierSeatsAvailable;
+                    break;
+                case 3:
+                    travelClass = "AC 2-Tier";
+                    availableSeats = selectedTrain.ac2TierSeatsAvailable;
+                    break;
+                case 4:
+                    travelClass = "Chair Car";
+                    availableSeats = selectedTrain.chairCarSeatsAvailable;
+                    break;
+            }
+
+            if (availableSeats >= seats)
+                break;
+
+            std::cout << "\nError: Only " << availableSeats
+                      << " seats are available in " << travelClass
+                      << ". Please try again.\n";
+            continue;
+        }
+
+        std::cout << "Booking cancelled.\n";
+        return 0;
     }
 
-    // 9. Collect individual passenger details
+    // 10. Collect passenger details after validating seat availability
     std::vector<Passenger> passengers;
 
     if (!PassengerDetails::collectPassengerDetails(
@@ -139,55 +261,7 @@ int main() {
         return 1;
     }
 
-    // 10. Validate travel class selection
-    std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
-              << "1. Sleeper\n"
-              << "2. AC 3-Tier\n"
-              << "3. AC 2-Tier\n"
-              << "4. Chair Car\n";
-
-    while (true) {
-        std::cout << "Select travel class (1-4): ";
-
-        if (!std::getline(std::cin, input)) return 1;
-
-        if (Validation::parseMenuChoice(
-                input, 1, 4, classChoice, errorMessage))
-            break;
-
-        std::cout << "Error: " << errorMessage << " Try again.\n";
-    }
-
-    std::string travelClass;
-    int availableSeats = 0;
-
-    switch (classChoice) {
-        case 1:
-            travelClass = "Sleeper";
-            availableSeats = selectedTrain.sleeperSeatsAvailable;
-            break;
-        case 2:
-            travelClass = "AC 3-Tier";
-            availableSeats = selectedTrain.ac3TierSeatsAvailable;
-            break;
-        case 3:
-            travelClass = "AC 2-Tier";
-            availableSeats = selectedTrain.ac2TierSeatsAvailable;
-            break;
-        case 4:
-            travelClass = "Chair Car";
-            availableSeats = selectedTrain.chairCarSeatsAvailable;
-            break;
-    }
-
-    // 11. Check seat availability
-    if (availableSeats < seats) {
-        std::cout << "Error: Not enough seats available. Only "
-                  << availableSeats << " seats remain.\n";
-        return 1;
-    }
-
-    // 12. Calculate fare and display booking details
+    // 11. Calculate fare and display booking details
     try {
         const double totalFare =
             FareCalculator::calculateFare(
@@ -213,7 +287,7 @@ int main() {
                       << "\nGender: " << passengers[i].gender << '\n';
         }
 
-        // 13. Confirm booking
+        // 12. Confirm booking
         std::string confirmation;
 
         std::cout << "\nConfirm booking? (Y/N): ";
@@ -224,7 +298,7 @@ int main() {
             return 0;
         }
 
-        // 14. Create booking and generate unique PNR
+        // 13. Create booking and generate unique PNR
         std::string pnr;
 
         if (!BookingManager::createBooking(
@@ -239,7 +313,7 @@ int main() {
             return 1;
         }
 
-        // 15. Display confirmation
+        // 14. Display confirmation
         std::cout << "\n========== BOOKING CONFIRMED ==========\n"
                   << "PNR: " << pnr
                   << "\nTrain: " << selectedTrain.trainName
