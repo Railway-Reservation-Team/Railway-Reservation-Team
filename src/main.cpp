@@ -235,8 +235,7 @@ int main() {
         if (!BookingManager::createBooking(
                 selectedTrain,
                 travelClass,
-                passengerNames.str(),
-                seats,
+                passengers,
                 totalFare,
                 pnr,
                 errorMessage)) {
