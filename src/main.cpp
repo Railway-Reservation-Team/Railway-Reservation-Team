@@ -1,4 +1,3 @@
-
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
@@ -9,37 +8,41 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <limits>
-#include <sstream>
 #include <exception>
 
 int main() {
-    std::string source, destination, journeyDate;
+    std::string source;
+    std::string destination;
+    std::string journeyDate;
     std::string errorMessage;
+    std::string input;
+
     int seats = 0;
+    int trainChoice = 0;
+    int classChoice = 0;
 
     std::cout << "===== Railway Reservation System =====\n";
 
-    // 1. Collect and validate source
+    // 1. Validate source station
     while (true) {
         std::cout << "Enter source station: ";
         if (!std::getline(std::cin, source)) return 1;
 
-        if (source.find_first_not_of(" \t") != std::string::npos)
+        if (Validation::isNonEmpty(source, errorMessage))
             break;
 
-        std::cout << "Error: Source station cannot be empty.\n";
+        std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 2. Collect and validate destination
+    // 2. Validate destination station
     while (true) {
         std::cout << "Enter destination station: ";
         if (!std::getline(std::cin, destination)) return 1;
 
-        if (destination.find_first_not_of(" \t") != std::string::npos)
+        if (Validation::isNonEmpty(destination, errorMessage))
             break;
 
-        std::cout << "Error: Destination station cannot be empty.\n";
+        std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
     // 3. Validate journey date
@@ -98,35 +101,30 @@ int main() {
                   << " | Seats: " << train.chairCarSeatsAvailable << '\n';
     }
 
-    // 7. Select train
-    int choice;
+    // 7. Validate train selection
+    while (true) {
+        std::cout << "\nSelect train option (1-"
+                  << results.size() << "): ";
 
-    std::cout << "\nSelect train option (1-"
-              << results.size() << "): ";
+        if (!std::getline(std::cin, input)) return 1;
 
-    if (!(std::cin >> choice) ||
-        choice < 1 ||
-        choice > static_cast<int>(results.size())) {
-        std::cout << "Error: Invalid train selection.\n";
-        return 1;
+        if (Validation::parseMenuChoice(
+                input, 1, static_cast<int>(results.size()),
+                trainChoice, errorMessage))
+            break;
+
+        std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    const Train selectedTrain = results[choice - 1];
+    const Train selectedTrain = results[trainChoice - 1];
 
-    std::cin.ignore(
-        std::numeric_limits<std::streamsize>::max(), '\n'
-    );
-
-    // 8. Collect passenger count
-    std::string seatInput;
-
+    // 8. Validate passenger count
     while (true) {
         std::cout << "\nEnter number of passengers (1-6): ";
 
-        if (!std::getline(std::cin, seatInput)) return 1;
+        if (!std::getline(std::cin, input)) return 1;
 
-        if (Validation::parseSeatCount(
-                seatInput, seats, errorMessage))
+        if (Validation::parseSeatCount(input, seats, errorMessage))
             break;
 
         std::cout << "Error: " << errorMessage << " Try again.\n";
@@ -141,20 +139,23 @@ int main() {
         return 1;
     }
 
-    // 10. Select travel class
-    int classChoice;
-
+    // 10. Validate travel class selection
     std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
               << "1. Sleeper\n"
               << "2. AC 3-Tier\n"
               << "3. AC 2-Tier\n"
-              << "4. Chair Car\n"
-              << "Select travel class: ";
+              << "4. Chair Car\n";
 
-    if (!(std::cin >> classChoice) ||
-        classChoice < 1 || classChoice > 4) {
-        std::cout << "Error: Invalid class selection.\n";
-        return 1;
+    while (true) {
+        std::cout << "Select travel class (1-4): ";
+
+        if (!std::getline(std::cin, input)) return 1;
+
+        if (Validation::parseMenuChoice(
+                input, 1, 4, classChoice, errorMessage))
+            break;
+
+        std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
     std::string travelClass;
@@ -181,7 +182,8 @@ int main() {
 
     // 11. Check seat availability
     if (availableSeats < seats) {
-        std::cout << "Error: Not enough seats available. Booking rejected.\n";
+        std::cout << "Error: Not enough seats available. Only "
+                  << availableSeats << " seats remain.\n";
         return 1;
     }
 
@@ -204,27 +206,20 @@ int main() {
 
         std::cout << "\n========== PASSENGER LIST ==========\n";
 
-        std::ostringstream passengerNames;
-
         for (size_t i = 0; i < passengers.size(); ++i) {
             std::cout << "\nPassenger " << i + 1
                       << "\nName: " << passengers[i].name
                       << "\nAge: " << passengers[i].age
                       << "\nGender: " << passengers[i].gender << '\n';
-
-            if (i > 0)
-                passengerNames << "; ";
-
-            passengerNames << passengers[i].name;
         }
 
         // 13. Confirm booking
-        char confirm;
+        std::string confirmation;
 
         std::cout << "\nConfirm booking? (Y/N): ";
-        std::cin >> confirm;
+        if (!std::getline(std::cin, confirmation)) return 1;
 
-        if (confirm != 'Y' && confirm != 'y') {
+        if (confirmation != "Y" && confirmation != "y") {
             std::cout << "Booking cancelled. No seats allocated.\n";
             return 0;
         }
