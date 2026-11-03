@@ -22,7 +22,7 @@ The application uses a modular C++17 console-based architecture.
 | SeatInventory | Update seat availability in train data |
 | Booking data file | Persist booking records in data/bookings.dat |
 
-These modules are implemented on the TASK-09 development branch.
+These modules are implemented after TASK-09 safe integration (PR #56) was merged into main.
 
 ### 4. Data Storage
 
@@ -34,7 +34,7 @@ TRAIN_NO|TRAIN_NAME|SOURCE|DESTINATION|DEPARTURE|ARRIVAL|DURATION|FARES|SEAT_COU
 **Booking data:** data/bookings.dat
 
 Format:
-PNR|TRAIN_NO|DATE|CLASS|STATUS|PASSENGER_COUNT|TOTAL_FARE
+PNR|TRAIN_NO|DATE|CLASS|PASSENGER_DETAILS|PASSENGER_COUNT|TOTAL_FARE|STATUS
 
 ### 5. Booking Workflow
 1. Passenger enters journey details.

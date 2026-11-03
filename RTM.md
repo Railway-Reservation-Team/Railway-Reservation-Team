@@ -9,9 +9,9 @@
 | FR-04 | Display train availability and fares | TrainData, TrainSearch | Application test | Partially implemented |
 | FR-05 | Validate passenger information | Validation | Automated test | Passed |
 | FR-06 | Calculate ticket fare | FareCalculator | Automated test | Passed |
-| FR-07 | Generate unique PNR | BookingManager | Booking test | Implemented on TASK-09 branch |
-| FR-08 | Persist booking records | BookingManager | File verification | Implemented on TASK-09 branch |
-| FR-09 | Update seat availability | SeatInventory | Booking integration test | Implemented on TASK-09 branch |
+| FR-07 | Generate unique PNR | BookingManager | Booking test | Implemented and merged into main (PR #56) |
+| FR-08 | Persist booking records | BookingManager | File verification | Implemented and merged into main (PR #56) |
+| FR-09 | Update seat availability | SeatInventory | Booking integration test | Implemented and merged into main (PR #56) |
 | FR-10 | Process payment | PaymentModule | Payment test | Pending |
 | FR-11 | Cancel tickets and process refunds | CancellationManager | Cancellation test | Pending |
 | FR-12 | PNR enquiry and booking history | PNRService | PNR test | Partially implemented |
@@ -43,6 +43,6 @@
 
 ## Notes
 - PASS means verified by the available automated tests.
-- Implemented on TASK-09 branch means the implementation was tested there but is not necessarily merged into main.
+- Implemented and merged into main (PR #56) means the implementation was tested there but is not necessarily merged into main.
 - Pending means implementation or verification remains outstanding.
 - This matrix should be updated when additional modules are completed.

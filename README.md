@@ -180,7 +180,7 @@ bookings.dat
 Booking records use the format:
 
 ```text
-<PNR>|<TRAIN_NO>|<DATE>|<CLASS>|<STATUS>|<PASSENGER_COUNT>|<TOTAL_FARE>
+<PNR>|<TRAIN_NO>|<DATE>|<CLASS>|<PASSENGER_DETAILS>|<PASSENGER_COUNT>|<TOTAL_FARE>|<STATUS>
 ```
 
 Example:
