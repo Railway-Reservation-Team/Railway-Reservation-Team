@@ -1,6 +1,10 @@
-#include "FareCalculator.h"
 
+#include "FareCalculator.h"
+#include "Validation.h"
+
+#include <cmath>
 #include <stdexcept>
+#include <string>
 
 namespace FareCalculator {
 
@@ -33,13 +37,20 @@ double calculateFare(
         throw std::invalid_argument("Invalid travel class.");
     }
 
-    if (farePerPassenger <= 0) {
+    if (!std::isfinite(farePerPassenger) ||
+        farePerPassenger <= 0) {
         throw std::invalid_argument(
-            "Selected class is not available."
+            "Selected class has an invalid or unavailable fare."
         );
     }
 
-    return farePerPassenger * passengerCount;
+    double totalFare = farePerPassenger * passengerCount;
+
+    if (!std::isfinite(totalFare)) {
+        throw std::overflow_error("Calculated fare is too large.");
+    }
+
+    return totalFare;
 }
 
 }
