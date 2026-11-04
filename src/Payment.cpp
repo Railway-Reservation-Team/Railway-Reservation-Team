@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 
 bool processPayment(
     double totalFare,
@@ -11,6 +12,16 @@ bool processPayment(
 ) {
     int methodChoice;
     int resultChoice;
+
+    // Initialize payment details.
+    paymentMethod.clear();
+    paymentStatus = "FAILED";
+
+    // Validate the fare before processing payment.
+    if (!std::isfinite(totalFare) || totalFare <= 0.0) {
+        std::cout << "\nInvalid payment amount.\n";
+        return false;
+    }
 
     std::cout << std::fixed << std::setprecision(2);
 
@@ -27,7 +38,6 @@ bool processPayment(
     if (!(std::cin >> methodChoice) ||
         methodChoice < 1 || methodChoice > 3) {
         std::cout << "\nInvalid payment method.\n";
-        paymentStatus = "FAILED";
         return false;
     }
 
@@ -55,7 +65,6 @@ bool processPayment(
     if (!(std::cin >> resultChoice) ||
         resultChoice < 1 || resultChoice > 2) {
         std::cout << "\nInvalid payment result.\n";
-        paymentStatus = "FAILED";
         return false;
     }
 
@@ -65,8 +74,6 @@ bool processPayment(
         std::cout << "\nPayment Successful!\n";
         return true;
     }
-
-    paymentStatus = "FAILED";
 
     std::cout << "\nPayment Failed!\n";
     std::cout << "Your booking has NOT been confirmed.\n";
