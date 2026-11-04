@@ -1,4 +1,3 @@
-
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
@@ -6,6 +5,7 @@
 #include "PassengerDetails.h"
 #include "BookingManager.h"
 #include "Cancellation.h"
+#include "AdminTrainMenu.h"
 
 #include <iostream>
 #include <string>
@@ -13,8 +13,7 @@
 #include <exception>
 #include <iomanip>
 
-int main() {
-
+int runBooking() {
     std::string source;
     std::string destination;
     std::string journeyDate;
@@ -395,6 +394,37 @@ int main() {
 
         std::cout << "Booking error: " << e.what() << '\n';
         return 1;
+    }
+
+    return 0;
+}
+
+int main() {
+    std::string choice;
+
+    while (true) {
+        std::cout << "\n===== RAILWAY RESERVATION SYSTEM =====\n"
+                  << "1. Passenger Booking\n"
+                  << "2. Admin Train Management\n"
+                  << "3. Exit\n"
+                  << "Enter choice: ";
+
+        if (!std::getline(std::cin, choice))
+            break;
+
+        if (choice == "1") {
+            runBooking();
+        }
+        else if (choice == "2") {
+            AdminTrainMenu::run(std::cin, std::cout);
+        }
+        else if (choice == "3") {
+            std::cout << "Exiting system. Goodbye!\n";
+            break;
+        }
+        else {
+            std::cout << "Invalid choice. Try again.\n";
+        }
     }
 
     return 0;
