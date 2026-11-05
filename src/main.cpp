@@ -1,15 +1,18 @@
+
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "Payment.h"
 #include "AdminTrainMenu.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <exception>
+#include <iomanip>
 
 int runBooking() {
     std::string source;
@@ -212,6 +215,30 @@ int runBooking() {
             return 0;
         }
 
+        // Process payment before creating the booking.
+        std::string paymentMethod;
+        std::string paymentStatus;
+
+        const bool paymentSuccessful = processPayment(
+            totalFare,
+            paymentMethod,
+            paymentStatus
+        );
+
+        if (!paymentSuccessful) {
+            std::cout << "\n========================================\n"
+                      << "          BOOKING NOT CONFIRMED\n"
+                      << "========================================\n"
+                      << "Payment Status: " << paymentStatus << '\n'
+                      << "Payment failed. No booking was saved.\n";
+
+            return 1;
+        }
+
+        std::cout << "\nPayment Status: SUCCESS\n"
+                  << "Payment Method: " << paymentMethod << '\n';
+
+        // Create booking only after successful payment.
         std::string pnr;
 
         if (!BookingManager::createBooking(
@@ -221,10 +248,17 @@ int runBooking() {
                 totalFare,
                 pnr,
                 errorMessage)) {
+
             std::cout << "Booking failed: "
                       << errorMessage << '\n';
+
+            std::cout << "Payment was successful, but booking was not saved.\n";
+            std::cout << "Manual payment reversal may be required.\n";
+
             return 1;
         }
+
+        std::cout << std::fixed << std::setprecision(2);
 
         std::cout << "\n========== BOOKING CONFIRMED ==========\n"
                   << "PNR: " << pnr
@@ -235,6 +269,8 @@ int runBooking() {
                   << "\nTravel Class: " << travelClass
                   << "\nSeats Allocated: " << seats
                   << "\nTotal Fare: Rs. " << totalFare
+                  << "\nPayment Method: " << paymentMethod
+                  << "\nPayment Status: " << paymentStatus
                   << "\nBooking Status: Confirmed\n";
 
         std::cout << "\nYour seats have been successfully allocated.\n";
