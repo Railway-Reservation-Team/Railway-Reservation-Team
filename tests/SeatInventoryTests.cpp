@@ -1,3 +1,4 @@
+
 #include "../src/SeatInventory.h"
 
 #include <iostream>
@@ -57,6 +58,18 @@ int main() {
     check("Class name with extra spaces",
           getAvailableSeats(train, "  AC 2-Tier  ") == 35);
 
+    check("AC 3-Tier with hyphen and no spaces",
+          getAvailableSeats(train, "AC-3-Tier") == 65);
+
+    check("AC 3-Tier without spaces",
+          getAvailableSeats(train, "AC3Tier") == 65);
+
+    check("AC 2-Tier with hyphen and no spaces",
+          getAvailableSeats(train, "AC-2-Tier") == 35);
+
+    check("AC 2-Tier without spaces",
+          getAvailableSeats(train, "AC2Tier") == 35);
+
     check("AC 3-Tier alias",
           getAvailableSeats(train, "3A") == 65);
 
@@ -74,6 +87,9 @@ int main() {
 
     check("Empty class returns -1",
           getAvailableSeats(train, "") == -1);
+
+    check("Whitespace-only class returns -1",
+          getAvailableSeats(train, "   ") == -1);
 
     // 4. Seat request tests
     std::cout << "\n--- Seat Request Tests ---\n";
@@ -134,25 +150,29 @@ int main() {
           inventory.getActiveHoldCount(startTime) == 1);
 
     Train limitedTrain = train;
-limitedTrain.trainNumber = "LIMITED";
-limitedTrain.ac3TierSeatsAvailable = 5;
+    limitedTrain.trainNumber = "LIMITED";
+    limitedTrain.ac3TierSeatsAvailable = 5;
 
-SeatHoldResponse limitedHold =
-    inventory.holdSeats(limitedTrain, "3A", 3, startTime);
+    SeatHoldResponse limitedHold =
+        inventory.holdSeats(limitedTrain, "3A", 3, startTime);
 
-check("Second hold cannot exceed remaining availability",
-      limitedHold.result == SeatHoldResult::SUCCESS &&
-      inventory.holdSeats(
-          limitedTrain, "3A", 3, startTime
-      ).result == SeatHoldResult::EXCEEDS_AVAILABLE_SEATS);
+    check("First limited hold succeeds",
+          limitedHold.result == SeatHoldResult::SUCCESS);
+
+    check("Second hold cannot exceed remaining availability",
+          inventory.holdSeats(
+              limitedTrain, "3A", 3, startTime
+          ).result == SeatHoldResult::EXCEEDS_AVAILABLE_SEATS);
 
     check("Invalid class cannot be held",
-          inventory.holdSeats(train, "First Class", 1, startTime).result ==
-              SeatHoldResult::INVALID_CLASS);
+          inventory.holdSeats(
+              train, "First Class", 1, startTime
+          ).result == SeatHoldResult::INVALID_CLASS);
 
     check("Seven passengers cannot be held",
-          inventory.holdSeats(train, "3A", 7, startTime).result ==
-              SeatHoldResult::EXCEEDS_MAX_PASSENGERS);
+          inventory.holdSeats(
+              train, "3A", 7, startTime
+          ).result == SeatHoldResult::EXCEEDS_MAX_PASSENGERS);
 
     // 6. Hold release tests
     std::cout << "\n--- Hold Release Tests ---\n";

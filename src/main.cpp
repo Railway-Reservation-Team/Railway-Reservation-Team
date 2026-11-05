@@ -1,3 +1,5 @@
+
+
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
@@ -5,6 +7,7 @@
 #include "PassengerDetails.h"
 #include "BookingManager.h"
 #include "AdminTrainMenu.h"
+#include "SeatInventory.h"
 
 #include <iostream>
 #include <string>
@@ -77,7 +80,7 @@ int runBooking() {
 
     std::cout << "\n========== MATCHING TRAINS ==========\n";
 
-    for (size_t i = 0; i < results.size(); ++i) {
+    for (std::size_t i = 0; i < results.size(); ++i) {
         const Train& train = results[i];
 
         std::cout << "\nTrain Option: " << i + 1
@@ -96,6 +99,7 @@ int runBooking() {
                   << " | Seats: " << train.chairCarSeatsAvailable << '\n';
     }
 
+    // Allow retry for invalid train selections.
     while (true) {
         std::cout << "\nSelect train option (1-"
                   << results.size() << "): ";
@@ -150,29 +154,60 @@ int runBooking() {
     }
 
     std::string travelClass;
-    int availableSeats = 0;
 
     switch (classChoice) {
         case 1:
             travelClass = "Sleeper";
-            availableSeats = selectedTrain.sleeperSeatsAvailable;
             break;
+
         case 2:
             travelClass = "AC 3-Tier";
-            availableSeats = selectedTrain.ac3TierSeatsAvailable;
             break;
+
         case 3:
             travelClass = "AC 2-Tier";
-            availableSeats = selectedTrain.ac2TierSeatsAvailable;
             break;
+
         case 4:
             travelClass = "Chair Car";
-            availableSeats = selectedTrain.chairCarSeatsAvailable;
             break;
+
+        default:
+            std::cout << "Error: Invalid travel class selected.\n";
+            return 1;
     }
 
-    if (availableSeats < seats) {
-        std::cout << "Error: Not enough seats available. Only "
+    // Obtain availability through the US-03 seat inventory module.
+    const int availableSeats =
+        getAvailableSeats(selectedTrain, travelClass);
+
+    const SeatRequestResult seatResult =
+        validateSeatRequest(availableSeats, seats);
+
+    if (seatResult == SeatRequestResult::INVALID_AVAILABILITY) {
+        std::cout << "Error: Could not determine seat availability.\n";
+        return 1;
+    }
+
+    if (availableSeats == 0) {
+        std::cout << "Sorry, no seats are available in "
+                  << travelClass << ".\n";
+        return 1;
+    }
+
+    if (seatResult == SeatRequestResult::INVALID_REQUEST) {
+        std::cout << "Error: Invalid number of seats requested.\n";
+        return 1;
+    }
+
+    if (seatResult == SeatRequestResult::EXCEEDS_MAX_PASSENGERS) {
+        std::cout << "Error: Maximum six passengers are allowed per booking.\n";
+        return 1;
+    }
+
+    if (seatResult == SeatRequestResult::EXCEEDS_AVAILABLE_SEATS) {
+        std::cout << "Error: Not enough seats available in "
+                  << travelClass << ". Only "
                   << availableSeats << " seats remain.\n";
         return 1;
     }
@@ -189,13 +224,14 @@ int runBooking() {
                   << "\nJourney Date: " << journeyDate
                   << "\nTravel Class: " << travelClass
                   << "\nNumber of Passengers: " << passengers.size()
+                  << "\nAvailable Seats: " << availableSeats
                   << "\nFare Per Passenger: Rs. "
                   << totalFare / seats
                   << "\nTotal Fare: Rs. " << totalFare << '\n';
 
         std::cout << "\n========== PASSENGER LIST ==========\n";
 
-        for (size_t i = 0; i < passengers.size(); ++i) {
+        for (std::size_t i = 0; i < passengers.size(); ++i) {
             std::cout << "\nPassenger " << i + 1
                       << "\nName: " << passengers[i].name
                       << "\nAge: " << passengers[i].age
