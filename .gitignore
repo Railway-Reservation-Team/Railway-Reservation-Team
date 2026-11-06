@@ -1,5 +1,7 @@
-# Compiled executable
+# Compiled executables
+railway
 railway.exe
+seat_inventory_tests
 
 # Other build outputs
 *.o

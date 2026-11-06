@@ -1,9 +1,12 @@
+
 #ifndef VALIDATION_H
 #define VALIDATION_H
 
 #include <string>
 
 namespace Validation {
+
+    bool isNonEmpty(const std::string& input, std::string& error);
 
     bool isValidPassengerName(
         const std::string& name,
@@ -34,6 +37,13 @@ namespace Validation {
         std::string& error
     );
 
+    bool parseMenuChoice(
+        const std::string& input,
+        int minimum,
+        int maximum,
+        int& choice,
+        std::string& error
+    );
 }
 
 #endif

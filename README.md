@@ -180,7 +180,7 @@ bookings.dat
 Booking records use the format:
 
 ```text
-<PNR>|<TRAIN_NO>|<DATE>|<CLASS>|<STATUS>|<PASSENGER_COUNT>|<TOTAL_FARE>
+<PNR>|<TRAIN_NO>|<DATE>|<CLASS>|<PASSENGER_DETAILS>|<PASSENGER_COUNT>|<TOTAL_FARE>|<STATUS>
 ```
 
 Example:
@@ -283,3 +283,41 @@ All team members should understand and be able to explain the submitted code dur
 - PES University SE Mini-Project Guidelines, Jackfruit 2026
 - GitHub Education
 - SonarQube Documentation
+
+---
+
+## Development and Testing
+
+Requirements: g++, C++17, Linux/Ubuntu/WSL, Git.
+
+Compile: `g++ -std=c++17 -Wall -Wextra -pedantic src/*.cpp -o railway`
+
+Run: `./railway`
+
+Regression tests:
+`g++ -std=c++17 -Wall -Wextra -pedantic -Isrc tests/test_modules.cpp src/Validation.cpp src/TrainSearch.cpp src/FareCalculator.cpp -o tests/test_modules`
+
+`./tests/test_modules`
+
+Documentation:
+- RTM.md
+- SRS_Updates.md
+- SAD_Updates.md
+- FINAL_TEST_RESULTS.md
+- TEST_REPORT.md
+
+Automated regression result: 18 passed, 0 failed. Booking, PNR and seat inventory checks are documented for the TASK-09 development branch. Authentication, payment, cancellation and administrator functionality remain pending implementation or verification.
+
+### Verified Automated Test Results
+
+| Test Suite | Passed | Failed |
+|---|---:|---:|
+| Validation, search and fare calculation | 18 | 0 |
+| Seat inventory | 42 | 0 |
+| Admin train management | 8 | 0 |
+| Admin fare and reservations | 6 | 0 |
+| **Total** | **74** | **0** |
+
+All four test suites passed. The complete application compiled successfully.
+
+See `FINAL_TEST_RESULTS.md` and `TEST_REPORT.md` for detailed results.
