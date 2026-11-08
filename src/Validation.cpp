@@ -29,12 +29,20 @@ bool isValidPassengerName(
         return false;
     }
 
+    bool hasLetter = false;
+
     for (unsigned char ch : name) {
-        if (!std::isalpha(ch) &&
-            ch != ' ' && ch != '-' && ch != '\'') {
+        if (std::isalpha(ch)) {
+            hasLetter = true;
+        } else if (ch != ' ' && ch != '-' && ch != '\'') {
             error = "Passenger name contains invalid characters.";
             return false;
         }
+    }
+
+    if (!hasLetter) {
+        error = "Passenger name must contain letters.";
+        return false;
     }
 
     error.clear();
