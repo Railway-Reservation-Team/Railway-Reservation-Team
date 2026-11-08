@@ -1,5 +1,6 @@
 #include "AdminFareReservationManager.h"
 #include "TrainData.h"
+#include "AtomicFileReplace.h"
 
 #include <fstream>
 #include <sstream>
@@ -107,7 +108,7 @@ bool writeBookings(
         return false;
     }
 
-    if (std::rename(temporaryFile.c_str(), filename.c_str()) != 0) {
+    if (!replaceFileAtomically(temporaryFile, filename)) {
         std::remove(temporaryFile.c_str());
         errorMessage = "Unable to replace booking file.";
         return false;
@@ -192,6 +193,8 @@ bool updateTrainSeats(
         records.push_back(record.str());
     }
 
+    file.close();
+
     if (!found) {
         errorMessage = "Train for this reservation was not found.";
         return false;
@@ -216,7 +219,7 @@ bool updateTrainSeats(
         return false;
     }
 
-    if (std::rename(temporaryFile.c_str(), filename.c_str()) != 0) {
+    if (!replaceFileAtomically(temporaryFile, filename)) {
         std::remove(temporaryFile.c_str());
         errorMessage = "Unable to replace train data file.";
         return false;
@@ -307,6 +310,8 @@ bool updateFares(
         records.push_back(record.str());
     }
 
+    file.close();
+
     if (!found) {
         errorMessage = "Train not found.";
         return false;
@@ -331,7 +336,7 @@ bool updateFares(
         return false;
     }
 
-    if (std::rename(temporaryFile.c_str(), filename.c_str()) != 0) {
+    if (!replaceFileAtomically(temporaryFile, filename)) {
         std::remove(temporaryFile.c_str());
         errorMessage = "Unable to replace train data file.";
         return false;
