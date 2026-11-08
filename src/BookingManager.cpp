@@ -1,5 +1,6 @@
 #include "BookingManager.h"
 #include "TrainData.h"
+#include "AtomicFileReplace.h"
 
 #include <fstream>
 #include <sstream>
@@ -272,7 +273,7 @@ bool createBooking(
         }
     }
 
-    if (std::rename("data/trains.tmp", TRAIN_FILE.c_str()) != 0) {
+    if (!replaceFileAtomically("data/trains.tmp", TRAIN_FILE)) {
         std::remove("data/trains.tmp");
         errorMessage = "Could not update seat inventory.";
         return false;

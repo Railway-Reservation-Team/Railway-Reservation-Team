@@ -205,4 +205,3 @@ The identified issues and recommendations provide a starting point for improving
 
 
 This review is based on static inspection of the source files in the current TASK-08 branch. It does not constitute a penetration test or a complete runtime security assessment. Requirements marked as not implemented refer to the inspected application code.
-

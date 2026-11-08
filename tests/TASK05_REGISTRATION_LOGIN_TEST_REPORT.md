@@ -1,4 +1,4 @@
-﻿# TASK-05: Passenger Registration and Login Testing
+# TASK-05: Passenger Registration and Login Testing
 
 
 
@@ -95,7 +95,3 @@ The TASK-05 test scenarios were identified and reviewed against the available pr
 
 
 Therefore, FR-01 (Passenger registration) and FR-02 (Passenger login) remain pending. These test cases should be executed after the AuthManager module is implemented and integrated into the application.
-
-
-
-
