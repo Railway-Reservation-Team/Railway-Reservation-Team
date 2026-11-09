@@ -1,9 +1,11 @@
+
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "Payment.h"
 #include "SeatInventory.h"
 #include "AdminTrainMenu.h"
 #include "AuthManager.h"
@@ -12,12 +14,14 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <iomanip>
 
 int runBooking() {
     if (!AuthManager::isSessionActive()) {
         std::cout << "Your passenger session has expired. Please log in again.\n";
         return 1;
     }
+
     std::string source;
     std::string destination;
     std::string journeyDate;
@@ -129,7 +133,7 @@ int runBooking() {
     int availableSeats = 0;
     bool bookingReady = false;
 
-    // 8. Validate passenger count and selected class availability
+    // 8. Validate passenger count and class availability
     while (!bookingReady) {
         while (true) {
             std::cout << "\nEnter number of passengers (1-6): ";
@@ -142,7 +146,7 @@ int runBooking() {
             std::cout << "Error: " << errorMessage << " Try again.\n";
         }
 
-        // 9. Select travel class and check availability
+        // 9. Select travel class
         while (true) {
             std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
                       << "1. Sleeper\n"
@@ -177,7 +181,6 @@ int runBooking() {
                     break;
             }
 
-            // US-03: Check class-wise seat availability.
             availableSeats = getAvailableSeats(selectedTrain, travelClass);
 
             const SeatRequestResult seatResult =
@@ -225,22 +228,18 @@ int runBooking() {
                 std::cout << "Error: " << errorMessage << " Try again.\n";
             }
 
-            if (retryChoice == 1) {
-                // Restart the outer loop and ask for passenger count again.
+            if (retryChoice == 1)
                 break;
-            }
 
-            if (retryChoice == 2) {
-                // Keep the passenger count and ask for another travel class.
+            if (retryChoice == 2)
                 continue;
-            }
 
             std::cout << "Booking cancelled.\n";
             return 0;
         }
     }
 
-    // 10. Collect passenger details after validating seat availability
+    // 10. Collect passenger details
     std::vector<Passenger> passengers;
 
     if (!PassengerDetails::collectPassengerDetails(
@@ -249,12 +248,11 @@ int runBooking() {
         return 1;
     }
 
-    // 11. Calculate fare and display booking details
     try {
+        // 11. Calculate fare
         const double totalFare =
             FareCalculator::calculateFare(
-                selectedTrain, travelClass, seats
-            );
+                selectedTrain, travelClass, seats);
 
         std::cout << "\n========== BOOKING DETAILS ==========\n"
                   << "Train: " << selectedTrain.trainName
@@ -286,13 +284,36 @@ int runBooking() {
             return 0;
         }
 
-        // Ensure the passenger is still authenticated before saving a booking.
+        // 13. Verify passenger session
         if (!AuthManager::isSessionActive()) {
             std::cout << "Session expired. Please log in again. Booking was not saved.\n";
             return 1;
         }
 
-        // 13. Create booking and generate unique PNR
+        // 14. Process payment
+        std::string paymentMethod;
+        std::string paymentStatus;
+
+        const bool paymentSuccessful = processPayment(
+            totalFare,
+            paymentMethod,
+            paymentStatus
+        );
+
+        if (!paymentSuccessful) {
+            std::cout << "\n========================================\n"
+                      << "          BOOKING NOT CONFIRMED\n"
+                      << "========================================\n"
+                      << "Payment Status: " << paymentStatus << '\n'
+                      << "Payment failed. No booking was saved.\n";
+
+            return 1;
+        }
+
+        std::cout << "\nPayment Status: SUCCESS\n"
+                  << "Payment Method: " << paymentMethod << '\n';
+
+        // 15. Create booking and generate PNR
         std::string pnr;
 
         if (!BookingManager::createBooking(
@@ -302,12 +323,19 @@ int runBooking() {
                 totalFare,
                 pnr,
                 errorMessage)) {
+
             std::cout << "Booking failed: "
                       << errorMessage << '\n';
+
+            std::cout << "Payment was successful, but booking was not saved.\n";
+            std::cout << "Manual payment reversal may be required.\n";
+
             return 1;
         }
 
-        // 14. Display confirmation
+        // 16. Display confirmation
+        std::cout << std::fixed << std::setprecision(2);
+
         std::cout << "\n========== BOOKING CONFIRMED ==========\n"
                   << "PNR: " << pnr
                   << "\nTrain: " << selectedTrain.trainName
@@ -317,6 +345,8 @@ int runBooking() {
                   << "\nTravel Class: " << travelClass
                   << "\nSeats Allocated: " << seats
                   << "\nTotal Fare: Rs. " << totalFare
+                  << "\nPayment Method: " << paymentMethod
+                  << "\nPayment Status: " << paymentStatus
                   << "\nBooking Status: Confirmed\n";
 
         std::cout << "\nYour seats have been successfully allocated.\n";
@@ -414,7 +444,6 @@ int main() {
             AuthManager::recordActivity();
         }
         else if (choice == "4") {
-            // Existing admin menu is preserved.
             AdminTrainMenu::run(std::cin, std::cout);
         }
         else if (choice == "5") {

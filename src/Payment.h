@@ -1,3 +1,4 @@
+
 #ifndef PAYMENT_H
 #define PAYMENT_H
 
@@ -7,6 +8,14 @@
 #include <string>
 #include <vector>
 
+// Payment processing function
+bool processPayment(
+    double totalFare,
+    std::string& paymentMethod,
+    std::string& paymentStatus
+);
+
+// Payment data structure
 struct Payment {
     std::string transactionId;
     std::string pnr;
@@ -16,7 +25,7 @@ struct Payment {
     std::string paymentDateTime;
 };
 
-// Payment records use the format: YYYY-MM-DD HH:MM:SS.
+// Validate payment date and time: YYYY-MM-DD HH:MM:SS
 inline bool isValidPaymentDateTime(const std::string& value) {
     if (value.size() != 19 ||
         value[4] != '-' || value[7] != '-' ||
@@ -48,9 +57,12 @@ inline bool isValidPaymentDateTime(const std::string& value) {
         31, 28, 31, 30, 31, 30,
         31, 31, 30, 31, 30, 31
     };
+
     int maxDays = daysInMonth[month - 1];
+
     const bool leapYear = (year % 400 == 0) ||
                           (year % 4 == 0 && year % 100 != 0);
+
     if (month == 2 && leapYear) {
         maxDays = 29;
     }
@@ -105,8 +117,7 @@ inline bool isUniqueTransactionId(
     return true;
 }
 
-// Convert a Payment object into a pipe-separated local storage record.
-// Existing payments may be supplied to reject duplicate transaction IDs.
+// Serialize payment into a pipe-separated record.
 inline bool serializePayment(
     const Payment& payment,
     std::string& record,
@@ -156,6 +167,7 @@ inline bool serializePayment(
     }
 
     std::ostringstream output;
+
     output << payment.transactionId << '|'
            << payment.pnr << '|'
            << std::fixed << std::setprecision(2) << payment.amount << '|'
@@ -167,8 +179,7 @@ inline bool serializePayment(
     return true;
 }
 
-// Convert a pipe-separated local storage record back into a Payment object.
-// Pass already-loaded records to reject duplicate transaction IDs.
+// Parse a pipe-separated payment record.
 inline bool parsePaymentRecord(
     const std::string& record,
     Payment& payment,
@@ -191,6 +202,7 @@ inline bool parsePaymentRecord(
     }
 
     Payment parsedPayment;
+
     parsedPayment.transactionId = fields[0];
     parsedPayment.pnr = fields[1];
     parsedPayment.paymentMethod = fields[3];
@@ -211,6 +223,7 @@ inline bool parsePaymentRecord(
     }
 
     std::string serialized;
+
     if (!serializePayment(
             parsedPayment, serialized, errorMessage, existingPayments)) {
         return false;
