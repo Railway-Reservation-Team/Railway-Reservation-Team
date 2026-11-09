@@ -90,32 +90,60 @@ The application uses local data files for persistent storage and does not requir
 Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd Railway-Reservation-System
+git clone https://github.com/Railway-Reservation-Team/Railway-Reservation-Team.git
+cd Railway-Reservation-Team
 ```
 
-Create and enter the build directory:
+Configure and build from the repository root:
 
 ```bash
-mkdir build
-cd build
-cmake ..
-cmake --build .
+cmake -S . -B build
+cmake --build build
 ```
 
-Run the generated executable according to the executable name configured in `CMakeLists.txt`.
+Run the application from the repository root so the relative `data/` paths resolve:
 
-### Using Makefile
+```bash
+# Windows PowerShell
+.\\build\\Debug\\railway.exe
 
-If a Makefile is provided:
+# Linux / Ubuntu / WSL
+./build/railway
+```
+
+Run the included module tests:
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+### Using Makefile (Linux / Ubuntu / WSL with GNU Make)
+
+Build the application:
 
 ```bash
 make
 ```
 
-Then run the generated executable.
+Run it from the repository root:
 
-> Replace `<repository-url>` with your actual GitHub repository URL.
+```bash
+./railway
+```
+
+Build and run the included module tests:
+
+```bash
+make test
+```
+
+Remove generated binaries:
+
+```bash
+make clean
+```
+
+
 
 ## 6. Usage
 
@@ -321,3 +349,8 @@ Automated regression result: 18 passed, 0 failed. Booking, PNR and seat inventor
 All four test suites passed. The complete application compiled successfully.
 
 See `FINAL_TEST_RESULTS.md` and `TEST_REPORT.md` for detailed results.
+
+
+### Project build configuration (TASK-01)
+
+The repository includes a root-level `CMakeLists.txt` and `Makefile`. Both use the C++17 standard, compile the application sources under `src/`, and provide a target for the existing `tests/test_modules.cpp` module test program. CMake copies the `data/` directory into the build directory; launch the application from the repository root when using the documented commands so runtime data paths remain consistent.
