@@ -16,3 +16,7 @@ seat_inventory_tests
 /data/users.dat
 /data/users.dat.tmp
 /data/auth_audit.log
+
+# Administrator authentication data (never commit account records)
+/data/admin.dat
+/data/admin.dat.tmp

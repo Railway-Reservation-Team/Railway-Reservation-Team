@@ -1,4 +1,5 @@
 #include "AdminTrainMenu.h"
+#include "AdminAuthManager.h"
 #include "AdminTrainManager.h"
 #include "Train.h"
 #include <cmath>
@@ -205,6 +206,11 @@ void deleteTrain(std::istream& input, std::ostream& output) {
 namespace AdminTrainMenu {
 
 void run(std::istream& input, std::ostream& output) {
+    if (!AdminAuthManager::isAuthenticated()) {
+        output << "Access denied. Administrator login required.\n";
+        return;
+    }
+
     std::string choice;
 
     while (true) {
