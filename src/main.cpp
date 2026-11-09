@@ -5,70 +5,14 @@
 #include "PassengerDetails.h"
 #include "BookingManager.h"
 #include "ETicketGenerator.h"
+#include "AdminTrainMenu.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <exception>
 
-int main() {
-    std::string menuChoice;
-
-    std::cout << "===== Railway Reservation System =====\n"
-              << "1. Book a Ticket\n"
-              << "2. Generate E-Ticket\n"
-              << "3. Display E-Ticket Details\n"
-              << "4. Exit\n"
-              << "Enter your choice: ";
-
-    if (!std::getline(std::cin, menuChoice)) return 1;
-
-    if (menuChoice == "2") {
-        std::string pnr;
-        std::string ticketPath;
-        std::string errorMessage;
-
-        std::cout << "Enter PNR: ";
-        if (!std::getline(std::cin, pnr)) return 1;
-
-        if (ETicketGenerator::generateETicket(
-                pnr, ticketPath, errorMessage)) {
-            std::cout << "\nE-Ticket generated successfully!\n"
-                      << "Saved at: " << ticketPath << '\n';
-            return 0;
-        }
-
-        std::cout << "E-Ticket generation failed: "
-                  << errorMessage << '\n';
-        return 1;
-    }
-
-    if (menuChoice == "3") {
-        std::string pnr;
-        std::string errorMessage;
-
-        std::cout << "Enter PNR: ";
-        if (!std::getline(std::cin, pnr)) return 1;
-
-        if (ETicketGenerator::displayETicket(pnr, errorMessage)) {
-            return 0;
-        }
-
-        std::cout << "E-Ticket display failed: "
-                  << errorMessage << '\n';
-        return 1;
-    }
-
-    if (menuChoice == "4") {
-        std::cout << "Thank you!\n";
-        return 0;
-    }
-
-    if (menuChoice != "1") {
-        std::cout << "Invalid choice.\n";
-        return 1;
-    }
-
+int runBooking() {
     std::string source;
     std::string destination;
     std::string journeyDate;
@@ -169,15 +113,96 @@ int main() {
 
     const Train selectedTrain = results[trainChoice - 1];
 
-    while (true) {
-        std::cout << "\nEnter number of passengers (1-6): ";
+    std::string travelClass;
+    int availableSeats = 0;
+    bool bookingReady = false;
 
-        if (!std::getline(std::cin, input)) return 1;
+    while (!bookingReady) {
+        while (true) {
+            std::cout << "\nEnter number of passengers (1-6): ";
 
-        if (Validation::parseSeatCount(input, seats, errorMessage))
-            break;
+            if (!std::getline(std::cin, input)) return 1;
 
-        std::cout << "Error: " << errorMessage << " Try again.\n";
+            if (Validation::parseSeatCount(input, seats, errorMessage))
+                break;
+
+            std::cout << "Error: " << errorMessage << " Try again.\n";
+        }
+
+        while (true) {
+            std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
+                      << "1. Sleeper\n"
+                      << "2. AC 3-Tier\n"
+                      << "3. AC 2-Tier\n"
+                      << "4. Chair Car\n";
+
+            while (true) {
+                std::cout << "Select travel class (1-4): ";
+
+                if (!std::getline(std::cin, input)) return 1;
+
+                if (Validation::parseMenuChoice(
+                        input, 1, 4, classChoice, errorMessage))
+                    break;
+
+                std::cout << "Error: " << errorMessage << " Try again.\n";
+            }
+
+            switch (classChoice) {
+                case 1:
+                    travelClass = "Sleeper";
+                    availableSeats = selectedTrain.sleeperSeatsAvailable;
+                    break;
+                case 2:
+                    travelClass = "AC 3-Tier";
+                    availableSeats = selectedTrain.ac3TierSeatsAvailable;
+                    break;
+                case 3:
+                    travelClass = "AC 2-Tier";
+                    availableSeats = selectedTrain.ac2TierSeatsAvailable;
+                    break;
+                case 4:
+                    travelClass = "Chair Car";
+                    availableSeats = selectedTrain.chairCarSeatsAvailable;
+                    break;
+            }
+
+            if (availableSeats >= seats) {
+                bookingReady = true;
+                break;
+            }
+
+            std::cout << "\nError: Only " << availableSeats
+                      << " seats are available in " << travelClass
+                      << ". You requested " << seats << " seats.\n";
+
+            std::cout << "1. Enter passenger count again\n"
+                      << "2. Select travel class again\n"
+                      << "3. Cancel booking\n";
+
+            int retryChoice = 0;
+
+            while (true) {
+                std::cout << "Choose an option (1-3): ";
+
+                if (!std::getline(std::cin, input)) return 1;
+
+                if (Validation::parseMenuChoice(
+                        input, 1, 3, retryChoice, errorMessage))
+                    break;
+
+                std::cout << "Error: " << errorMessage << " Try again.\n";
+            }
+
+            if (retryChoice == 1)
+                break;
+
+            if (retryChoice == 2)
+                continue;
+
+            std::cout << "Booking cancelled.\n";
+            return 0;
+        }
     }
 
     std::vector<Passenger> passengers;
@@ -185,52 +210,6 @@ int main() {
     if (!PassengerDetails::collectPassengerDetails(
             seats, passengers, std::cin, std::cout)) {
         std::cout << "Passenger details collection failed.\n";
-        return 1;
-    }
-
-    std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
-              << "1. Sleeper\n"
-              << "2. AC 3-Tier\n"
-              << "3. AC 2-Tier\n"
-              << "4. Chair Car\n";
-
-    while (true) {
-        std::cout << "Select travel class (1-4): ";
-
-        if (!std::getline(std::cin, input)) return 1;
-
-        if (Validation::parseMenuChoice(
-                input, 1, 4, classChoice, errorMessage))
-            break;
-
-        std::cout << "Error: " << errorMessage << " Try again.\n";
-    }
-
-    std::string travelClass;
-    int availableSeats = 0;
-
-    switch (classChoice) {
-        case 1:
-            travelClass = "Sleeper";
-            availableSeats = selectedTrain.sleeperSeatsAvailable;
-            break;
-        case 2:
-            travelClass = "AC 3-Tier";
-            availableSeats = selectedTrain.ac3TierSeatsAvailable;
-            break;
-        case 3:
-            travelClass = "AC 2-Tier";
-            availableSeats = selectedTrain.ac2TierSeatsAvailable;
-            break;
-        case 4:
-            travelClass = "Chair Car";
-            availableSeats = selectedTrain.chairCarSeatsAvailable;
-            break;
-    }
-
-    if (availableSeats < seats) {
-        std::cout << "Error: Not enough seats available. Only "
-                  << availableSeats << " seats remain.\n";
         return 1;
     }
 
@@ -299,6 +278,71 @@ int main() {
     catch (const std::exception& e) {
         std::cout << "Booking error: " << e.what() << '\n';
         return 1;
+    }
+
+    return 0;
+}
+
+int main() {
+    std::string choice;
+
+    while (true) {
+        std::cout << "\n===== RAILWAY RESERVATION SYSTEM =====\n"
+                  << "1. Passenger Booking\n"
+                  << "2. Admin Train Management\n"
+                  << "3. Generate E-Ticket\n"
+                  << "4. Display E-Ticket Details\n"
+                  << "5. Exit\n"
+                  << "Enter choice: ";
+
+        if (!std::getline(std::cin, choice))
+            break;
+
+        if (choice == "1") {
+            runBooking();
+        }
+        else if (choice == "2") {
+            AdminTrainMenu::run(std::cin, std::cout);
+        }
+        else if (choice == "3") {
+            std::string pnr;
+            std::string ticketPath;
+            std::string errorMessage;
+
+            std::cout << "Enter PNR: ";
+            if (!std::getline(std::cin, pnr))
+                continue;
+
+            if (ETicketGenerator::generateETicket(
+                    pnr, ticketPath, errorMessage)) {
+                std::cout << "\nE-Ticket generated successfully!\n"
+                          << "Saved at: " << ticketPath << '\n';
+            }
+            else {
+                std::cout << "E-Ticket generation failed: "
+                          << errorMessage << '\n';
+            }
+        }
+        else if (choice == "4") {
+            std::string pnr;
+            std::string errorMessage;
+
+            std::cout << "Enter PNR: ";
+            if (!std::getline(std::cin, pnr))
+                continue;
+
+            if (!ETicketGenerator::displayETicket(pnr, errorMessage)) {
+                std::cout << "E-Ticket display failed: "
+                          << errorMessage << '\n';
+            }
+        }
+        else if (choice == "5") {
+            std::cout << "Exiting system. Goodbye!\n";
+            break;
+        }
+        else {
+            std::cout << "Invalid choice. Try again.\n";
+        }
     }
 
     return 0;
