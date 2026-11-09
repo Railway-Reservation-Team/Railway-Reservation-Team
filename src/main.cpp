@@ -5,6 +5,7 @@
 #include "PassengerDetails.h"
 #include "BookingManager.h"
 #include "AdminTrainMenu.h"
+#include "AuthManager.h"
 
 #include <iostream>
 #include <string>
@@ -12,6 +13,10 @@
 #include <exception>
 
 int runBooking() {
+    if (!AuthManager::isSessionActive()) {
+        std::cout << "Your passenger session has expired. Please log in again.\n";
+        return 1;
+    }
     std::string source;
     std::string destination;
     std::string journeyDate;
@@ -263,6 +268,12 @@ int runBooking() {
             return 0;
         }
 
+        // Ensure the passenger is still authenticated before saving a booking.
+        if (!AuthManager::isSessionActive()) {
+            std::cout << "Session expired. Please log in again. Booking was not saved.\n";
+            return 1;
+        }
+
         // 13. Create booking and generate unique PNR
         std::string pnr;
 
@@ -302,31 +313,110 @@ int runBooking() {
 
 int main() {
     std::string choice;
+    std::string name;
+    std::string email;
+    std::string phone;
+    std::string password;
+    std::string errorMessage;
 
     while (true) {
+        const bool loggedIn = AuthManager::isSessionActive();
+
         std::cout << "\n===== RAILWAY RESERVATION SYSTEM =====\n"
-                  << "1. Passenger Booking\n"
-                  << "2. Admin Train Management\n"
-                  << "3. Exit\n"
-                  << "Enter choice: ";
+                  << "1. Passenger Registration\n"
+                  << "2. Passenger Login\n"
+                  << "3. Passenger Booking\n"
+                  << "4. Admin Train Management\n"
+                  << "5. Passenger Logout\n"
+                  << "6. Exit\n";
+
+        if (loggedIn) {
+            std::cout << "Logged-in passenger: "
+                      << AuthManager::getCurrentUserEmail() << '\n';
+        } else {
+            std::cout << "Passenger status: Not logged in\n";
+        }
+
+        std::cout << "Enter choice: ";
 
         if (!std::getline(std::cin, choice))
             break;
 
         if (choice == "1") {
-            runBooking();
+            std::cout << "\n========== PASSENGER REGISTRATION ==========\n";
+
+            std::cout << "Enter full name: ";
+            if (!std::getline(std::cin, name)) break;
+
+            std::cout << "Enter email: ";
+            if (!std::getline(std::cin, email)) break;
+
+            std::cout << "Enter phone number: ";
+            if (!std::getline(std::cin, phone)) break;
+
+            std::cout << "Enter password: ";
+            if (!std::getline(std::cin, password)) break;
+
+            if (AuthManager::registerPassenger(
+                    name, email, phone, password, errorMessage)) {
+                std::cout << "Registration successful! Please log in.\n";
+            } else {
+                std::cout << "Registration failed: "
+                          << errorMessage << '\n';
+            }
+
+            password.clear();
         }
         else if (choice == "2") {
-            AdminTrainMenu::run(std::cin, std::cout);
+            std::cout << "\n========== PASSENGER LOGIN ==========\n";
+
+            std::cout << "Enter registered email: ";
+            if (!std::getline(std::cin, email)) break;
+
+            std::cout << "Enter password: ";
+            if (!std::getline(std::cin, password)) break;
+
+            if (AuthManager::login(email, password, errorMessage)) {
+                std::cout << "Login successful. Welcome!\n";
+            } else {
+                std::cout << "Login failed: "
+                          << errorMessage << '\n';
+            }
+
+            password.clear();
         }
         else if (choice == "3") {
+            if (!AuthManager::isSessionActive()) {
+                std::cout << "Please register and log in before booking.\n";
+                continue;
+            }
+
+            AuthManager::recordActivity();
+            runBooking();
+            AuthManager::recordActivity();
+        }
+        else if (choice == "4") {
+            // Existing admin menu is preserved.
+            AdminTrainMenu::run(std::cin, std::cout);
+        }
+        else if (choice == "5") {
+            if (AuthManager::isSessionActive()) {
+                AuthManager::logout();
+                std::cout << "Passenger logged out successfully.\n";
+            } else {
+                std::cout << "No active passenger session.\n";
+            }
+        }
+        else if (choice == "6") {
+            AuthManager::logout();
             std::cout << "Exiting system. Goodbye!\n";
             break;
         }
         else {
-            std::cout << "Invalid choice. Try again.\n";
+            std::cout << "Invalid choice. Please enter 1-6.\n";
         }
     }
 
+    AuthManager::logout();
     return 0;
 }
