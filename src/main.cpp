@@ -9,6 +9,7 @@
 #include "SeatInventory.h"
 #include "AdminTrainMenu.h"
 #include "AuthManager.h"
+#include "AdminAuthManager.h"
 
 #include <iostream>
 #include <string>
@@ -374,9 +375,10 @@ int main() {
                   << "1. Passenger Registration\n"
                   << "2. Passenger Login\n"
                   << "3. Passenger Booking\n"
-                  << "4. Admin Train Management\n"
-                  << "5. Passenger Logout\n"
-                  << "6. Exit\n";
+                  << "4. Administrator Login\n"
+                  << "5. Administrator Logout\n"
+                  << "6. Passenger Logout\n"
+                  << "7. Exit\n";
 
         if (loggedIn) {
             std::cout << "Logged-in passenger: "
@@ -384,6 +386,10 @@ int main() {
         } else {
             std::cout << "Passenger status: Not logged in\n";
         }
+
+        std::cout << "Administrator status: "
+                  << (AdminAuthManager::isAuthenticated()
+                          ? "Logged in" : "Not logged in") << '\n';
 
         std::cout << "Enter choice: ";
 
@@ -444,9 +450,65 @@ int main() {
             AuthManager::recordActivity();
         }
         else if (choice == "4") {
-            AdminTrainMenu::run(std::cin, std::cout);
+            std::string adminUsername;
+            errorMessage.clear();
+
+            bool accountExists =
+                AdminAuthManager::hasAdminAccount(errorMessage);
+
+            if (!accountExists && !errorMessage.empty()) {
+                std::cout << "Administrator account error: "
+                          << errorMessage << '\n';
+                continue;
+            }
+
+            if (!accountExists) {
+                std::cout << "\n========== FIRST-TIME ADMIN SETUP ==========\n";
+                std::cout << "Create administrator username: ";
+                if (!std::getline(std::cin, adminUsername)) break;
+
+                std::cout << "Create administrator password: ";
+                if (!std::getline(std::cin, password)) break;
+
+                if (!AdminAuthManager::setupAdmin(
+                        adminUsername, password, errorMessage)) {
+                    std::cout << "Setup failed: " << errorMessage << '\n';
+                    password.clear();
+                    continue;
+                }
+
+                std::cout << "Administrator account created.\n";
+            } else {
+                std::cout << "\n========== ADMINISTRATOR LOGIN ==========\n";
+                std::cout << "Username: ";
+                if (!std::getline(std::cin, adminUsername)) break;
+
+                std::cout << "Password: ";
+                if (!std::getline(std::cin, password)) break;
+            }
+
+            if (AdminAuthManager::login(
+                    adminUsername, password, errorMessage)) {
+                std::cout << "Administrator login successful.\n";
+                AdminTrainMenu::run(std::cin, std::cout);
+                AdminAuthManager::logout();
+                std::cout << "Administrator session ended.\n";
+            } else {
+                std::cout << "Administrator login failed: "
+                          << errorMessage << '\n';
+            }
+
+            password.clear();
         }
         else if (choice == "5") {
+            if (AdminAuthManager::isAuthenticated()) {
+                AdminAuthManager::logout();
+                std::cout << "Administrator logged out successfully.\n";
+            } else {
+                std::cout << "No active administrator session.\n";
+            }
+        }
+        else if (choice == "6") {
             if (AuthManager::isSessionActive()) {
                 AuthManager::logout();
                 std::cout << "Passenger logged out successfully.\n";
@@ -454,13 +516,14 @@ int main() {
                 std::cout << "No active passenger session.\n";
             }
         }
-        else if (choice == "6") {
+        else if (choice == "7") {
             AuthManager::logout();
+            AdminAuthManager::logout();
             std::cout << "Exiting system. Goodbye!\n";
             break;
         }
         else {
-            std::cout << "Invalid choice. Please enter 1-6.\n";
+            std::cout << "Invalid choice. Please enter 1-7.\n";
         }
     }
 
