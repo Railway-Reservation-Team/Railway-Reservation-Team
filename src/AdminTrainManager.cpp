@@ -1,5 +1,6 @@
 #include "AdminTrainManager.h"
 #include "TrainData.h"
+#include "AtomicFileReplace.h"
 
 #include <fstream>
 #include <sstream>
@@ -101,7 +102,7 @@ bool writeRecords(
         return false;
     }
 
-    if (std::rename(temporaryFile.c_str(), filename.c_str()) != 0) {
+    if (!replaceFileAtomically(temporaryFile, filename)) {
         std::remove(temporaryFile.c_str());
         errorMessage = "Unable to replace train data file.";
         return false;

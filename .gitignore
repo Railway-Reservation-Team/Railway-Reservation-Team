@@ -11,3 +11,8 @@ seat_inventory_tests
 # IDE and editor files
 .vscode/
 .vs/
+
+# Passenger authentication data (never commit account records or audit logs)
+/data/users.dat
+/data/users.dat.tmp
+/data/auth_audit.log

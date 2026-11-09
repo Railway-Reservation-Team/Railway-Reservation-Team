@@ -48,7 +48,7 @@ The application uses local data files for persistent storage and does not requir
 - E-ticket generation and local saving/printing
 
 ### Administrator Features
-- Separate administrator login
+- Separate administrator authentication (specified; implementation pending)
 - Add, edit and delete train schedules
 - Manage train fares
 - Configure seat quotas
@@ -76,6 +76,7 @@ The application uses local data files for persistent storage and does not requir
 - **Programming Language:** C++17
 - **Build System:** CMake 3.16+ or Makefile
 - **Compiler:** GCC 9+, MSVC 2019+, or equivalent
+- **Cryptography:** OpenSSL (libcrypto), used by passenger authentication
 - **Testing:** GoogleTest 1.14+
 - **CI/CD:** Jenkins
 - **Static Analysis:** SonarQube or equivalent
@@ -122,11 +123,13 @@ Then run the generated executable.
 The application starts with a console-based main menu containing options such as:
 
 ```text
-1. Register
-2. Login
-3. Search Trains
-4. Admin Login
-5. Exit
+
+1. Passenger Registration
+2. Passenger Login
+3. Passenger Booking
+4. Admin Train Management
+5. Passenger Logout
+6. Exit
 ```
 
 ### Passenger Booking Flow
@@ -290,7 +293,7 @@ All team members should understand and be able to explain the submitted code dur
 
 Requirements: g++, C++17, Linux/Ubuntu/WSL, Git.
 
-Compile: `g++ -std=c++17 -Wall -Wextra -pedantic src/*.cpp -o railway`
+Compile: `g++ -std=c++17 -Wall -Wextra -pedantic -Isrc src/*.cpp -o railway -lcrypto` (requires OpenSSL development libraries)
 
 Run: `./railway`
 
@@ -306,4 +309,22 @@ Documentation:
 - FINAL_TEST_RESULTS.md
 - TEST_REPORT.md
 
-Automated regression result: 18 passed, 0 failed. Booking, PNR and seat inventory checks are documented for the TASK-09 development branch. Authentication, payment, cancellation and administrator functionality remain pending implementation or verification.
+The passenger authentication module has been implemented and integrated into the main application. Its dedicated test suite reports 20 passed and 0 failed. The complete application builds successfully. Separate administrator authentication remains pending implementation.
+
+### Verified Automated Test Results
+
+| Test Suite | Passed | Failed |
+|---|---:|---:|
+| Passenger authentication | 20 | 0 |
+| US-13 passenger-count validation | 11 | 0 |
+| Seat inventory | 42 | 0 |
+| Validation, search and fare calculation | 18 | 0 |
+| Passenger details and fare calculation | 13 | 0 |
+| Booking manager | 8 | 0 |
+| Admin train management | 8 | 0 |
+| Admin fare and reservations | 6 | 0 |
+| **Total** | **126** | **0** |
+
+All eight test suites passed. The complete application compiled successfully.
+
+See `FINAL_TEST_RESULTS.md` and `TEST_REPORT.md` for detailed results.

@@ -6,7 +6,9 @@
 #include "PassengerDetails.h"
 #include "BookingManager.h"
 #include "Payment.h"
+#include "SeatInventory.h"
 #include "AdminTrainMenu.h"
+#include "AuthManager.h"
 
 #include <iostream>
 #include <string>
@@ -15,6 +17,11 @@
 #include <iomanip>
 
 int runBooking() {
+    if (!AuthManager::isSessionActive()) {
+        std::cout << "Your passenger session has expired. Please log in again.\n";
+        return 1;
+    }
+
     std::string source;
     std::string destination;
     std::string journeyDate;
@@ -27,6 +34,7 @@ int runBooking() {
 
     std::cout << "===== Railway Reservation System =====\n";
 
+    // 1. Validate source station
     while (true) {
         std::cout << "Enter source station: ";
         if (!std::getline(std::cin, source)) return 1;
@@ -37,6 +45,7 @@ int runBooking() {
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
+    // 2. Validate destination station
     while (true) {
         std::cout << "Enter destination station: ";
         if (!std::getline(std::cin, destination)) return 1;
@@ -47,6 +56,7 @@ int runBooking() {
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
+    // 3. Validate journey date
     while (true) {
         std::cout << "Enter journey date (YYYY-MM-DD): ";
         if (!std::getline(std::cin, journeyDate)) return 1;
@@ -57,6 +67,7 @@ int runBooking() {
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
+    // 4. Load trains
     const std::vector<Train> trains =
         loadTrains("data/trains.dat", journeyDate, errorMessage);
 
@@ -70,6 +81,7 @@ int runBooking() {
         return 0;
     }
 
+    // 5. Search trains
     const std::vector<Train> results =
         searchTrains(trains, source, destination, journeyDate);
 
@@ -78,6 +90,7 @@ int runBooking() {
         return 0;
     }
 
+    // 6. Display matching trains
     std::cout << "\n========== MATCHING TRAINS ==========\n";
 
     for (size_t i = 0; i < results.size(); ++i) {
@@ -99,6 +112,7 @@ int runBooking() {
                   << " | Seats: " << train.chairCarSeatsAvailable << '\n';
     }
 
+    // 7. Validate train selection
     while (true) {
         std::cout << "\nSelect train option (1-"
                   << results.size() << "): ";
@@ -115,17 +129,117 @@ int runBooking() {
 
     const Train selectedTrain = results[trainChoice - 1];
 
-    while (true) {
-        std::cout << "\nEnter number of passengers (1-6): ";
+    std::string travelClass;
+    int availableSeats = 0;
+    bool bookingReady = false;
 
-        if (!std::getline(std::cin, input)) return 1;
+    // 8. Validate passenger count and class availability
+    while (!bookingReady) {
+        while (true) {
+            std::cout << "\nEnter number of passengers (1-6): ";
 
-        if (Validation::parseSeatCount(input, seats, errorMessage))
-            break;
+            if (!std::getline(std::cin, input)) return 1;
 
-        std::cout << "Error: " << errorMessage << " Try again.\n";
+            if (Validation::parseSeatCount(input, seats, errorMessage))
+                break;
+
+            std::cout << "Error: " << errorMessage << " Try again.\n";
+        }
+
+        // 9. Select travel class
+        while (true) {
+            std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
+                      << "1. Sleeper\n"
+                      << "2. AC 3-Tier\n"
+                      << "3. AC 2-Tier\n"
+                      << "4. Chair Car\n";
+
+            while (true) {
+                std::cout << "Select travel class (1-4): ";
+
+                if (!std::getline(std::cin, input)) return 1;
+
+                if (Validation::parseMenuChoice(
+                        input, 1, 4, classChoice, errorMessage))
+                    break;
+
+                std::cout << "Error: " << errorMessage << " Try again.\n";
+            }
+
+            switch (classChoice) {
+                case 1:
+                    travelClass = "Sleeper";
+                    break;
+                case 2:
+                    travelClass = "AC 3-Tier";
+                    break;
+                case 3:
+                    travelClass = "AC 2-Tier";
+                    break;
+                case 4:
+                    travelClass = "Chair Car";
+                    break;
+            }
+
+            availableSeats = getAvailableSeats(selectedTrain, travelClass);
+
+            const SeatRequestResult seatResult =
+                validateSeatRequest(availableSeats, seats);
+
+            if (seatResult == SeatRequestResult::VALID) {
+                bookingReady = true;
+                break;
+            }
+
+            if (seatResult == SeatRequestResult::INVALID_AVAILABILITY) {
+                std::cout << "\nError: Invalid seat availability.\n";
+            }
+            else if (seatResult == SeatRequestResult::INVALID_REQUEST) {
+                std::cout << "\nError: Invalid passenger count.\n";
+            }
+            else if (seatResult == SeatRequestResult::EXCEEDS_MAX_PASSENGERS) {
+                std::cout << "\nError: Maximum six passengers are allowed per booking.\n";
+            }
+            else if (availableSeats == 0) {
+                std::cout << "\nSorry, no seats are available in "
+                          << travelClass << ".\n";
+            }
+            else {
+                std::cout << "\nError: Only " << availableSeats
+                          << " seats are available in " << travelClass
+                          << ". You requested " << seats << " seats.\n";
+            }
+
+            std::cout << "1. Enter passenger count again\n"
+                      << "2. Select travel class again\n"
+                      << "3. Cancel booking\n";
+
+            int retryChoice = 0;
+
+            while (true) {
+                std::cout << "Choose an option (1-3): ";
+
+                if (!std::getline(std::cin, input)) return 1;
+
+                if (Validation::parseMenuChoice(
+                        input, 1, 3, retryChoice, errorMessage))
+                    break;
+
+                std::cout << "Error: " << errorMessage << " Try again.\n";
+            }
+
+            if (retryChoice == 1)
+                break;
+
+            if (retryChoice == 2)
+                continue;
+
+            std::cout << "Booking cancelled.\n";
+            return 0;
+        }
     }
 
+    // 10. Collect passenger details
     std::vector<Passenger> passengers;
 
     if (!PassengerDetails::collectPassengerDetails(
@@ -134,57 +248,11 @@ int runBooking() {
         return 1;
     }
 
-    std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
-              << "1. Sleeper\n"
-              << "2. AC 3-Tier\n"
-              << "3. AC 2-Tier\n"
-              << "4. Chair Car\n";
-
-    while (true) {
-        std::cout << "Select travel class (1-4): ";
-
-        if (!std::getline(std::cin, input)) return 1;
-
-        if (Validation::parseMenuChoice(
-                input, 1, 4, classChoice, errorMessage))
-            break;
-
-        std::cout << "Error: " << errorMessage << " Try again.\n";
-    }
-
-    std::string travelClass;
-    int availableSeats = 0;
-
-    switch (classChoice) {
-        case 1:
-            travelClass = "Sleeper";
-            availableSeats = selectedTrain.sleeperSeatsAvailable;
-            break;
-        case 2:
-            travelClass = "AC 3-Tier";
-            availableSeats = selectedTrain.ac3TierSeatsAvailable;
-            break;
-        case 3:
-            travelClass = "AC 2-Tier";
-            availableSeats = selectedTrain.ac2TierSeatsAvailable;
-            break;
-        case 4:
-            travelClass = "Chair Car";
-            availableSeats = selectedTrain.chairCarSeatsAvailable;
-            break;
-    }
-
-    if (availableSeats < seats) {
-        std::cout << "Error: Not enough seats available. Only "
-                  << availableSeats << " seats remain.\n";
-        return 1;
-    }
-
     try {
+        // 11. Calculate fare
         const double totalFare =
             FareCalculator::calculateFare(
-                selectedTrain, travelClass, seats
-            );
+                selectedTrain, travelClass, seats);
 
         std::cout << "\n========== BOOKING DETAILS ==========\n"
                   << "Train: " << selectedTrain.trainName
@@ -205,6 +273,7 @@ int runBooking() {
                       << "\nGender: " << passengers[i].gender << '\n';
         }
 
+        // 12. Confirm booking
         std::string confirmation;
 
         std::cout << "\nConfirm booking? (Y/N): ";
@@ -215,7 +284,13 @@ int runBooking() {
             return 0;
         }
 
-        // Process payment before creating the booking.
+        // 13. Verify passenger session
+        if (!AuthManager::isSessionActive()) {
+            std::cout << "Session expired. Please log in again. Booking was not saved.\n";
+            return 1;
+        }
+
+        // 14. Process payment
         std::string paymentMethod;
         std::string paymentStatus;
 
@@ -238,7 +313,7 @@ int runBooking() {
         std::cout << "\nPayment Status: SUCCESS\n"
                   << "Payment Method: " << paymentMethod << '\n';
 
-        // Create booking only after successful payment.
+        // 15. Create booking and generate PNR
         std::string pnr;
 
         if (!BookingManager::createBooking(
@@ -258,6 +333,7 @@ int runBooking() {
             return 1;
         }
 
+        // 16. Display confirmation
         std::cout << std::fixed << std::setprecision(2);
 
         std::cout << "\n========== BOOKING CONFIRMED ==========\n"
@@ -285,31 +361,109 @@ int runBooking() {
 
 int main() {
     std::string choice;
+    std::string name;
+    std::string email;
+    std::string phone;
+    std::string password;
+    std::string errorMessage;
 
     while (true) {
+        const bool loggedIn = AuthManager::isSessionActive();
+
         std::cout << "\n===== RAILWAY RESERVATION SYSTEM =====\n"
-                  << "1. Passenger Booking\n"
-                  << "2. Admin Train Management\n"
-                  << "3. Exit\n"
-                  << "Enter choice: ";
+                  << "1. Passenger Registration\n"
+                  << "2. Passenger Login\n"
+                  << "3. Passenger Booking\n"
+                  << "4. Admin Train Management\n"
+                  << "5. Passenger Logout\n"
+                  << "6. Exit\n";
+
+        if (loggedIn) {
+            std::cout << "Logged-in passenger: "
+                      << AuthManager::getCurrentUserEmail() << '\n';
+        } else {
+            std::cout << "Passenger status: Not logged in\n";
+        }
+
+        std::cout << "Enter choice: ";
 
         if (!std::getline(std::cin, choice))
             break;
 
         if (choice == "1") {
-            runBooking();
+            std::cout << "\n========== PASSENGER REGISTRATION ==========\n";
+
+            std::cout << "Enter full name: ";
+            if (!std::getline(std::cin, name)) break;
+
+            std::cout << "Enter email: ";
+            if (!std::getline(std::cin, email)) break;
+
+            std::cout << "Enter phone number: ";
+            if (!std::getline(std::cin, phone)) break;
+
+            std::cout << "Enter password: ";
+            if (!std::getline(std::cin, password)) break;
+
+            if (AuthManager::registerPassenger(
+                    name, email, phone, password, errorMessage)) {
+                std::cout << "Registration successful! Please log in.\n";
+            } else {
+                std::cout << "Registration failed: "
+                          << errorMessage << '\n';
+            }
+
+            password.clear();
         }
         else if (choice == "2") {
-            AdminTrainMenu::run(std::cin, std::cout);
+            std::cout << "\n========== PASSENGER LOGIN ==========\n";
+
+            std::cout << "Enter registered email: ";
+            if (!std::getline(std::cin, email)) break;
+
+            std::cout << "Enter password: ";
+            if (!std::getline(std::cin, password)) break;
+
+            if (AuthManager::login(email, password, errorMessage)) {
+                std::cout << "Login successful. Welcome!\n";
+            } else {
+                std::cout << "Login failed: "
+                          << errorMessage << '\n';
+            }
+
+            password.clear();
         }
         else if (choice == "3") {
+            if (!AuthManager::isSessionActive()) {
+                std::cout << "Please register and log in before booking.\n";
+                continue;
+            }
+
+            AuthManager::recordActivity();
+            runBooking();
+            AuthManager::recordActivity();
+        }
+        else if (choice == "4") {
+            AdminTrainMenu::run(std::cin, std::cout);
+        }
+        else if (choice == "5") {
+            if (AuthManager::isSessionActive()) {
+                AuthManager::logout();
+                std::cout << "Passenger logged out successfully.\n";
+            } else {
+                std::cout << "No active passenger session.\n";
+            }
+        }
+        else if (choice == "6") {
+            AuthManager::logout();
             std::cout << "Exiting system. Goodbye!\n";
             break;
         }
         else {
-            std::cout << "Invalid choice. Try again.\n";
+            std::cout << "Invalid choice. Please enter 1-6.\n";
         }
     }
 
+    AuthManager::logout();
     return 0;
 }

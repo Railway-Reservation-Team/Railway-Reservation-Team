@@ -1,6 +1,7 @@
 
 #include "BookingManager.h"
 #include "TrainData.h"
+#include "AtomicFileReplace.h"
 
 #include <fstream>
 #include <sstream>
@@ -12,29 +13,12 @@
 #include <string>
 #include <cctype>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 namespace BookingManager {
 
 static const std::string BOOKING_FILE = "data/bookings.dat";
 static const std::string TRAIN_FILE = "data/trains.dat";
 
-// Safely replace the original file with the temporary file.
-bool replaceFile(const char* temporaryFile, const char* originalFile) {
-#ifdef _WIN32
-    return MoveFileExA(
-        temporaryFile,
-        originalFile,
-        MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH
-    ) != 0;
-#else
-    return std::rename(temporaryFile, originalFile) == 0;
-#endif
-}
-
-// Encode special characters so passenger details remain safe.
+// Encode special characters in passenger details.
 std::string encodeField(const std::string& value) {
     std::ostringstream result;
     const char* hex = "0123456789ABCDEF";
@@ -177,7 +161,6 @@ bool createBooking(
 
     // Validate passenger information.
     for (const Passenger& passenger : passengers) {
-
         if (passenger.name.find_first_not_of(" \t") ==
                 std::string::npos ||
             passenger.age < 1 ||
@@ -210,7 +193,6 @@ bool createBooking(
     bool found = false;
 
     while (std::getline(input, line)) {
-
         if (line.empty()) {
             continue;
         }
@@ -261,7 +243,7 @@ bool createBooking(
         return false;
     }
 
-    // Save original train data for rollback.
+    // Read original train data for rollback.
     std::ifstream originalFile(TRAIN_FILE);
 
     if (!originalFile.is_open()) {
@@ -277,7 +259,6 @@ bool createBooking(
     std::ostringstream updatedData;
 
     for (const Train& train : trains) {
-
         updatedData << train.trainNumber << '|'
                     << train.trainName << '|'
                     << train.source << '|'
@@ -296,7 +277,7 @@ bool createBooking(
                     << train.journeyDate << '\n';
     }
 
-    // Write updated data to temporary file.
+    // Write updated train data to a temporary file.
     {
         std::ofstream temp("data/trains.tmp", std::ios::trunc);
 
@@ -308,18 +289,16 @@ bool createBooking(
         temp << updatedData.str();
 
         if (!temp) {
-            errorMessage = "Failed to write updated train data.";
             temp.close();
             std::remove("data/trains.tmp");
+            errorMessage = "Failed to write updated train data.";
             return false;
         }
     }
 
-    // Replace trains.dat safely on Windows.
-    if (!replaceFile("data/trains.tmp", TRAIN_FILE.c_str())) {
-
+    // Atomically replace train data.
+    if (!replaceFileAtomically("data/trains.tmp", TRAIN_FILE)) {
         std::remove("data/trains.tmp");
-
         errorMessage = "Could not update seat inventory.";
         return false;
     }
@@ -328,7 +307,6 @@ bool createBooking(
     std::ostringstream passengerData;
 
     for (std::size_t i = 0; i < passengers.size(); ++i) {
-
         if (i > 0) {
             passengerData << ';';
         }
@@ -345,7 +323,6 @@ bool createBooking(
         std::ofstream bookings(BOOKING_FILE, std::ios::app);
 
         if (bookings.is_open()) {
-
             bookings << pnr << '|'
                      << selectedTrain.trainNumber << '|'
                      << selectedTrain.journeyDate << '|'
@@ -353,8 +330,7 @@ bool createBooking(
                      << passengerData.str() << '|'
                      << passengers.size() << '|'
                      << std::fixed << std::setprecision(2)
-                     << totalFare
-                     << "|Confirmed\n";
+                     << totalFare << "|Confirmed\n";
 
             saved = static_cast<bool>(bookings);
         }
@@ -362,7 +338,6 @@ bool createBooking(
 
     // Restore train inventory if booking could not be saved.
     if (!saved) {
-
         std::ofstream restore(TRAIN_FILE, std::ios::trunc);
 
         if (restore.is_open()) {
@@ -372,7 +347,7 @@ bool createBooking(
         restore.close();
 
         errorMessage =
-            "Could not save booking. Seat allocation rolled back.";
+            "Could not save booking. Seat allocation rollback attempted.";
 
         return false;
     }
