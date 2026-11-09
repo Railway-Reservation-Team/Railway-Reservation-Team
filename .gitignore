@@ -20,3 +20,6 @@ seat_inventory_tests
 # Administrator authentication data (never commit account records)
 /data/admin.dat
 /data/admin.dat.tmp
+
+/data/admin.dat.backup
+/data/admin.dat.backup2
