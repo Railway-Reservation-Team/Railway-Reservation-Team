@@ -4,6 +4,7 @@
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "SeatInventory.h"
 #include "AdminTrainMenu.h"
 #include "AuthManager.h"
 
@@ -164,30 +165,47 @@ int runBooking() {
             switch (classChoice) {
                 case 1:
                     travelClass = "Sleeper";
-                    availableSeats = selectedTrain.sleeperSeatsAvailable;
                     break;
                 case 2:
                     travelClass = "AC 3-Tier";
-                    availableSeats = selectedTrain.ac3TierSeatsAvailable;
                     break;
                 case 3:
                     travelClass = "AC 2-Tier";
-                    availableSeats = selectedTrain.ac2TierSeatsAvailable;
                     break;
                 case 4:
                     travelClass = "Chair Car";
-                    availableSeats = selectedTrain.chairCarSeatsAvailable;
                     break;
             }
 
-            if (availableSeats >= seats) {
+            // US-03: Check class-wise seat availability.
+            availableSeats = getAvailableSeats(selectedTrain, travelClass);
+
+            const SeatRequestResult seatResult =
+                validateSeatRequest(availableSeats, seats);
+
+            if (seatResult == SeatRequestResult::VALID) {
                 bookingReady = true;
                 break;
             }
 
-            std::cout << "\nError: Only " << availableSeats
-                      << " seats are available in " << travelClass
-                      << ". You requested " << seats << " seats.\n";
+            if (seatResult == SeatRequestResult::INVALID_AVAILABILITY) {
+                std::cout << "\nError: Invalid seat availability.\n";
+            }
+            else if (seatResult == SeatRequestResult::INVALID_REQUEST) {
+                std::cout << "\nError: Invalid passenger count.\n";
+            }
+            else if (seatResult == SeatRequestResult::EXCEEDS_MAX_PASSENGERS) {
+                std::cout << "\nError: Maximum six passengers are allowed per booking.\n";
+            }
+            else if (availableSeats == 0) {
+                std::cout << "\nSorry, no seats are available in "
+                          << travelClass << ".\n";
+            }
+            else {
+                std::cout << "\nError: Only " << availableSeats
+                          << " seats are available in " << travelClass
+                          << ". You requested " << seats << " seats.\n";
+            }
 
             std::cout << "1. Enter passenger count again\n"
                       << "2. Select travel class again\n"
