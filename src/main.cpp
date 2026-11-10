@@ -1,10 +1,10 @@
-
 #include "TrainData.h"
 #include "TrainSearch.h"
 #include "Validation.h"
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "Cancellation.h"
 #include "Payment.h"
 #include "SeatInventory.h"
 #include "AdminTrainMenu.h"
@@ -45,43 +45,117 @@ int runBooking() {
     int seats = 0;
     int trainChoice = 0;
     int classChoice = 0;
+    int menuChoice = 0;
 
     std::cout << "===== Railway Reservation System =====\n";
+    std::cout << "\n========== MAIN MENU ==========\n";
+    std::cout << "1. Book Ticket\n";
+    std::cout << "2. Cancel Ticket\n";
+    std::cout << "Enter your choice (1-2): ";
 
-    // 1. Validate source station
+    if (!std::getline(std::cin, input)) {
+        return 1;
+    }
+
+    if (!Validation::parseMenuChoice(
+            input, 1, 2, menuChoice, errorMessage)) {
+        std::cout << "Error: " << errorMessage << '\n';
+        return 1;
+    }
+
+    if (menuChoice == 2) {
+        std::string pnr;
+        double refundAmount = 0.0;
+        double cancellationCharge = 0.0;
+
+        std::cout << "\n========== TICKET CANCELLATION ==========\n";
+        std::cout << "Enter your booking PNR: ";
+
+        if (!std::getline(std::cin, pnr)) {
+            return 1;
+        }
+
+        if (pnr.find_first_not_of(" \t") == std::string::npos) {
+            std::cout << "Error: PNR cannot be empty.\n";
+            return 1;
+        }
+
+        std::string confirmation;
+
+        std::cout << "Are you sure you want to cancel this ticket? (Y/N): ";
+
+        if (!std::getline(std::cin, confirmation)) {
+            return 1;
+        }
+
+        if (confirmation != "Y" && confirmation != "y") {
+            std::cout << "Cancellation request stopped.\n";
+            return 0;
+        }
+
+        if (!Cancellation::cancelBooking(
+                pnr, refundAmount, cancellationCharge, errorMessage)) {
+            std::cout << "\nCancellation failed: "
+                      << errorMessage << '\n';
+            return 1;
+        }
+
+        std::cout << std::fixed << std::setprecision(2);
+        std::cout << "\n========================================\n";
+        std::cout << "       TICKET CANCELLED SUCCESSFULLY\n";
+        std::cout << "========================================\n";
+        std::cout << "PNR: " << pnr << '\n';
+        std::cout << "Cancellation Charge: Rs. "
+                  << cancellationCharge << '\n';
+        std::cout << "Refund Amount: Rs. " << refundAmount << '\n';
+        std::cout << "Booking Status: Cancelled\n";
+        std::cout << "Seats restored successfully.\n";
+        std::cout << "Cancellation details saved.\n";
+        std::cout << "========================================\n";
+
+        return 0;
+    }
+
+    // Validate source station
     while (true) {
-        std::cout << "Enter source station: ";
+        std::cout << "\nEnter source station: ";
+
         if (!readBookingInput(source)) return 1;
 
-        if (Validation::isNonEmpty(source, errorMessage))
+        if (Validation::isNonEmpty(source, errorMessage)) {
             break;
+        }
 
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 2. Validate destination station
+    // Validate destination station
     while (true) {
         std::cout << "Enter destination station: ";
+
         if (!readBookingInput(destination)) return 1;
 
-        if (Validation::isNonEmpty(destination, errorMessage))
+        if (Validation::isNonEmpty(destination, errorMessage)) {
             break;
+        }
 
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 3. Validate journey date
+    // Validate journey date
     while (true) {
         std::cout << "Enter journey date (YYYY-MM-DD): ";
+
         if (!readBookingInput(journeyDate)) return 1;
 
-        if (Validation::isValidDate(journeyDate, errorMessage))
+        if (Validation::isValidDate(journeyDate, errorMessage)) {
             break;
+        }
 
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
 
-    // 4. Load trains
+    // Load trains
     const std::vector<Train> trains =
         loadTrains("data/trains.dat", journeyDate, errorMessage);
 
@@ -95,7 +169,7 @@ int runBooking() {
         return 0;
     }
 
-    // 5. Search trains
+    // Search trains
     const std::vector<Train> results =
         searchTrains(trains, source, destination, journeyDate);
 
@@ -104,7 +178,7 @@ int runBooking() {
         return 0;
     }
 
-    // 6. Display matching trains
+    // Display matching trains
     std::cout << "\n========== MATCHING TRAINS ==========\n";
 
     for (size_t i = 0; i < results.size(); ++i) {
@@ -126,7 +200,7 @@ int runBooking() {
                   << " | Seats: " << train.chairCarSeatsAvailable << '\n';
     }
 
-    // 7. Validate train selection
+    // Validate train selection
     while (true) {
         std::cout << "\nSelect train option (1-"
                   << results.size() << "): ";
@@ -135,8 +209,9 @@ int runBooking() {
 
         if (Validation::parseMenuChoice(
                 input, 1, static_cast<int>(results.size()),
-                trainChoice, errorMessage))
+                trainChoice, errorMessage)) {
             break;
+        }
 
         std::cout << "Error: " << errorMessage << " Try again.\n";
     }
@@ -147,20 +222,21 @@ int runBooking() {
     int availableSeats = 0;
     bool bookingReady = false;
 
-    // 8. Validate passenger count and class availability
+    // Validate passenger count and class availability
     while (!bookingReady) {
         while (true) {
             std::cout << "\nEnter number of passengers (1-6): ";
 
             if (!readBookingInput(input)) return 1;
 
-            if (Validation::parseSeatCount(input, seats, errorMessage))
+            if (Validation::parseSeatCount(input, seats, errorMessage)) {
                 break;
+            }
 
             std::cout << "Error: " << errorMessage << " Try again.\n";
         }
 
-        // 9. Select travel class
+        // Select travel class
         while (true) {
             std::cout << "\n========== SELECT TRAVEL CLASS ==========\n"
                       << "1. Sleeper\n"
@@ -174,8 +250,9 @@ int runBooking() {
                 if (!readBookingInput(input)) return 1;
 
                 if (Validation::parseMenuChoice(
-                        input, 1, 4, classChoice, errorMessage))
+                        input, 1, 4, classChoice, errorMessage)) {
                     break;
+                }
 
                 std::cout << "Error: " << errorMessage << " Try again.\n";
             }
@@ -236,24 +313,27 @@ int runBooking() {
                 if (!readBookingInput(input)) return 1;
 
                 if (Validation::parseMenuChoice(
-                        input, 1, 3, retryChoice, errorMessage))
+                        input, 1, 3, retryChoice, errorMessage)) {
                     break;
+                }
 
                 std::cout << "Error: " << errorMessage << " Try again.\n";
             }
 
-            if (retryChoice == 1)
+            if (retryChoice == 1) {
                 break;
+            }
 
-            if (retryChoice == 2)
+            if (retryChoice == 2) {
                 continue;
+            }
 
             std::cout << "Booking cancelled.\n";
             return 0;
         }
     }
 
-    // 10. Collect passenger details
+    // Collect passenger details
     std::vector<Passenger> passengers;
 
     if (!PassengerDetails::collectPassengerDetails(
@@ -264,7 +344,7 @@ int runBooking() {
     }
 
     try {
-        // 11. Calculate fare
+        // Calculate fare
         const double totalFare =
             FareCalculator::calculateFare(
                 selectedTrain, travelClass, seats);
@@ -288,10 +368,10 @@ int runBooking() {
                       << "\nGender: " << passengers[i].gender << '\n';
         }
 
-        // 12. Confirm booking
+        // Confirm booking
         std::string confirmation;
-
         std::cout << "\nConfirm booking? (Y/N): ";
+
         if (!readBookingInput(confirmation)) return 1;
 
         if (confirmation != "Y" && confirmation != "y") {
@@ -299,21 +379,18 @@ int runBooking() {
             return 0;
         }
 
-        // 13. Verify passenger session
+        // Verify passenger session
         if (!AuthManager::isSessionActive()) {
             std::cout << "Session expired. Please log in again. Booking was not saved.\n";
             return 1;
         }
 
-        // 14. Process payment
+        // Process payment
         std::string paymentMethod;
         std::string paymentStatus;
 
         const bool paymentSuccessful = processPayment(
-            totalFare,
-            paymentMethod,
-            paymentStatus
-        );
+            totalFare, paymentMethod, paymentStatus);
 
         if (!paymentSuccessful) {
             std::cout << "\n========================================\n"
@@ -321,14 +398,13 @@ int runBooking() {
                       << "========================================\n"
                       << "Payment Status: " << paymentStatus << '\n'
                       << "Payment failed. No booking was saved.\n";
-
             return 1;
         }
 
         std::cout << "\nPayment Status: SUCCESS\n"
                   << "Payment Method: " << paymentMethod << '\n';
 
-        // 15. Create booking and generate PNR
+        // Create booking and generate PNR
         std::string pnr;
 
         if (!BookingManager::createBooking(
@@ -338,17 +414,13 @@ int runBooking() {
                 totalFare,
                 pnr,
                 errorMessage)) {
-
-            std::cout << "Booking failed: "
-                      << errorMessage << '\n';
-
+            std::cout << "Booking failed: " << errorMessage << '\n';
             std::cout << "Payment was successful, but booking was not saved.\n";
             std::cout << "Manual payment reversal may be required.\n";
-
             return 1;
         }
 
-        // 16. Display confirmation
+        // Display booking confirmation
         std::cout << std::fixed << std::setprecision(2);
 
         std::cout << "\n========== BOOKING CONFIRMED ==========\n"
@@ -407,8 +479,9 @@ int main() {
 
         std::cout << "Enter choice: ";
 
-        if (!std::getline(std::cin, choice))
+        if (!std::getline(std::cin, choice)) {
             break;
+        }
 
         if (choice == "1") {
             std::cout << "\n========== PASSENGER REGISTRATION ==========\n";
@@ -447,8 +520,7 @@ int main() {
             if (AuthManager::login(email, password, errorMessage)) {
                 std::cout << "Login successful. Welcome!\n";
             } else {
-                std::cout << "Login failed: "
-                          << errorMessage << '\n';
+                std::cout << "Login failed: " << errorMessage << '\n';
             }
 
             password.clear();
@@ -479,9 +551,11 @@ int main() {
             if (!accountExists) {
                 std::cout << "\n========== FIRST-TIME ADMIN SETUP ==========\n";
                 std::cout << "Create administrator username: ";
+
                 if (!std::getline(std::cin, adminUsername)) break;
 
                 std::cout << "Create administrator password: ";
+
                 if (!std::getline(std::cin, password)) break;
 
                 if (!AdminAuthManager::setupAdmin(
@@ -495,9 +569,11 @@ int main() {
             } else {
                 std::cout << "\n========== ADMINISTRATOR LOGIN ==========\n";
                 std::cout << "Username: ";
+
                 if (!std::getline(std::cin, adminUsername)) break;
 
                 std::cout << "Password: ";
+
                 if (!std::getline(std::cin, password)) break;
             }
 

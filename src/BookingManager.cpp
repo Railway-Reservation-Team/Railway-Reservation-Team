@@ -9,7 +9,6 @@
 #include <random>
 #include <iomanip>
 #include <cmath>
-#include <cstdio>
 #include <string>
 #include <cctype>
 
@@ -63,6 +62,7 @@ std::string decodeField(const std::string& value) {
     return result;
 }
 
+// Check whether a PNR already exists.
 bool isPNRUsed(const std::string& candidate) {
     std::ifstream file(BOOKING_FILE);
     std::string line;
@@ -79,6 +79,7 @@ bool isPNRUsed(const std::string& candidate) {
     return false;
 }
 
+// Generate a unique 10-digit PNR.
 bool generateUniquePNR(std::string& pnr) {
     std::random_device rd;
     std::mt19937_64 generator(rd());
@@ -88,7 +89,8 @@ bool generateUniquePNR(std::string& pnr) {
     );
 
     for (int attempt = 0; attempt < 1000; ++attempt) {
-        std::string candidate = std::to_string(distribution(generator));
+        std::string candidate =
+            std::to_string(distribution(generator));
 
         if (!isPNRUsed(candidate)) {
             pnr = candidate;
@@ -99,6 +101,7 @@ bool generateUniquePNR(std::string& pnr) {
     return false;
 }
 
+// Find a booking using its PNR.
 bool findBooking(const std::string& requestedPNR, Booking& booking) {
     std::ifstream file(BOOKING_FILE);
 
@@ -141,6 +144,7 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
     return false;
 }
 
+// Create a booking and update seat inventory.
 bool createBooking(
     const Train& selectedTrain,
     const std::string& travelClass,
@@ -207,6 +211,11 @@ bool createBooking(
         if (train.trainNumber == selectedTrain.trainNumber &&
             train.journeyDate == selectedTrain.journeyDate) {
 
+            if (found) {
+                errorMessage = "Duplicate train record found.";
+                return false;
+            }
+
             int* available = nullptr;
 
             if (travelClass == "Sleeper") {
@@ -244,10 +253,10 @@ bool createBooking(
     }
 
     // Read original train data for rollback.
-    std::ifstream originalFile(TRAIN_FILE);
+    std::ifstream originalFile(TRAIN_FILE, std::ios::binary);
 
     if (!originalFile.is_open()) {
-        errorMessage = "Cannot read original train data for rollback.";
+        errorMessage = "Cannot read original train data.";
         return false;
     }
 
@@ -278,8 +287,10 @@ bool createBooking(
     }
 
     // Write updated train data to a temporary file.
+    const std::string TEMP_FILE = "data/trains.tmp";
+
     {
-        std::ofstream temp("data/trains.tmp", std::ios::trunc);
+        std::ofstream temp(TEMP_FILE, std::ios::trunc);
 
         if (!temp.is_open()) {
             errorMessage = "Cannot create temporary train data.";
@@ -290,15 +301,16 @@ bool createBooking(
 
         if (!temp) {
             temp.close();
-            std::remove("data/trains.tmp");
+            std::remove(TEMP_FILE.c_str());
+
             errorMessage = "Failed to write updated train data.";
             return false;
         }
     }
 
     // Atomically replace train data.
-    if (!replaceFileAtomically("data/trains.tmp", TRAIN_FILE)) {
-        std::remove("data/trains.tmp");
+    if (!replaceFileAtomically(TEMP_FILE, TRAIN_FILE)) {
+        std::remove(TEMP_FILE.c_str());
         errorMessage = "Could not update seat inventory.";
         return false;
     }
@@ -338,16 +350,38 @@ bool createBooking(
 
     // Restore train inventory if booking could not be saved.
     if (!saved) {
-        std::ofstream restore(TRAIN_FILE, std::ios::trunc);
+        const std::string ROLLBACK_FILE = "data/trains.rollback";
 
-        if (restore.is_open()) {
+        {
+            std::ofstream restore(
+                ROLLBACK_FILE,
+                std::ios::binary | std::ios::trunc
+            );
+
+            if (!restore.is_open()) {
+                errorMessage =
+                    "Booking save failed and rollback file could not be opened.";
+                return false;
+            }
+
             restore << originalContent.str();
+            restore.close();
+
+            if (!restore) {
+                errorMessage =
+                    "Booking save failed and rollback file could not be written.";
+                return false;
+            }
         }
 
-        restore.close();
+        if (!replaceFileAtomically(ROLLBACK_FILE, TRAIN_FILE)) {
+            errorMessage =
+                "Booking save failed. Seat rollback also failed.";
+            return false;
+        }
 
         errorMessage =
-            "Could not save booking. Seat allocation rollback attempted.";
+            "Could not save booking. Seat allocation rolled back.";
 
         return false;
     }
@@ -355,4 +389,4 @@ bool createBooking(
     return true;
 }
 
-}
+} // namespace BookingManager
