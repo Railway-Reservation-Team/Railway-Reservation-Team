@@ -19,7 +19,7 @@ set(RRS_CORE_SOURCES
     src/AdminTrainMenu.cpp
     src/AuthManager.cpp
     src/BookingManager.cpp
-    # Booking cancellation implementation
+    # Include the cancellation implementation required by the booking flow.
     src/Cancellation.cpp
     src/FareCalculator.cpp
     src/PassengerDetails.cpp
