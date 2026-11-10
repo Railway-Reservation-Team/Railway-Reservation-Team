@@ -13,6 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 
 set(RRS_CORE_SOURCES
+    src/AdminAuthManager.cpp
     src/AdminFareReservationManager.cpp
     src/AdminTrainManager.cpp
     src/AdminTrainMenu.cpp
@@ -20,6 +21,7 @@ set(RRS_CORE_SOURCES
     src/BookingManager.cpp
     src/FareCalculator.cpp
     src/PassengerDetails.cpp
+    src/Payment.cpp
     src/SeatInventory.cpp
     src/TrainSearch.cpp
     src/Validation.cpp
