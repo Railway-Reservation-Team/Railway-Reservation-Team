@@ -1,25 +1,30 @@
-# Compiled executables
+# C++ build artifacts
+/build/
+/cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+
+# Compiled executables and objects
 railway
 railway.exe
-seat_inventory_tests
-
-# Other build outputs
 *.o
 *.obj
 *.exe
 
-# IDE and editor files
+# IDE files
 .vscode/
 .vs/
 
-# Passenger authentication data (never commit account records or audit logs)
+# Passenger authentication data and audit logs
 /data/users.dat
 /data/users.dat.tmp
 /data/auth_audit.log
 
-# Administrator authentication data (never commit account records)
+# Administrator authentication data
 /data/admin.dat
 /data/admin.dat.tmp
-
 /data/admin.dat.backup
 /data/admin.dat.backup2
