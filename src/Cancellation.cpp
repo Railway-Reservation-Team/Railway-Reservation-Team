@@ -2,13 +2,17 @@
 #include "Cancellation.h"
 #include "BookingManager.h"
 #include "TrainData.h"
+#include "AtomicFileReplace.h"
 
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <string>
 #include <iomanip>
-#include <windows.h>
+#include <cmath>
+#include <cstdio>
+#include <ctime>
+#include <limits>
 
 namespace Cancellation {
 
@@ -16,17 +20,18 @@ const std::string BOOKING_FILE = "data/bookings.dat";
 const std::string TRAIN_FILE = "data/trains.dat";
 const std::string CANCELLATION_FILE = "data/cancellations.dat";
 
-// Provisional capacities. Confirm these with the project team.
-const int MAX_SLEEPER_SEATS = 100;
-const int MAX_AC3_SEATS = 80;
-const int MAX_AC2_SEATS = 60;
-const int MAX_CHAIR_CAR_SEATS = 50;
+// SRS default cancellation fee percentages.
+const int CANCELLATION_FEE_TIER1_PCT = 25;
+const int CANCELLATION_FEE_TIER2_PCT = 50;
 
-// Structure for updating files.
 struct FileUpdate {
     std::string filename;
     std::vector<std::string> lines;
-    bool existed = false;
+
+    FileUpdate(
+        const std::string& name,
+        const std::vector<std::string>& records
+    ) : filename(name), lines(records) {}
 };
 
 // Read records from a file.
@@ -35,7 +40,7 @@ bool readLines(
     std::vector<std::string>& lines,
     std::string& errorMessage) {
 
-    std::ifstream file(filename);
+    std::ifstream file(filename.c_str());
 
     if (!file.is_open()) {
         errorMessage = "Cannot open file: " + filename;
@@ -55,211 +60,255 @@ bool readLines(
         return false;
     }
 
-    file.close();
     return true;
 }
 
-// Update multiple files with backup and rollback protection.
+// Calculate cancellation fee and refund using the SRS time slabs.
+bool calculateRefund(
+    const Train& train,
+    double totalFare,
+    double& refund,
+    double& charge,
+    std::string& errorMessage) {
+
+    refund = 0.0;
+    charge = 0.0;
+
+    if (train.journeyDate.size() != 10 ||
+        train.journeyDate[4] != '-' ||
+        train.journeyDate[7] != '-') {
+        errorMessage = "Invalid train journey date.";
+        return false;
+    }
+
+    if (train.departureTime.size() != 5 ||
+        train.departureTime[2] != ':') {
+        errorMessage = "Invalid train departure time.";
+        return false;
+    }
+
+    for (std::size_t i = 0; i < train.departureTime.size(); ++i) {
+        if (i != 2 &&
+            (train.departureTime[i] < '0' ||
+             train.departureTime[i] > '9')) {
+            errorMessage = "Invalid train departure time.";
+            return false;
+        }
+    }
+
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+
+    try {
+        year = std::stoi(train.journeyDate.substr(0, 4));
+        month = std::stoi(train.journeyDate.substr(5, 2));
+        day = std::stoi(train.journeyDate.substr(8, 2));
+        hour = std::stoi(train.departureTime.substr(0, 2));
+        minute = std::stoi(train.departureTime.substr(3, 2));
+    }
+    catch (...) {
+        errorMessage = "Invalid journey date or departure time.";
+        return false;
+    }
+
+    if (hour < 0 || hour > 23 ||
+        minute < 0 || minute > 59) {
+        errorMessage = "Invalid train departure time.";
+        return false;
+    }
+
+    std::tm departure = {};
+
+    departure.tm_year = year - 1900;
+    departure.tm_mon = month - 1;
+    departure.tm_mday = day;
+    departure.tm_hour = hour;
+    departure.tm_min = minute;
+    departure.tm_sec = 0;
+    departure.tm_isdst = -1;
+
+    std::time_t departureTime = std::mktime(&departure);
+
+    if (departureTime == static_cast<std::time_t>(-1)) {
+        errorMessage = "Could not determine train departure time.";
+        return false;
+    }
+
+    std::time_t currentTime = std::time(nullptr);
+
+    double hoursRemaining =
+        std::difftime(departureTime, currentTime) / 3600.0;
+
+    if (hoursRemaining <= 0.0) {
+        errorMessage = "Cannot cancel after train departure.";
+        return false;
+    }
+
+    int feePercentage;
+
+    if (hoursRemaining > 24.0) {
+        feePercentage = CANCELLATION_FEE_TIER1_PCT;
+    }
+    else {
+        feePercentage = CANCELLATION_FEE_TIER2_PCT;
+    }
+
+    charge = totalFare * feePercentage / 100.0;
+    refund = totalFare - charge;
+
+    return true;
+}
+
+// Write multiple files with temporary files and rollback support.
 bool writeFilesAtomically(
     std::vector<FileUpdate>& updates,
     std::string& errorMessage) {
 
-    errorMessage.clear();
+    std::vector<std::string> originalContents(updates.size());
+    std::vector<bool> existed(updates.size(), false);
 
-    std::vector<bool> backupsCreated(updates.size(), false);
-    std::vector<bool> filesExisted(updates.size(), false);
-
-    // Step 1: Prepare backups and temporary files.
+    // Prepare temporary files before replacing originals.
     for (std::size_t i = 0; i < updates.size(); ++i) {
 
-        const std::string filename = updates[i].filename;
-        const std::string tempFile = filename + ".tmp";
-        const std::string backupFile = filename + ".bak";
+        std::ifstream original(
+            updates[i].filename.c_str(),
+            std::ios::binary
+        );
 
-        DWORD attributes = GetFileAttributesA(filename.c_str());
+        if (original.is_open()) {
+            std::ostringstream content;
+            content << original.rdbuf();
 
-        if (attributes == INVALID_FILE_ATTRIBUTES) {
-            DWORD error = GetLastError();
-
-            if (error != ERROR_FILE_NOT_FOUND &&
-                error != ERROR_PATH_NOT_FOUND) {
-
+            if (original.bad()) {
                 errorMessage =
-                    "Could not check file: " + filename;
+                    "Could not read " + updates[i].filename;
 
-                goto preparation_failed;
+                return false;
             }
 
-            filesExisted[i] = false;
-        }
-        else {
-            filesExisted[i] = true;
+            originalContents[i] = content.str();
+            existed[i] = true;
         }
 
-        if (filesExisted[i]) {
+        std::ofstream temp(
+            (updates[i].filename + ".tmp").c_str(),
+            std::ios::binary | std::ios::trunc
+        );
 
-            if (!CopyFileA(
-                    filename.c_str(),
-                    backupFile.c_str(),
-                    FALSE)) {
+        if (!temp.is_open()) {
+            errorMessage =
+                "Could not create temporary file for " +
+                updates[i].filename;
 
-                errorMessage =
-                    "Could not create backup for " + filename;
-
-                goto preparation_failed;
-            }
-
-            backupsCreated[i] = true;
-        }
-
-        {
-            std::ofstream file(tempFile, std::ios::trunc);
-
-            if (!file.is_open()) {
-                errorMessage =
-                    "Could not create temporary file: " + tempFile;
-
-                goto preparation_failed;
-            }
-
-            for (const std::string& line : updates[i].lines) {
-                file << line << '\n';
-            }
-
-            file.flush();
-
-            if (!file.good()) {
-                errorMessage =
-                    "Failed to write temporary file: " + tempFile;
-
-                file.close();
-                goto preparation_failed;
-            }
-
-            file.close();
-        }
-    }
-
-    // Step 2: Replace original files.
-    {
-        std::size_t committed = 0;
-
-        for (; committed < updates.size(); ++committed) {
-
-            const std::string tempFile =
-                updates[committed].filename + ".tmp";
-
-            if (!MoveFileExA(
-                    tempFile.c_str(),
-                    updates[committed].filename.c_str(),
-                    MOVEFILE_REPLACE_EXISTING |
-                    MOVEFILE_WRITE_THROUGH)) {
-
-                DWORD windowsError = GetLastError();
-
-                errorMessage =
-                    "Could not update " +
-                    updates[committed].filename +
-                    ". Windows error: " +
-                    std::to_string(windowsError);
-
-                break;
-            }
-        }
-
-        // Step 3: Roll back previously replaced files.
-        if (committed != updates.size()) {
-
-            bool rollbackSucceeded = true;
-
-            while (committed > 0) {
-
-                --committed;
-
-                const std::string filename =
-                    updates[committed].filename;
-
-                if (filesExisted[committed]) {
-
-                    const std::string backupFile =
-                        filename + ".bak";
-
-                    if (!MoveFileExA(
-                            backupFile.c_str(),
-                            filename.c_str(),
-                            MOVEFILE_REPLACE_EXISTING |
-                            MOVEFILE_WRITE_THROUGH)) {
-
-                        rollbackSucceeded = false;
-                    }
-                    else {
-                        backupsCreated[committed] = false;
-                    }
-                }
-                else {
-
-                    if (!DeleteFileA(filename.c_str()) &&
-                        GetLastError() != ERROR_FILE_NOT_FOUND) {
-
-                        rollbackSucceeded = false;
-                    }
-                }
-            }
-
-            // Remove temporary files.
             for (const FileUpdate& update : updates) {
-                DeleteFileA((update.filename + ".tmp").c_str());
+                std::remove((update.filename + ".tmp").c_str());
             }
 
-            // Delete backups only if rollback succeeded.
-            if (rollbackSucceeded) {
+            return false;
+        }
 
-                for (std::size_t i = 0; i < updates.size(); ++i) {
+        for (const std::string& record : updates[i].lines) {
+            temp << record << '\n';
+        }
 
-                    if (backupsCreated[i]) {
-                        DeleteFileA(
-                            (updates[i].filename + ".bak").c_str());
-                    }
-                }
-            }
-            else {
-                errorMessage +=
-                    " WARNING: Rollback was incomplete. "
-                    "Backup files have been retained for manual recovery.";
+        temp.close();
+
+        if (!temp) {
+            errorMessage =
+                "Failed writing temporary file for " +
+                updates[i].filename;
+
+            for (const FileUpdate& update : updates) {
+                std::remove((update.filename + ".tmp").c_str());
             }
 
             return false;
         }
     }
 
-    // Step 4: All replacements succeeded.
-    for (std::size_t i = 0; i < updates.size(); ++i) {
+    // Replace original files.
+    std::size_t committed = 0;
 
-        DeleteFileA((updates[i].filename + ".tmp").c_str());
+    for (; committed < updates.size(); ++committed) {
 
-        if (backupsCreated[i]) {
-            DeleteFileA((updates[i].filename + ".bak").c_str());
+        const std::string tempName =
+            updates[committed].filename + ".tmp";
+
+        if (!replaceFileAtomically(
+                tempName,
+                updates[committed].filename)) {
+
+            errorMessage =
+                "Could not replace " +
+                updates[committed].filename;
+
+            break;
         }
     }
 
-    return true;
+    if (committed == updates.size()) {
+        return true;
+    }
 
-preparation_failed:
+    // Roll back files already replaced.
+    bool rollbackSucceeded = true;
 
-    // No original file has been replaced yet.
-    for (std::size_t i = 0; i < updates.size(); ++i) {
+    while (committed > 0) {
+        --committed;
 
-        DeleteFileA((updates[i].filename + ".tmp").c_str());
+        const std::string filename =
+            updates[committed].filename;
 
-        if (backupsCreated[i]) {
-            DeleteFileA((updates[i].filename + ".bak").c_str());
+        if (existed[committed]) {
+
+            const std::string rollbackFile =
+                filename + ".rollback";
+
+            std::ofstream rollback(
+                rollbackFile.c_str(),
+                std::ios::binary | std::ios::trunc
+            );
+
+            if (!rollback.is_open()) {
+                rollbackSucceeded = false;
+                continue;
+            }
+
+            rollback << originalContents[committed];
+            rollback.close();
+
+            if (!rollback ||
+                !replaceFileAtomically(
+                    rollbackFile,
+                    filename)) {
+
+                rollbackSucceeded = false;
+            }
         }
+        else {
+            if (std::remove(filename.c_str()) != 0) {
+                rollbackSucceeded = false;
+            }
+        }
+    }
+
+    for (const FileUpdate& update : updates) {
+        std::remove((update.filename + ".tmp").c_str());
+    }
+
+    if (!rollbackSucceeded) {
+        errorMessage +=
+            " WARNING: Rollback incomplete. "
+            "Please inspect the affected files.";
     }
 
     return false;
 }
 
-// Cancel a confirmed booking and calculate refund.
+// Cancel a confirmed booking.
 bool cancelBooking(
     const std::string& pnr,
     double& refundAmount,
@@ -270,38 +319,34 @@ bool cancelBooking(
     cancellationCharge = 0.0;
     errorMessage.clear();
 
-    // Step 1: Find booking using PNR.
     Booking booking;
 
+    // Find booking using the existing BookingManager.
     if (!BookingManager::findBooking(pnr, booking)) {
         errorMessage = "Booking not found for the given PNR.";
         return false;
     }
 
-    // Step 2: Check cancellation eligibility.
     if (booking.status != "Confirmed") {
         errorMessage = "Only confirmed bookings can be cancelled.";
         return false;
     }
 
     if (booking.passengerCount <= 0 ||
+        !std::isfinite(booking.totalFare) ||
         booking.totalFare <= 0.0) {
 
         errorMessage = "Invalid booking details.";
         return false;
     }
 
-    // Step 3: Calculate refund.
-    // Confirm the 80/20 policy with the project team.
-    refundAmount = booking.totalFare * 0.80;
-    cancellationCharge = booking.totalFare * 0.20;
-
-    // Step 4: Read booking records.
+    // Read existing booking records.
     std::vector<std::string> bookingLines;
 
-    if (!readLines(BOOKING_FILE, bookingLines, errorMessage)) {
-        refundAmount = 0.0;
-        cancellationCharge = 0.0;
+    if (!readLines(
+            BOOKING_FILE,
+            bookingLines,
+            errorMessage)) {
         return false;
     }
 
@@ -317,14 +362,13 @@ bool cancelBooking(
             fields.push_back(field);
         }
 
+        // Existing BookingManager format contains 8 fields.
         if (fields.size() == 8 && fields[0] == pnr) {
 
             if (fields[7] != "Confirmed") {
                 errorMessage =
                     "Booking is no longer eligible for cancellation.";
 
-                refundAmount = 0.0;
-                cancellationCharge = 0.0;
                 return false;
             }
 
@@ -333,7 +377,6 @@ bool cancelBooking(
             std::ostringstream updatedLine;
 
             for (std::size_t i = 0; i < fields.size(); ++i) {
-
                 if (i > 0) {
                     updatedLine << '|';
                 }
@@ -349,17 +392,16 @@ bool cancelBooking(
 
     if (!bookingUpdated) {
         errorMessage = "Booking record could not be updated.";
-        refundAmount = 0.0;
-        cancellationCharge = 0.0;
         return false;
     }
 
-    // Step 5: Read train records.
+    // Read train records.
     std::vector<std::string> trainLines;
 
-    if (!readLines(TRAIN_FILE, trainLines, errorMessage)) {
-        refundAmount = 0.0;
-        cancellationCharge = 0.0;
+    if (!readLines(
+            TRAIN_FILE,
+            trainLines,
+            errorMessage)) {
         return false;
     }
 
@@ -371,8 +413,6 @@ bool cancelBooking(
 
         if (!parseTrainRecord(line, train)) {
             errorMessage = "Invalid train record.";
-            refundAmount = 0.0;
-            cancellationCharge = 0.0;
             return false;
         }
 
@@ -381,24 +421,32 @@ bool cancelBooking(
             continue;
         }
 
+        // Calculate the correct refund for this train.
+        if (!calculateRefund(
+                train,
+                booking.totalFare,
+                refundAmount,
+                cancellationCharge,
+                errorMessage)) {
+
+            refundAmount = 0.0;
+            cancellationCharge = 0.0;
+            return false;
+        }
+
         int* availableSeats = nullptr;
-        int maximumSeats = 0;
 
         if (booking.travelClass == "Sleeper") {
             availableSeats = &train.sleeperSeatsAvailable;
-            maximumSeats = MAX_SLEEPER_SEATS;
         }
         else if (booking.travelClass == "AC 3-Tier") {
             availableSeats = &train.ac3TierSeatsAvailable;
-            maximumSeats = MAX_AC3_SEATS;
         }
         else if (booking.travelClass == "AC 2-Tier") {
             availableSeats = &train.ac2TierSeatsAvailable;
-            maximumSeats = MAX_AC2_SEATS;
         }
         else if (booking.travelClass == "Chair Car") {
             availableSeats = &train.chairCarSeatsAvailable;
-            maximumSeats = MAX_CHAIR_CAR_SEATS;
         }
 
         if (availableSeats == nullptr) {
@@ -408,21 +456,22 @@ bool cancelBooking(
             return false;
         }
 
-        // Step 6: Validate maximum seat capacity.
-        if (booking.passengerCount > maximumSeats ||
-            *availableSeats > maximumSeats - booking.passengerCount) {
+        // Prevent integer overflow without an arbitrary capacity limit.
+        if (*availableSeats < 0 ||
+            *availableSeats >
+                std::numeric_limits<int>::max() -
+                booking.passengerCount) {
 
-            errorMessage =
-                "Seat restoration exceeds maximum capacity.";
-
+            errorMessage = "Invalid seat restoration values.";
             refundAmount = 0.0;
             cancellationCharge = 0.0;
             return false;
         }
 
-        // Restore available seats.
+        // Restore seats after successful cancellation.
         *availableSeats += booking.passengerCount;
 
+        // Preserve the existing 16-field train record format.
         std::ostringstream updatedTrain;
 
         updatedTrain
@@ -444,6 +493,7 @@ bool cancelBooking(
             << train.journeyDate;
 
         line = updatedTrain.str();
+
         trainUpdated = true;
         break;
     }
@@ -457,10 +507,12 @@ bool cancelBooking(
         return false;
     }
 
-    // Step 7: Read existing cancellation records.
+    // Read previous cancellation records if the file exists.
     std::vector<std::string> cancellationLines;
 
-    std::ifstream cancellationInput(CANCELLATION_FILE);
+    std::ifstream cancellationInput(
+        CANCELLATION_FILE.c_str()
+    );
 
     if (cancellationInput.is_open()) {
 
@@ -473,19 +525,16 @@ bool cancelBooking(
         }
 
         if (cancellationInput.bad()) {
-            cancellationInput.close();
-
-            errorMessage = "Could not read cancellation records.";
+            errorMessage =
+                "Could not read cancellation records.";
 
             refundAmount = 0.0;
             cancellationCharge = 0.0;
             return false;
         }
-
-        cancellationInput.close();
     }
 
-    // Step 8: Prepare cancellation record.
+    // Create cancellation record.
     std::ostringstream cancellationRecord;
 
     cancellationRecord
@@ -501,13 +550,22 @@ bool cancelBooking(
 
     cancellationLines.push_back(cancellationRecord.str());
 
-    // Step 9: Update all three files with rollback protection.
-    std::vector<FileUpdate> updates = {
-        {CANCELLATION_FILE, cancellationLines},
-        {TRAIN_FILE, trainLines},
-        {BOOKING_FILE, bookingLines}
-    };
+    // Prepare all three file updates.
+    std::vector<FileUpdate> updates;
 
+    updates.push_back(
+        FileUpdate(CANCELLATION_FILE, cancellationLines)
+    );
+
+    updates.push_back(
+        FileUpdate(TRAIN_FILE, trainLines)
+    );
+
+    updates.push_back(
+        FileUpdate(BOOKING_FILE, bookingLines)
+    );
+
+    // Save updates with rollback support.
     if (!writeFilesAtomically(updates, errorMessage)) {
 
         refundAmount = 0.0;
@@ -519,7 +577,6 @@ bool cancelBooking(
         return false;
     }
 
-    // Step 10: Cancellation completed successfully.
     return true;
 }
 
