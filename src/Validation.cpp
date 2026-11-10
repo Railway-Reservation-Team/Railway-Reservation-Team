@@ -118,12 +118,16 @@ bool parseSeatCount(
             return false;
         }
 
-        value = value * 10 + (ch - '0');
+        const int digit = ch - '0';
 
-        if (value > 6) {
+        // Check the permitted range before multiplying to prevent overflow
+        // even when the input contains an extremely long digit sequence.
+        if (digit > 6 || value > (6 - digit) / 10) {
             error = "Passenger count must be between 1 and 6.";
             return false;
         }
+
+        value = value * 10 + digit;
     }
 
     if (value < 1) {
@@ -195,6 +199,11 @@ bool parseMenuChoice(
         return false;
     }
 
+    if (minimum > maximum || maximum < 0) {
+        error = "Invalid menu choice range.";
+        return false;
+    }
+
     int value = 0;
 
     for (unsigned char ch : input) {
@@ -203,7 +212,15 @@ bool parseMenuChoice(
             return false;
         }
 
-        value = value * 10 + (ch - '0');
+        const int digit = ch - '0';
+
+        // Guard integer conversion before multiplication and addition.
+        if (value > (std::numeric_limits<int>::max() - digit) / 10) {
+            error = "Menu choice is outside the allowed range.";
+            return false;
+        }
+
+        value = value * 10 + digit;
 
         if (value > maximum) {
             error = "Menu choice is outside the allowed range.";
