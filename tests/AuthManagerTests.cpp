@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -28,15 +29,37 @@ int main() {
     namespace fs = std::filesystem;
 
     const fs::path originalDirectory = fs::current_path();
-    const fs::path testDirectory =
-        fs::temp_directory_path() / "RRS_AuthManager_Test";
+    const fs::path temporaryRoot = fs::temp_directory_path();
 
     std::error_code filesystemError;
-    fs::remove_all(testDirectory, filesystemError);
-    fs::create_directories(testDirectory, filesystemError);
+    fs::path testDirectory;
+    std::random_device randomDevice;
 
-    if (filesystemError) {
-        std::cerr << "Unable to create authentication test directory.\n";
+    for (int attempt = 0; attempt < 100; ++attempt) {
+        const auto timestamp =
+            std::chrono::steady_clock::now().time_since_epoch().count();
+
+        const std::string directoryName =
+            "RRS_AuthManager_Test_" + std::to_string(timestamp) + "_" +
+            std::to_string(randomDevice());
+
+        const fs::path candidate = temporaryRoot / directoryName;
+
+        filesystemError.clear();
+
+        if (fs::create_directory(candidate, filesystemError)) {
+            testDirectory = candidate;
+            break;
+        }
+
+        if (filesystemError) {
+            std::cerr << "Unable to create authentication test directory.\n";
+            return 1;
+        }
+    }
+
+    if (testDirectory.empty()) {
+        std::cerr << "Unable to create a unique authentication test directory.\n";
         return 1;
     }
 
