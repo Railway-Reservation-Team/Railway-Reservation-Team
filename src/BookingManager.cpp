@@ -1,6 +1,7 @@
 
 #include "BookingManager.h"
 #include "TrainData.h"
+#include "AtomicFileReplace.h"
 
 #include <fstream>
 #include <sstream>
@@ -10,7 +11,6 @@
 #include <cmath>
 #include <string>
 #include <cctype>
-#include <windows.h>
 
 namespace BookingManager {
 
@@ -163,9 +163,8 @@ bool createBooking(
         return false;
     }
 
-    // Validate passenger details.
+    // Validate passenger information.
     for (const Passenger& passenger : passengers) {
-
         if (passenger.name.find_first_not_of(" \t") ==
                 std::string::npos ||
             passenger.age < 1 ||
@@ -179,13 +178,13 @@ bool createBooking(
         }
     }
 
-    // Generate PNR.
+    // Generate a unique PNR.
     if (!generateUniquePNR(pnr)) {
         errorMessage = "Could not generate a unique PNR.";
         return false;
     }
 
-    // Open train data.
+    // Read train data.
     std::ifstream input(TRAIN_FILE);
 
     if (!input.is_open()) {
@@ -198,7 +197,6 @@ bool createBooking(
     bool found = false;
 
     while (std::getline(input, line)) {
-
         if (line.empty()) {
             continue;
         }
@@ -270,7 +268,6 @@ bool createBooking(
     std::ostringstream updatedData;
 
     for (const Train& train : trains) {
-
         updatedData << train.trainNumber << '|'
                     << train.trainName << '|'
                     << train.source << '|'
@@ -289,7 +286,7 @@ bool createBooking(
                     << train.journeyDate << '\n';
     }
 
-    // Write updated data to temporary file.
+    // Write updated train data to a temporary file.
     const std::string TEMP_FILE = "data/trains.tmp";
 
     {
@@ -304,35 +301,24 @@ bool createBooking(
 
         if (!temp) {
             temp.close();
-            DeleteFileA(TEMP_FILE.c_str());
+            std::remove(TEMP_FILE.c_str());
 
             errorMessage = "Failed to write updated train data.";
             return false;
         }
     }
 
-    // Replace existing train file safely on Windows.
-    if (!MoveFileExA(
-            TEMP_FILE.c_str(),
-            TRAIN_FILE.c_str(),
-            MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
-
-        DWORD windowsError = GetLastError();
-
-        DeleteFileA(TEMP_FILE.c_str());
-
-        errorMessage =
-            "Could not update seat inventory. Windows error: " +
-            std::to_string(windowsError);
-
+    // Atomically replace train data.
+    if (!replaceFileAtomically(TEMP_FILE, TRAIN_FILE)) {
+        std::remove(TEMP_FILE.c_str());
+        errorMessage = "Could not update seat inventory.";
         return false;
     }
 
-    // Prepare passenger information.
+    // Prepare passenger details.
     std::ostringstream passengerData;
 
     for (std::size_t i = 0; i < passengers.size(); ++i) {
-
         if (i > 0) {
             passengerData << ';';
         }
@@ -342,14 +328,13 @@ bool createBooking(
                       << encodeField(passengers[i].gender);
     }
 
-    // Save booking record.
+    // Save booking information.
     bool saved = false;
 
     {
         std::ofstream bookings(BOOKING_FILE, std::ios::app);
 
         if (bookings.is_open()) {
-
             bookings << pnr << '|'
                      << selectedTrain.trainNumber << '|'
                      << selectedTrain.journeyDate << '|'
@@ -357,16 +342,14 @@ bool createBooking(
                      << passengerData.str() << '|'
                      << passengers.size() << '|'
                      << std::fixed << std::setprecision(2)
-                     << totalFare
-                     << "|Confirmed\n";
+                     << totalFare << "|Confirmed\n";
 
             saved = static_cast<bool>(bookings);
         }
     }
 
-    // Restore original train data if booking could not be saved.
+    // Restore train inventory if booking could not be saved.
     if (!saved) {
-
         const std::string ROLLBACK_FILE = "data/trains.rollback";
 
         {
@@ -375,9 +358,14 @@ bool createBooking(
                 std::ios::binary | std::ios::trunc
             );
 
-            if (restore.is_open()) {
-                restore << originalContent.str();
+            if (!restore.is_open()) {
+                errorMessage =
+                    "Booking save failed and rollback file could not be opened.";
+                return false;
             }
+
+            restore << originalContent.str();
+            restore.close();
 
             if (!restore) {
                 errorMessage =
@@ -386,17 +374,9 @@ bool createBooking(
             }
         }
 
-        if (!MoveFileExA(
-                ROLLBACK_FILE.c_str(),
-                TRAIN_FILE.c_str(),
-                MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
-
-            DWORD windowsError = GetLastError();
-
+        if (!replaceFileAtomically(ROLLBACK_FILE, TRAIN_FILE)) {
             errorMessage =
-                "Booking save failed. Seat rollback also failed. Windows error: " +
-                std::to_string(windowsError);
-
+                "Booking save failed. Seat rollback also failed.";
             return false;
         }
 
