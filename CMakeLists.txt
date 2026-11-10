@@ -59,6 +59,7 @@ if(BUILD_TESTING)
         tests/US05Tests.cpp
         tests/US13Tests.cpp
         tests/test_modules.cpp
+        tests/TrainDataFileTests.cpp
     )
 
     foreach(test_source IN LISTS RRS_TEST_SOURCES)
