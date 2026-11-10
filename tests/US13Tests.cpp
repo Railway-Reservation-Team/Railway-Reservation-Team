@@ -53,6 +53,15 @@ int main() {
     test("Large passenger count rejected",
          !Validation::parseSeatCount("100", seats, error));
 
+    test("Extremely long passenger count rejected without overflow",
+         !Validation::parseSeatCount(
+             std::string(1000, '9'), seats, error));
+
+    int menuChoice = 0;
+    test("Extremely long menu choice rejected without overflow",
+         !Validation::parseMenuChoice(
+             std::string(1000, '9'), 1, 6, menuChoice, error));
+
     // Acceptance 6: Validation can be called again after an error
     bool invalidRejected =
         !Validation::parseSeatCount("0", seats, error);
