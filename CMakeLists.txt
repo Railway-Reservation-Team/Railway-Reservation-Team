@@ -19,6 +19,7 @@ set(RRS_CORE_SOURCES
     src/AdminTrainMenu.cpp
     src/AuthManager.cpp
     src/BookingManager.cpp
+    src/Cancellation.cpp
     src/FareCalculator.cpp
     src/PassengerDetails.cpp
     src/Payment.cpp
