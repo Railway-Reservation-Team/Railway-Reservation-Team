@@ -13,6 +13,19 @@
 #include <vector>
 #include <exception>
 
+bool readBookingInput(std::string& value) {
+    if (!std::getline(std::cin, value)) {
+        return false;
+    }
+
+    if (!AuthManager::recordActivity()) {
+        std::cout << "\nSession expired. Please log in again.\n";
+        return false;
+    }
+
+    return true;
+}
+
 int runBooking() {
     if (!AuthManager::isSessionActive()) {
         std::cout << "Your passenger session has expired. Please log in again.\n";
@@ -33,7 +46,7 @@ int runBooking() {
     // 1. Validate source station
     while (true) {
         std::cout << "Enter source station: ";
-        if (!std::getline(std::cin, source)) return 1;
+        if (!readBookingInput(source)) return 1;
 
         if (Validation::isNonEmpty(source, errorMessage))
             break;
@@ -44,7 +57,7 @@ int runBooking() {
     // 2. Validate destination station
     while (true) {
         std::cout << "Enter destination station: ";
-        if (!std::getline(std::cin, destination)) return 1;
+        if (!readBookingInput(destination)) return 1;
 
         if (Validation::isNonEmpty(destination, errorMessage))
             break;
@@ -55,7 +68,7 @@ int runBooking() {
     // 3. Validate journey date
     while (true) {
         std::cout << "Enter journey date (YYYY-MM-DD): ";
-        if (!std::getline(std::cin, journeyDate)) return 1;
+        if (!readBookingInput(journeyDate)) return 1;
 
         if (Validation::isValidDate(journeyDate, errorMessage))
             break;
@@ -113,7 +126,7 @@ int runBooking() {
         std::cout << "\nSelect train option (1-"
                   << results.size() << "): ";
 
-        if (!std::getline(std::cin, input)) return 1;
+        if (!readBookingInput(input)) return 1;
 
         if (Validation::parseMenuChoice(
                 input, 1, static_cast<int>(results.size()),
@@ -134,7 +147,7 @@ int runBooking() {
         while (true) {
             std::cout << "\nEnter number of passengers (1-6): ";
 
-            if (!std::getline(std::cin, input)) return 1;
+            if (!readBookingInput(input)) return 1;
 
             if (Validation::parseSeatCount(input, seats, errorMessage))
                 break;
@@ -153,7 +166,7 @@ int runBooking() {
             while (true) {
                 std::cout << "Select travel class (1-4): ";
 
-                if (!std::getline(std::cin, input)) return 1;
+                if (!readBookingInput(input)) return 1;
 
                 if (Validation::parseMenuChoice(
                         input, 1, 4, classChoice, errorMessage))
@@ -216,7 +229,7 @@ int runBooking() {
             while (true) {
                 std::cout << "Choose an option (1-3): ";
 
-                if (!std::getline(std::cin, input)) return 1;
+                if (!readBookingInput(input)) return 1;
 
                 if (Validation::parseMenuChoice(
                         input, 1, 3, retryChoice, errorMessage))
@@ -244,7 +257,8 @@ int runBooking() {
     std::vector<Passenger> passengers;
 
     if (!PassengerDetails::collectPassengerDetails(
-            seats, passengers, std::cin, std::cout)) {
+            seats, passengers, std::cin, std::cout,
+            []() { return AuthManager::recordActivity(); })) {
         std::cout << "Passenger details collection failed.\n";
         return 1;
     }
@@ -279,7 +293,7 @@ int runBooking() {
         std::string confirmation;
 
         std::cout << "\nConfirm booking? (Y/N): ";
-        if (!std::getline(std::cin, confirmation)) return 1;
+        if (!readBookingInput(confirmation)) return 1;
 
         if (confirmation != "Y" && confirmation != "y") {
             std::cout << "Booking cancelled. No seats allocated.\n";
