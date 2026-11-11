@@ -4,6 +4,8 @@
 #include "FareCalculator.h"
 #include "PassengerDetails.h"
 #include "BookingManager.h"
+#include "ETicketManager.h"
+#include "PaymentReceiptManager.h"
 #include "Cancellation.h"
 #include "Payment.h"
 #include "SeatInventory.h"
@@ -392,17 +394,53 @@ int runBooking() {
         const bool paymentSuccessful = processPayment(
             totalFare, paymentMethod, paymentStatus);
 
+
         if (!paymentSuccessful) {
             std::cout << "\n========================================\n"
                       << "          BOOKING NOT CONFIRMED\n"
                       << "========================================\n"
                       << "Payment Status: " << paymentStatus << '\n'
                       << "Payment failed. No booking was saved.\n";
+
+
+            // Save a receipt for an actual simulated payment attempt.
+            if (!paymentMethod.empty() && paymentStatus == "FAILED") {
+                PaymentReceipt failedReceipt;
+                std::string receiptError;
+
+                if (PaymentReceiptManager::generateTransactionId(
+                        failedReceipt.transactionId, receiptError)) {
+
+                    failedReceipt.pnr = "";
+                    failedReceipt.amount = totalFare;
+                    failedReceipt.paymentMethod = paymentMethod;
+                    failedReceipt.status = "FAILED";
+                    failedReceipt.paymentDateTime =
+                        PaymentReceiptManager::getCurrentDateTime();
+
+                    if (PaymentReceiptManager::saveReceipt(
+                            failedReceipt, receiptError)) {
+
+                        std::cout << "\nFailed payment receipt recorded.\n"
+                                  << "Transaction ID: "
+                                  << failedReceipt.transactionId << '\n'
+                                  << "Amount: Rs. " << totalFare << '\n'
+                                  << "Status: FAILED\n";
+                    } else {
+                        std::cout << "\nWarning: Failed payment receipt "
+                                  << "could not be saved: "
+                                  << receiptError << '\n';
+                    }
+                } else {
+                    std::cout << "\nWarning: Transaction ID generation "
+                              << "failed: " << receiptError << '\n';
+                }
+            }
+
+
             return 1;
         }
 
-        std::cout << "\nPayment Status: SUCCESS\n"
-                  << "Payment Method: " << paymentMethod << '\n';
 
         // Create booking and generate PNR
         std::string pnr;
@@ -419,8 +457,51 @@ int runBooking() {
             std::cout << "Manual payment reversal may be required.\n";
             return 1;
         }
+             // 16. Generate and export e-ticket
+
+        // Generate and save successful payment receipt.
+        PaymentReceipt successfulReceipt;
+        std::string receiptError;
+
+        if (PaymentReceiptManager::generateTransactionId(
+                successfulReceipt.transactionId, receiptError)) {
+
+            successfulReceipt.pnr = pnr;
+            successfulReceipt.amount = totalFare;
+            successfulReceipt.paymentMethod = paymentMethod;
+            successfulReceipt.status = "SUCCESS";
+            successfulReceipt.paymentDateTime =
+                PaymentReceiptManager::getCurrentDateTime();
+
+            if (PaymentReceiptManager::saveReceipt(
+                    successfulReceipt, receiptError)) {
+
+                std::cout << "\n========== PAYMENT RECEIPT ==========\n"
+                          << "Transaction ID: "
+                          << successfulReceipt.transactionId
+                          << "\nPNR: " << successfulReceipt.pnr
+                          << "\nAmount: Rs. " << successfulReceipt.amount
+                          << "\nPayment Method: "
+                          << successfulReceipt.paymentMethod
+                          << "\nPayment Status: SUCCESS"
+                          << "\nDate/Time: "
+                          << successfulReceipt.paymentDateTime
+                          << "\n======================================\n";
+            } else {
+                std::cout << "\nWarning: Payment receipt could not be saved: "
+                          << receiptError << '\n';
+            }
+        } else {
+            std::cout << "\nWarning: Transaction ID generation failed: "
+                      << receiptError << '\n';
+        }
+
+
+        // 17. Display confirmation
+
 
         // Display booking confirmation
+
         std::cout << std::fixed << std::setprecision(2);
 
         std::cout << "\n========== BOOKING CONFIRMED ==========\n"

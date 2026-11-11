@@ -15,6 +15,7 @@ option(RRS_ENABLE_COVERAGE "Enable GCC coverage instrumentation" OFF)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 
 set(RRS_CORE_SOURCES
+
     src/AdminAuthManager.cpp
     src/AdminFareReservationManager.cpp
     src/AdminTrainManager.cpp
@@ -25,6 +26,8 @@ set(RRS_CORE_SOURCES
     src/FareCalculator.cpp
     src/PassengerDetails.cpp
     src/Payment.cpp
+    src/PaymentReceiptManager.cpp
+    src/ETicketManager.cpp
     src/SeatInventory.cpp
     src/TrainSearch.cpp
     src/Validation.cpp
@@ -75,6 +78,8 @@ if(BUILD_TESTING)
         tests/PaymentProcessTests.cpp
         tests/PerformanceTests.cpp
         tests/PaymentStructureTests.cpp
+        tests/ETicketTests.cpp
+        tests/PaymentReceiptTests.cpp
         tests/SeatInventoryTests.cpp
         tests/US05Tests.cpp
         tests/US13Tests.cpp
