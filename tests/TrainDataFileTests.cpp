@@ -64,6 +64,11 @@ int main() {
     Train inactive;
     check("17-field deactivated record parses with inactive state",
           parseTrainRecord("TEST102|Inactive Express|Bengaluru|Chennai|09:00|15:00|6h|1000|1500|2000|800|8|10|10|10|2026-12-15|0", inactive) && !inactive.active);
+    Train roundTrip;
+    check("Activation state survives train record serialization",
+          parseTrainRecord(serializeTrainRecord(inactive), roundTrip) && !roundTrip.active);
+    check("Invalid activation flag is rejected",
+          !parseTrainRecord("TEST102|Inactive Express|Bengaluru|Chennai|09:00|15:00|6h|1000|1500|2000|800|8|10|10|10|2026-12-15|2", roundTrip));
     check("Journey date filter excludes other dates", loadTrains(mixed.string(), "2026-12-16", error).empty());
 
     fs::remove_all(root, ec);
