@@ -197,7 +197,7 @@ void deactivateTrain(std::istream& input, std::ostream& output) {
     if (!std::getline(input, trainNumber)) return;
 
     if (AdminTrainManager::deactivateTrain(TRAIN_FILE, trainNumber, error))
-        output << "Train deactivated successfully. Historical records are preserved.\\n";
+        output << "Train deactivated successfully. Historical records are preserved.\n";
     else
         output << "Error: " << error << '\\n';
 }
