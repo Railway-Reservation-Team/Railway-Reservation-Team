@@ -105,6 +105,17 @@ int main() {
     assert(pnr.size() == 10);
     assert(bookingMs <= 3000);
 
+    {
+        std::ofstream report("performance-results.txt", std::ios::trunc);
+        assert(report.is_open());
+        report << "Seeded train count: 200\n"
+               << "NFR-01 search: " << searchMs << " ms (limit 2000 ms)\n"
+               << "NFR-02 booking: " << bookingMs << " ms (limit 3000 ms)\n"
+               << "NFR-04 train-file read: " << ioMs << " ms (limit 200 ms)\n"
+               << "NFR-03 startup: not measured by this test\n"
+               << "NFR-05 peak memory: not measured by this test\n";
+    }
+
     std::cout << "Performance checks passed for 200 seeded trains.\n";
     std::cout << "Search time (NFR-01): " << searchMs << " ms (limit 2000 ms)\n";
     std::cout << "Booking time (NFR-02): " << bookingMs << " ms (limit 3000 ms)\n";
