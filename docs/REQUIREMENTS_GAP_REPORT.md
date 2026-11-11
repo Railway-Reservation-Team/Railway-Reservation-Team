@@ -29,7 +29,7 @@ A green build does not mean all requirements have passed.
 | RRS-F-015 | Restore cancelled seats to corresponding train/class | `Cancellation.cpp`, `CancellationTests`, Jira RRS-61 | Implemented in tested cancellation flow; verify exactly-once restoration and persistence |
 | RRS-F-016 | Administrator adds train records | `AdminTrainManager`, `AdminTrainMenu`, Jira RRS-28 | Implemented and tested |
 | RRS-F-017 | Administrator edits train schedule/route/class/availability | `AdminTrainManager`, Jira RRS-28 | Update path implemented and tested; verify every field and authorization |
-| RRS-F-018 | Authorized administrator deactivates a train from future bookings | Jira RRS-65 created for the explicit gap | Not implemented by destructive delete; deactivation must preserve historical bookings |
+| RRS-F-018 | Authorized administrator deactivates a train from future bookings | `AdminTrainManager::deactivateTrain`, admin menu, backward-compatible active flag in `TrainData`, tests; Jira RRS-65 | Implemented and verified in PR #83; deactivated trains remain visible to admins, are excluded from passenger search/new bookings, and retain historical bookings |
 | RRS-F-019 | Authorized administrator views reservation/cancellation records | `AdminFareReservationManager`, Jira RRS-62 | Viewing/search functions exist; verify role-gated menu and complete records |
 | RRS-F-020 | Record booking/cancellation transactions with timestamp and status | Jira RRS-62; administrator audit changes proposed in PR #81 | Partial. PR #81 records administrator actions; passenger booking transaction audit must also be verified/implemented |
 | RRS-F-021 | Passenger views reservation status (e.g. Confirmed/Cancelled) | Jira RRS-63 | Not demonstrated end-to-end; status retrieval must be passenger-authenticated and match persisted state |
@@ -72,7 +72,9 @@ Latest previously completed baseline run: [GitHub Actions run 43027487428](https
 - Branch coverage remains below the 70% target stated in the Test Plan.
 - Existing performance checks use 200 seeded trains for search, booking and train-file read; they do not prove every SRS NFR.
 
-PR #81 ([administrator audit logging](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/pull/81)) is a proposed change, not merged evidence. Its latest CI must pass and the PR must be reviewed before claiming the audit work is integrated.
+PR #81 ([administrator audit logging](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/pull/81)) is merged to main. Its CI run 43071499990 passed on Ubuntu and Windows. It adds timestamped administrator authentication, train, fare and reservation action events; full RRS-F-020 still requires passenger booking transaction audit evidence.
+
+PR #83 ([SRS FR-018 train deactivation](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/pull/83)) is merged to main. CI run 43073959982 passed on Ubuntu and Windows with all 20/20 CTest tests passing and the static-analysis/coverage job successful. A post-merge main-branch workflow is running separately.
 
 ## Cross-document inconsistencies requiring an approved decision
 
