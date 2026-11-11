@@ -80,6 +80,14 @@ if(BUILD_TESTING)
         tests/TrainDataFileTests.cpp
     )
 
+    add_test(NAME ConsoleMenuSmoke
+        COMMAND ${CMAKE_COMMAND}
+            "-DAPP=$<TARGET_FILE:railway>"
+            "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/test-work/ConsoleMenuSmoke"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/ConsoleMenuSmoke.cmake"
+    )
+    set_tests_properties(ConsoleMenuSmoke PROPERTIES TIMEOUT 30)
+
     foreach(test_source IN LISTS RRS_TEST_SOURCES)
         get_filename_component(test_name "${test_source}" NAME_WE)
         set(test_target "rrs_${test_name}")
