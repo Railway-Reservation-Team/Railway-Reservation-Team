@@ -4,6 +4,7 @@
 #include "AtomicFileReplace.h"
 
 #include <fstream>
+#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <random>
