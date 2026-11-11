@@ -1,0 +1,36 @@
+if(NOT DEFINED APP OR NOT DEFINED WORK_DIR)
+    message(FATAL_ERROR "APP and WORK_DIR must be supplied")
+endif()
+
+file(MAKE_DIRECTORY "${WORK_DIR}/data")
+set(input_file "${WORK_DIR}/menu-input.txt")
+file(WRITE "${input_file}"
+"9\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n6\n7\n")
+
+execute_process(
+    COMMAND "${APP}"
+    INPUT_FILE "${input_file}"
+    WORKING_DIRECTORY "${WORK_DIR}"
+    OUTPUT_VARIABLE app_output
+    ERROR_VARIABLE app_error
+    RESULT_VARIABLE app_result
+    TIMEOUT 20
+)
+
+if(NOT app_result EQUAL 0)
+    message(FATAL_ERROR "Console application returned ${app_result}. stderr: ${app_error}")
+endif()
+
+foreach(expected_text
+    "Invalid choice"
+    "Registration successful"
+    "Login successful"
+    "Passenger logged out successfully"
+    "Exiting system")
+    string(FIND "${app_output}" "${expected_text}" found_at)
+    if(found_at EQUAL -1)
+        message(FATAL_ERROR "Expected console output not found: ${expected_text}. Output: ${app_output}")
+    endif()
+endforeach()
+
+message(STATUS "Console menu invalid-choice, registration, login, logout and exit paths passed.")
