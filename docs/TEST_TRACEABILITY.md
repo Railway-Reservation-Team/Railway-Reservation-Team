@@ -12,18 +12,20 @@ This matrix follows the 14 test cases and SEC-01 to SEC-05 checks in the submitt
 | TC-04 | Train search and no-results behavior | `test_modules`, `US05Tests` | Related search/module tests exist; complete scenario coverage needs review against the detailed procedure. |
 | TC-05 | Five-minute seat soft-lock expiry | `SeatInventoryTests` | Seat-inventory suite exists; do not mark the five-minute elapsed-time scenario passed without explicit evidence. |
 | TC-06 | Unique PNR on confirmed booking | `BookingManagerTests`, `BookingIntegrationTest` | Related booking tests exist; validate exact 10-digit uniqueness and traveller-count assertions. |
-| TC-07 | Waitlist auto-upgrade after cancellation | `BookingIntegrationTest`, `BookingManagerTests` | Related integration/booking tests exist; exact auto-upgrade scenario requires confirmation. |
-| TC-08 | Failed payment releases hold; success records receipt | `PaymentStructureTests`, `PaymentProcessTests`, `BookingIntegrationTest` | Payment data validation and interactive success/failure simulation are now covered separately. The complete payment-to-booking rollback/receipt scenario still needs end-to-end evidence. |
+| TC-07 | Waitlist auto-upgrade after cancellation | No qualifying suite | Current `BookingManager::createBooking` rejects insufficient seats; no waitlist persistence or cancellation-triggered promotion was found. Keep this test open until FR-12/FR-13 are implemented. |
+| TC-08 | Failed payment releases hold; success records receipt | `PaymentStructureTests`, `PaymentProcessTests`, `BookingIntegrationTest` | Interactive success/failure simulation and payment-record serialization are tested. The application flow does not yet persist a unique transaction receipt or demonstrate a complete seat-hold retry/release cycle. |
 | TC-09 | Cancellation refund fee slabs | `CancellationTests` | Automated coverage now exercises a future booking cancellation, the over-24-hour 25% fee tier, refund calculation, seat restoration, status update, and repeat-cancellation rejection. The within-24-hour 50% fee tier and post-departure rejection still need explicit tests. |
 | TC-10 | Performance and memory targets | `PerformanceTests`, `ConsoleMenuSmoke` | `PerformanceTests` seeds 200 trains and checks search ≤2s, booking ≤3s, and train-file read ≤200ms. Console startup is exercised end-to-end, but startup timing ≤3s and peak memory ≤128MB still need explicit process-level measurement. |
-| TC-11 | PNR status, history, e-ticket | `BookingManagerTests`, `BookingIntegrationTest` | Related booking tests exist; PNR/history/e-ticket end-to-end evidence needs confirmation. |
+| TC-11 | PNR status, history, e-ticket | No dedicated service or end-to-end suite found | The inspected repository has no PNR status/history service or e-ticket export flow. Keep TC-11 open; booking lookup by PNR alone does not satisfy the complete test case. |
 | TC-12 / SEC-05 | Corrupt data and verify integrity/recovery | `FileStoreTests`, `TrainDataFileTests`, `AuthManagerTests` | Corrupted passenger account storage is rejected; checksum/record-count recovery for all stores is not established. |
-| TC-13 | Admin train/fare management and reports | `AdminTrainManagerTests`, `AdminFareReservationTests`, `AdminTrainMenuTests` | Direct manager suites and an authenticated menu flow now exercise train add, view, update and delete. The report-generator requirement still needs separate evidence. |
+| TC-13 | Admin train/fare management and reports | `AdminTrainManagerTests`, `AdminFareReservationTests`, `AdminTrainMenuTests` | Train add/view/update/delete and fare/reservation functions have tests. No ReportGenerator or occupancy/revenue report flow was found; the reports portion remains open. |
 | TC-14 / SEC-02 / SEC-03 | Data-file confinement and malformed-input safety | `FileStoreTests`, `TrainDataFileTests`, validation suites | Relative `data/` paths and selected malformed-record checks exist; strict directory confinement and full boundary/fuzz coverage remain open. |
 | SEC-04 | Passenger session expiry after 15 minutes | `AuthManagerTests` | Passenger timeout test exists; administrator inactivity timeout not established. |
 
 | Console menu smoke | `ConsoleMenuSmoke` | Exercises invalid menu choice, passenger registration, login, full successful ticket booking and simulated payment, logout, and exit through the built console executable. |
 | Administrator menu flow | `AdminTrainMenuTests`, `AdminTrainMenuSecurityTests` | Exercises unauthenticated access denial and authenticated add, view, update, delete, invalid-choice, and return paths. |
+
+See [REQUIREMENTS_GAP_REPORT.md](REQUIREMENTS_GAP_REPORT.md) for features that are absent or only partially implemented, including waitlist auto-upgrade, PNR/history/e-ticket, and report generation.
 
 ## Execution status
 
