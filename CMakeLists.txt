@@ -65,6 +65,7 @@ if(BUILD_TESTING)
         tests/AdminAuthManagerTests.cpp
         tests/AdminFareReservationTests.cpp
         tests/AdminTrainMenuSecurityTests.cpp
+        tests/AdminTrainMenuTests.cpp
         tests/AdminTrainManagerTests.cpp
         tests/AuthManagerTests.cpp
         tests/BookingIntegrationTest.cpp
