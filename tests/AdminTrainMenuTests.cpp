@@ -58,6 +58,7 @@ int main() {
     const bool added = result.find("Train added successfully") != std::string::npos;
     const bool updated = result.find("Train updated successfully") != std::string::npos;
     const bool deactivated = result.find("Train deactivated successfully") != std::string::npos;
+    const bool statusShown = result.find("Status: Deactivated") != std::string::npos;
     const bool deleted = result.find("Train deleted successfully") != std::string::npos;
     const bool viewed = result.find("ALL TRAINS") != std::string::npos;
 
@@ -65,7 +66,7 @@ int main() {
     fs::current_path(original);
     fs::remove_all(work, ec);
 
-    if (!(invalidChoice && added && updated && deactivated && deleted && viewed)) {
+    if (!(invalidChoice && added && updated && deactivated && statusShown && deleted && viewed)) {
         std::cerr << "Admin menu flow failed. Output:\n" << result << '\n';
         return 1;
     }
