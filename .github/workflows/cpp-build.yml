@@ -130,6 +130,12 @@ jobs:
       - name: Generate coverage and validation reports
         shell: bash
         run: |
+          cp build-coverage/test-work/PerformanceTests/performance-results.txt docs/reports/performance-results.txt
+          {
+            echo "# Performance Validation Results"
+            echo
+            cat docs/reports/performance-results.txt
+          } > docs/reports/PERFORMANCE_REPORT.md
           $HOME/.local/bin/gcovr --root . --filter "src/" --exclude-unreachable-branches --print-summary | tee coverage/summary.txt
           cp coverage/summary.txt docs/reports/coverage-summary.txt
           cat coverage/summary.txt >> "$GITHUB_STEP_SUMMARY"
@@ -156,7 +162,10 @@ jobs:
           {
             echo "# System Validation Report"
             echo
-            echo "Automated CI validates compilation, registered CTest suites, Cppcheck, and coverage. Manual end-to-end acceptance walkthroughs for UC-01 to UC-13, performance measurements against NFR-01 to NFR-05, and any security checks not represented by automated tests remain separate validation activities. This report does not claim those manual activities passed."
+            echo "Automated CI validates compilation, registered CTest suites, Cppcheck, coverage, and the measured NFR-01/NFR-02/NFR-04 checks. NFR-03 startup timing, NFR-05 peak memory, manual end-to-end acceptance walkthroughs for UC-01 to UC-13, and security checks not represented by automated tests remain open. This report does not claim those activities passed."
+            echo
+            echo "## Automated performance measurements"
+            cat docs/reports/performance-results.txt
           } > docs/reports/SYSTEM_VALIDATION_REPORT.md
       - name: Upload testing and coverage reports
         uses: actions/upload-artifact@v4
