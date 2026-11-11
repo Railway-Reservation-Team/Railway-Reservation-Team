@@ -1,38 +1,68 @@
 # Test Case Traceability and Execution Status
 
-## Basis
+## Requirement baseline
 
-This matrix follows the 14 test cases and SEC-01 to SEC-05 checks in the submitted Software Test Plan. It maps them to the current repository's CTest suites where a related test source exists. A related unit suite is not automatically proof that the complete end-to-end test case or every stated security requirement has passed.
+The authoritative submitted SRS v1.0 (06-Sep-2026) defines 21 functional requirements (RRS-F-001–021), 6 non-functional requirements (RRS-NF-001–006) and 6 security requirements (RRS-SR-001–006). The Software Test Plan contains 14 test cases and additional module scope. Where the Test Plan uses different NFR names/targets or adds waitlisting, payment receipts, e-ticket export and reports, those items must be recorded as Test Plan scope or approved SRS extensions—not silently mapped to a different SRS FR.
 
-| Test Plan ID | Test Plan objective | Related automated suite(s) | Current evidence / gap |
+See [REQUIREMENTS_GAP_REPORT.md](REQUIREMENTS_GAP_REPORT.md) for the full SRS ID-by-ID status and cross-document discrepancies.
+
+## Test Plan scenario traceability
+
+| Test Plan ID | Test objective | Related automated suite(s) | Current evidence / gap |
 |---|---|---|---|
-| TC-01 | Passenger registration and duplicate-email rejection | `AuthManagerTests` | Registration and duplicate-account checks exist; confirm latest CI result. |
-| TC-02 | Login, five-failure lockout, session expiry | `AuthManagerTests` | Login, lockout and passenger session timeout checks exist; confirm latest CI result. |
-| TC-03 / SEC-01 | Passwords not stored in plaintext | `AuthManagerTests`, `AdminAuthManagerTests` | Passenger and administrator authentication use salted PBKDF2-HMAC-SHA-256 in source; tests inspect account storage. |
-| TC-04 | Train search and no-results behavior | `test_modules`, `US05Tests` | Related search/module tests exist; complete scenario coverage needs review against the detailed procedure. |
-| TC-05 | Five-minute seat soft-lock expiry | `SeatInventoryTests` | Seat-inventory suite exists; do not mark the five-minute elapsed-time scenario passed without explicit evidence. |
-| TC-06 | Unique PNR on confirmed booking | `BookingManagerTests`, `BookingIntegrationTest` | Related booking tests exist; validate exact 10-digit uniqueness and traveller-count assertions. |
-| TC-07 | Waitlist auto-upgrade after cancellation | No qualifying suite | Current `BookingManager::createBooking` rejects insufficient seats; no waitlist persistence or cancellation-triggered promotion was found. Keep this test open until FR-12/FR-13 are implemented. |
-| TC-08 | Failed payment releases hold; success records receipt | `PaymentStructureTests`, `PaymentProcessTests`, `BookingIntegrationTest` | Interactive success/failure simulation and payment-record serialization are tested. The application flow does not yet persist a unique transaction receipt or demonstrate a complete seat-hold retry/release cycle. |
-| TC-09 | Cancellation refund fee slabs | `CancellationTests` | Automated coverage now exercises a future booking cancellation, the over-24-hour 25% fee tier, refund calculation, seat restoration, status update, and repeat-cancellation rejection. The within-24-hour 50% fee tier and post-departure rejection still need explicit tests. |
-| TC-10 | Performance and memory targets | `PerformanceTests`, `ConsoleMenuSmoke` | `PerformanceTests` seeds 200 trains and checks search ≤2s, booking ≤3s, and train-file read ≤200ms. Console startup is exercised end-to-end, but startup timing ≤3s and peak memory ≤128MB still need explicit process-level measurement. |
-| TC-11 | PNR status, history, e-ticket | No dedicated service or end-to-end suite found | The inspected repository has no PNR status/history service or e-ticket export flow. Keep TC-11 open; booking lookup by PNR alone does not satisfy the complete test case. |
-| TC-12 / SEC-05 | Corrupt data and verify integrity/recovery | `FileStoreTests`, `TrainDataFileTests`, `AuthManagerTests` | Corrupted passenger account storage is rejected; checksum/record-count recovery for all stores is not established. |
-| TC-13 | Admin train/fare management and reports | `AdminTrainManagerTests`, `AdminFareReservationTests`, `AdminTrainMenuTests` | Train add/view/update/delete and fare/reservation functions have tests. No ReportGenerator or occupancy/revenue report flow was found; the reports portion remains open. |
-| TC-14 / SEC-02 / SEC-03 | Data-file confinement and malformed-input safety | `FileStoreTests`, `TrainDataFileTests`, `ValidationTests` | Validation boundary tests now cover names, dates, fares, menu choices and passenger counts. Strict data-directory confinement and broad file-record fuzzing remain open. |
-| SEC-04 | Passenger session expiry after 15 minutes | `AuthManagerTests` | Passenger timeout test exists; administrator inactivity timeout not established. |
+| TC-01 | Passenger registration and duplicate-email rejection | `AuthManagerTests` | Registration and duplicate-account checks exist; latest baseline CI passed |
+| TC-02 | Login, five-failure lockout, session expiry | `AuthManagerTests` | Login, lockout and passenger inactivity timeout tests exist; verify exact 15-minute threshold |
+| TC-03 / SEC-01 | Passwords not stored in plaintext | `AuthManagerTests`, `AdminAuthManagerTests` | Auth modules use salted PBKDF2-HMAC-SHA-256; inspect both account stores and logs |
+| TC-04 | Train search and no-results behavior | `test_modules`, `US05Tests` | Related search/module tests exist; manually verify all required result fields |
+| TC-05 | Five-minute seat soft-lock expiry | `SeatInventoryTests` | Seat-inventory suite exists; do not claim elapsed five-minute expiry without explicit evidence |
+| TC-06 | Unique PNR on confirmed booking | `BookingManagerTests`, `BookingIntegrationTest` | Related booking tests exist; verify required PNR length/format and uniqueness in persisted data |
+| TC-07 | Waitlist auto-upgrade after cancellation | No qualifying suite confirmed | Waitlist is not a numbered FR in SRS v1.0; it is added Test Plan scope. Keep open unless approved extension is implemented and FIFO promotion is tested |
+| TC-08 | Failed payment releases hold; success records receipt | `PaymentStructureTests`, `PaymentProcessTests`, `BookingIntegrationTest` | Simulated payment paths and record serialization are tested; unique persisted receipt and full hold-release/retry scenario remain to be demonstrated if required |
+| TC-09 | Cancellation refund fee slabs | `CancellationTests` | Cancellation/refund and seat-restoration tests exist; explicitly verify all configured slabs, boundary dates, post-departure rejection and repeated cancellation |
+| TC-10 | Performance and memory targets | `PerformanceTests`, `ConsoleMenuSmoke` | Current tests check search <=2s, booking <=3s and train-file read <=200ms on seeded data. Startup <=3s and peak memory <=128MB are not measured. These Test Plan targets do not directly equal SRS NF-001/NF-002/NF-004 |
+| TC-11 | PNR status, history, e-ticket | No complete dedicated end-to-end suite confirmed | SRS RRS-F-012 is PNR/account retrieval and RRS-F-021 is passenger status. History/e-ticket export are additional Test Plan scope. Keep open until retrieval, access control, history and export flow are verified |
+| TC-12 / SEC-05 | Corrupt data and verify integrity/recovery | `FileStoreTests`, `TrainDataFileTests`, `AuthManagerTests` | Corrupted passenger-account storage rejection exists; checksum/record-count detection and safe recovery for all stores not established |
+| TC-13 | Admin train/fare management and reports | `AdminTrainManagerTests`, `AdminFareReservationTests`, `AdminTrainMenuTests` | Admin train/fare/reservation paths have tests; report generation is extra Test Plan scope and remains open pending ReportGenerator evidence |
+| TC-14 / SEC-02 / SEC-03 | Data-file confinement and malformed-input safety | `FileStoreTests`, `TrainDataFileTests`, `ValidationTests` | Selected validation boundary tests exist; strict application-directory confinement and broad malformed/oversized file-record fuzzing remain open |
+| SEC-04 | Passenger session expiry after 15 minutes | `AuthManagerTests` | Passenger timeout test exists; explicitly verify 15-minute boundary and admin inactivity behavior only if required by approved scope |
 
-| Console menu smoke | `ConsoleMenuSmoke` | Exercises invalid menu choice, passenger registration, login, full successful ticket booking and simulated payment, logout, and exit through the built console executable. |
-| Administrator menu flow | `AdminTrainMenuTests`, `AdminTrainMenuSecurityTests` | Exercises unauthenticated access denial and authenticated add, view, update, delete, invalid-choice, and return paths. |
+## SRS non-functional requirement tests
 
-See [REQUIREMENTS_GAP_REPORT.md](REQUIREMENTS_GAP_REPORT.md) for features that are absent or only partially implemented, including waitlist auto-upgrade, PNR/history/e-ticket, and report generation.
+| SRS ID | Acceptance target | Current evidence | Status |
+|---|---|---|---|
+| RRS-NF-001 | 90th percentile <=3 seconds for >=90% of train-search and normal menu requests under normal load | Search <=2s test on 200 seeded trains exists; no complete p90/90%-of-requests measurement | Partial |
+| RRS-NF-002 | 99.5% operational availability over defined period excluding maintenance | No continuous availability monitoring/measurement for local offline console app | Not demonstrated; clarify scope |
+| RRS-NF-003 | No plaintext passwords; secure protection | PBKDF2-HMAC-SHA-256 salted storage in auth modules; test storage/log inspection | Implemented; evidence review required |
+| RRS-NF-004 | 100 concurrent reservation operations without inconsistency/duplicate confirmed booking | No 100-operation concurrency test; offline single-user SRS context conflicts | Not demonstrated; clarify scope |
+| RRS-NF-005 | First-time-user usability checklist passes | Validation messages exist; no documented non-team user evaluation | Partial |
+| RRS-NF-006 | Reservation records persist after application restart | File storage exists; complete booking/restart/retrieve same PNR scenario needs explicit evidence | Partial |
+
+## SRS security requirement tests
+
+| SRS ID | Security objective | Current evidence / gap |
+|---|---|---|
+| RRS-SR-001 | Authentication before protected booking details | Passenger authentication exists; PNR/history access control needs end-to-end verification |
+| RRS-SR-002 | No plaintext password display/storage/logging | Salted PBKDF2-HMAC-SHA-256 in passenger/admin auth modules; inspect logs and persisted stores |
+| RRS-SR-003 | Role-based admin authorization | Admin auth and guarded train menu tests exist; verify all admin operations |
+| RRS-SR-004 | Validate every user input before processing/storage | Validation suite exists; oversized and malformed-file fuzz matrix incomplete |
+| RRS-SR-005 | Transaction integrity/no duplicate commitment | Booking, cancellation and seat tests exist; failure-injection, duplicate requests and rollback consistency need broader evidence |
+| RRS-SR-006 | Timestamped authentication failures and administrator actions | PR #81 proposes audit helper/events and tests; pending CI, review and merge; ensure passenger booking/cancellation transactions are also audited |
 
 ## Execution status
 
-Workflow run [43026470906](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43026470906) passed all **20/20 registered CTest tests** on Ubuntu and Windows. Cppcheck, coverage generation, and the performance-report artifact also completed successfully. Automated performance checks cover the 200-train search, booking and train-file-read thresholds (NFR-01, NFR-02 and NFR-04). This is evidence that the registered tests passed; it is not evidence that every manual step in all 14 Test Plan cases has been executed.
+Latest previously completed baseline run: [GitHub Actions run 43027487428](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43027487428). It passed all **20/20 registered CTest tests** on Ubuntu and Windows. Cppcheck and coverage generation completed.
 
-The measured coverage in that run was **79.7% line**, **96.9% function**, and **49.9% branch**. The required 70% branch-coverage target remains open. This document deliberately does not pre-mark tests as passed. Manual acceptance tests, performance measurements, and security checks not covered by automated assertions must be recorded separately with date, tester, input data, expected result, actual result, and evidence.
+Measured baseline coverage:
+- Line coverage: **79.7%**
+- Function coverage: **96.9%**
+- Branch coverage: **49.9%**
 
-## Coverage target
+The Test Plan's 70% branch coverage target remains open. Passing registered tests do not prove every manual step in the 14 Test Plan cases or every SRS requirement.
 
-The Test Plan requires at least 70% branch coverage. Record the exact measured branch percentage from the latest completed gcovr report. If it is below 70%, the requirement remains open.
+## Tooling deviation
+
+The Test Plan names Jenkins, GoogleTest and SonarQube (or equivalent). The implemented pipeline uses GitHub Actions, CMake/CTest repository test executables, Cppcheck and gcovr. The substitution is documented in `CI_CD_AND_TESTING.md`; evaluator acceptance and an approved Test Plan revision should be recorded.
+
+## Evidence recording rule
+
+For every manual or automated acceptance test, record: requirement/test ID, build SHA, date, tester, OS/toolchain, test data, exact input, expected result, actual result, Pass/Fail/Not Demonstrated, and evidence link. Do not mark a requirement Done only because the application compiles or a related unit test passes.
