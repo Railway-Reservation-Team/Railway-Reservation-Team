@@ -13,14 +13,16 @@ This matrix follows the 14 test cases and SEC-01 to SEC-05 checks in the submitt
 | TC-05 | Five-minute seat soft-lock expiry | `SeatInventoryTests` | Seat-inventory suite exists; do not mark the five-minute elapsed-time scenario passed without explicit evidence. |
 | TC-06 | Unique PNR on confirmed booking | `BookingManagerTests`, `BookingIntegrationTest` | Related booking tests exist; validate exact 10-digit uniqueness and traveller-count assertions. |
 | TC-07 | Waitlist auto-upgrade after cancellation | `BookingIntegrationTest`, `BookingManagerTests` | Related integration/booking tests exist; exact auto-upgrade scenario requires confirmation. |
-| TC-08 | Failed payment releases hold; success records receipt | `PaymentStructureTests`, `BookingIntegrationTest` | Payment and integration suites exist; exact failed-payment/receipt sequence requires confirmation. |
-| TC-09 | Cancellation refund fee slabs | No dedicated cancellation suite identified in current CMake list | Manual or new automated evidence required for both time bands. |
+| TC-08 | Failed payment releases hold; success records receipt | `PaymentStructureTests`, `PaymentProcessTests`, `BookingIntegrationTest` | Payment data validation and interactive success/failure simulation are now covered separately. The complete payment-to-booking rollback/receipt scenario still needs end-to-end evidence. |
+| TC-09 | Cancellation refund fee slabs | `CancellationTests` | Automated coverage now exercises a future booking cancellation, the over-24-hour 25% fee tier, refund calculation, seat restoration, status update, and repeat-cancellation rejection. The within-24-hour 50% fee tier and post-departure rejection still need explicit tests. |
 | TC-10 | Performance and memory targets | No dedicated benchmark suite identified | Measure the NFR thresholds using the Test Plan's seeded workload; do not infer from unit-test success. |
 | TC-11 | PNR status, history, e-ticket | `BookingManagerTests`, `BookingIntegrationTest` | Related booking tests exist; PNR/history/e-ticket end-to-end evidence needs confirmation. |
 | TC-12 / SEC-05 | Corrupt data and verify integrity/recovery | `FileStoreTests`, `TrainDataFileTests`, `AuthManagerTests` | Corrupted passenger account storage is rejected; checksum/record-count recovery for all stores is not established. |
 | TC-13 | Admin train/fare management and reports | `AdminTrainManagerTests`, `AdminFareReservationTests` | Admin management suites exist; report-generator requirements need explicit mapping/evidence. |
 | TC-14 / SEC-02 / SEC-03 | Data-file confinement and malformed-input safety | `FileStoreTests`, `TrainDataFileTests`, validation suites | Relative `data/` paths and selected malformed-record checks exist; strict directory confinement and full boundary/fuzz coverage remain open. |
 | SEC-04 | Passenger session expiry after 15 minutes | `AuthManagerTests` | Passenger timeout test exists; administrator inactivity timeout not established. |
+
+| Console menu smoke | `ConsoleMenuSmoke` | Exercises invalid menu choice, passenger registration, login, logout, and exit through the built console executable. |
 
 ## Execution status
 
