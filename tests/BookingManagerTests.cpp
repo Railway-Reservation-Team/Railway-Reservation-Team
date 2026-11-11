@@ -63,6 +63,21 @@ int main() {
 
     check(bookingCreated && validPNR, "Generate a unique 10-digit PNR");
 
+    // Test 2b: A second persisted booking must receive a different PNR.
+    std::vector<Passenger> secondPassengers = {
+        {"Charlie Brown", 28, "Other"}
+    };
+    std::string secondPNR;
+    std::string secondError;
+    bool secondBookingCreated = BookingManager::createBooking(
+        train, "Sleeper", secondPassengers, 1000.0, secondPNR, secondError
+    );
+    check(
+        secondBookingCreated && secondPNR.size() == 10 && secondPNR != pnr,
+        "Generate a different PNR for a second booking"
+    );
+
+
     // Test 3: Booking lookup.
     Booking booking;
     bool found = bookingCreated &&
@@ -105,8 +120,8 @@ int main() {
 
     check(
         updatedTrains.size() == 1 &&
-        updatedTrains[0].sleeperSeatsAvailable == 8,
-        "Deduct two seats after a two-passenger booking"
+        updatedTrains[0].sleeperSeatsAvailable == 7,
+        "Deduct three seats after two bookings (two passengers, then one)"
     );
 
     // Test 8: Reject more than six passengers.
