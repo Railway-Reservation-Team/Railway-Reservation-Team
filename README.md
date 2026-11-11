@@ -78,7 +78,7 @@ The application uses local data files for persistent storage and does not requir
 - **Compiler:** GCC 9+, MSVC 2019+, or equivalent
 - **Cryptography:** OpenSSL (libcrypto), used by passenger authentication
 - **Testing:** GoogleTest 1.14+
-- **CI/CD:** Jenkins
+- **CI/CD:** GitHub Actions (cross-platform build, automated tests, static analysis, coverage, downloadable artifacts and tagged releases)
 - **Static Analysis:** SonarQube or equivalent
 - **Coverage:** gcov/lcov
 - **Storage:** Local text/binary data files
@@ -250,8 +250,10 @@ The project is designed to support:
 
 - Unit testing using GoogleTest
 - At least 70% branch coverage using gcov/lcov
-- Jenkins-based automated build and testing
-- SonarQube static analysis
+- GitHub Actions build and test matrix on Ubuntu and Windows
+- Cppcheck static analysis and gcovr coverage reports on Ubuntu
+- Downloadable platform-specific build artifacts for each successful pipeline run
+- GitHub Releases published from version tags (for example, `v1.0.0`) after build, test and quality jobs pass
 - Branch-based development and pull-request reviews
 - Modular C++ design with testable business logic
 
@@ -354,6 +356,26 @@ The passenger authentication module has been implemented and integrated into the
 | **Total** | **126** | **0** |
 
 All eight test suites passed. The complete application compiled successfully.
+
+## 10.1 Continuous Integration and Delivery (GitHub Actions)
+
+The workflow is defined in `.github/workflows/cpp-build.yml`.
+
+- Pull requests targeting `main` and pushes to `main`, `feature/**` and `fix/**` run the CI pipeline.
+- The application is configured and built with CMake, then all registered CTest suites are executed on Ubuntu and Windows.
+- The quality job runs Cppcheck and generates a gcovr coverage report from the test run.
+- Successful platform builds are packaged with the sample train data and README, then uploaded as workflow artifacts.
+- Pushing a version tag such as `v1.0.0` runs the same build, test and quality gates. Only when those jobs pass does the release job publish the Windows and Ubuntu ZIP packages as a GitHub Release.
+- Workflow artifacts are temporary CI downloads; GitHub Releases are the versioned delivery channel.
+
+To create a release after reviewing and merging the intended code into the release branch:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The release workflow requires no custom deployment server because this project is a standalone console application.
 
 See `FINAL_TEST_RESULTS.md` and `TEST_REPORT.md` for detailed results.
 
