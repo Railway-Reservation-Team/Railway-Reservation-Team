@@ -361,9 +361,10 @@ All 12 registered CTest targets passed in the verified GitHub Actions run. The c
 
 The workflow is defined in `.github/workflows/cpp-build.yml`.
 
-- Pull requests targeting `main` and pushes to `main`, `feature/**` and `fix/**` run the CI pipeline.
+- Pull requests targeting `main` run the CI pipeline on every update; pushes to `main` and version tags also trigger the workflow. A manual run is available through GitHub Actions.
 - The application is configured and built with CMake, then all registered CTest suites are executed on Ubuntu and Windows.
 - The quality job runs Cppcheck and generates a gcovr coverage report from the test run.
+- The latest inspected coverage report measured **50.5% line coverage** and **30.8% branch coverage**. The README's 70% branch-coverage target is not yet met; the report is published so the team can track improvements.
 - Successful platform builds are packaged with the sample train data, README and required OpenSSL runtime library, then uploaded as workflow artifacts. The Linux package includes a `run.sh` launcher that sets its bundled-library path.
 - Pushing a version tag such as `v1.0.0` runs the same build, test and quality gates. Only when those jobs pass does the release job publish the Windows and Ubuntu ZIP packages as a GitHub Release.
 - Workflow artifacts are temporary CI downloads; GitHub Releases are the versioned delivery channel.
