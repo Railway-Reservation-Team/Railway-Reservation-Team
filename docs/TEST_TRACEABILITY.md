@@ -24,7 +24,9 @@ This matrix follows the 14 test cases and SEC-01 to SEC-05 checks in the submitt
 
 ## Execution status
 
-The latest completed GitHub Actions run is the source of truth for automated suite pass/fail status. This document deliberately does not pre-mark tests as passed. Manual acceptance tests, performance measurements, and security checks not covered by automated assertions must be recorded separately with date, tester, input data, expected result, actual result, and evidence.
+Workflow run [43022855092](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43022855092) passed all **14/14 registered CTest suites** on Ubuntu and Windows. Cppcheck and coverage report generation also completed successfully. This is evidence that the registered suites passed; it is not evidence that every manual step in all 14 Test Plan cases has been executed.
+
+The measured coverage in that run was **56.6% line**, **83.1% function**, and **33.7% branch**. The required 70% branch-coverage target remains open. This document deliberately does not pre-mark tests as passed. Manual acceptance tests, performance measurements, and security checks not covered by automated assertions must be recorded separately with date, tester, input data, expected result, actual result, and evidence.
 
 ## Coverage target
 
