@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -88,6 +89,56 @@ int main() {
     // Repeated cancellation is rejected because the booking is no longer confirmed.
     assert(!Cancellation::cancelBooking(pnr, refund, charge, error));
     assert(error.find("Only confirmed bookings") != std::string::npos);
+
+    // The within-24-hour fee tier charges 50%.
+    const std::time_t nearDeparture = std::time(nullptr) + 2 * 60 * 60;
+    std::tm localDeparture = *std::localtime(&nearDeparture);
+    char nearDate[11]{};
+    char nearTime[6]{};
+    assert(std::strftime(nearDate, sizeof(nearDate), "%Y-%m-%d", &localDeparture) > 0);
+    assert(std::strftime(nearTime, sizeof(nearTime), "%H:%M", &localDeparture) > 0);
+
+    Train nearTrain = train;
+    nearTrain.trainNumber = "77776";
+    nearTrain.journeyDate = nearDate;
+    nearTrain.departureTime = nearTime;
+    {
+        std::ofstream trains("data/trains.dat", std::ios::trunc);
+        trains << nearTrain.trainNumber << "|Near Departure Express|Bengaluru|Chennai|"
+               << nearTrain.departureTime << "|07:00|7h|500|800|1000|400|10|10|10|10|"
+               << nearTrain.journeyDate << "\\n";
+    }
+    {
+        std::ofstream bookings("data/bookings.dat", std::ios::trunc);
+    }
+
+    std::string nearPnr;
+    assert(BookingManager::createBooking(
+        nearTrain, "Sleeper", passengers, 1000.0, nearPnr, error));
+    assert(Cancellation::cancelBooking(nearPnr, refund, charge, error));
+    assert(std::fabs(charge - 500.0) < 0.001);
+    assert(std::fabs(refund - 500.0) < 0.001);
+
+    // A booking whose train has already departed cannot be cancelled.
+    Train departedTrain = train;
+    departedTrain.trainNumber = "77775";
+    departedTrain.journeyDate = "2000-01-01";
+    departedTrain.departureTime = "00:00";
+    {
+        std::ofstream trains("data/trains.dat", std::ios::trunc);
+        trains << departedTrain.trainNumber << "|Departed Express|Bengaluru|Chennai|"
+               << "00:00|07:00|7h|500|800|1000|400|10|10|10|10|"
+               << "2000-01-01\\n";
+    }
+    {
+        std::ofstream bookings("data/bookings.dat", std::ios::trunc);
+    }
+
+    std::string departedPnr;
+    assert(BookingManager::createBooking(
+        departedTrain, "Sleeper", passengers, 1000.0, departedPnr, error));
+    assert(!Cancellation::cancelBooking(departedPnr, refund, charge, error));
+    assert(error.find("Cannot cancel after train departure") != std::string::npos);
 
     // A malformed PNR does not identify a valid booking.
     assert(!Cancellation::cancelBooking(
