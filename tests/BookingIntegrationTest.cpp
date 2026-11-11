@@ -57,7 +57,7 @@ int main() {
     assert(booking.status == "Confirmed");
     std::cout << "[PASS] Booking retrieval using PNR\n";
 
-    // Verify eight-field booking serialization.
+    // Verify the new nine-field format includes a waitlist-position slot.
     std::ifstream savedBookings("data/bookings.dat");
     std::string savedLine;
     std::getline(savedBookings, savedLine);
@@ -71,8 +71,8 @@ int main() {
         ++fieldCount;
     }
 
-    assert(fieldCount == 8);
-    std::cout << "[PASS] Existing eight-field booking format\n";
+    assert(fieldCount == 9);
+    std::cout << "[PASS] Nine-field booking format with waitlist position\n";
 
     // Verify that two AC 2-Tier seats were deducted.
     std::ifstream updatedTrains("data/trains.dat");
