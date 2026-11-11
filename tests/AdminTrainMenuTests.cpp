@@ -43,9 +43,11 @@ int main() {
         "11:00\n16:00\n5h\n2099-12-31\n"
         "600\n900\n1100\n450\n18\n18\n18\n18\n"
         "2\n"
+        "5\n77777\n"
+        "2\n"
         "4\n77777\n"
         "2\n"
-        "5\n";
+        "6\n";
 
     std::istringstream input(menuInput);
     std::ostringstream output;
@@ -55,6 +57,7 @@ int main() {
     const bool invalidChoice = result.find("Invalid choice") != std::string::npos;
     const bool added = result.find("Train added successfully") != std::string::npos;
     const bool updated = result.find("Train updated successfully") != std::string::npos;
+    const bool deactivated = result.find("Train deactivated successfully") != std::string::npos;
     const bool deleted = result.find("Train deleted successfully") != std::string::npos;
     const bool viewed = result.find("ALL TRAINS") != std::string::npos;
 
@@ -62,12 +65,12 @@ int main() {
     fs::current_path(original);
     fs::remove_all(work, ec);
 
-    if (!(invalidChoice && added && updated && deleted && viewed)) {
+    if (!(invalidChoice && added && updated && deactivated && deleted && viewed)) {
         std::cerr << "Admin menu flow failed. Output:\n" << result << '\n';
         return 1;
     }
 
     std::cout << "Administrator train menu flow passed.\n";
-    std::cout << "Invalid choice, add, view, update, delete and back paths: PASS\n";
+    std::cout << "Invalid choice, add, view, update, deactivate, delete and back paths: PASS\n";
     return 0;
 }
