@@ -1,6 +1,8 @@
 #include "../src/AdminTrainManager.h"
 
 #include <cassert>
+#include <filesystem>
+#include <iterator>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -38,6 +40,11 @@ void prepareFile() {
 }
 
 int main() {
+    std::error_code auditFsError;
+    std::filesystem::create_directories("data", auditFsError);
+    if (auditFsError) return 1;
+    std::filesystem::remove("data/admin_audit.log", auditFsError);
+
     std::string error;
     std::vector<Train> trains;
 
@@ -90,6 +97,17 @@ int main() {
 
     assert(!AdminTrainManager::addTrain(TEST_FILE, invalidTrain, error));
     std::cout << "PASS: Reject invalid train details\n";
+
+    {
+        std::ifstream auditFile("data/admin_audit.log");
+        const std::string audit(
+            (std::istreambuf_iterator<char>(auditFile)),
+            std::istreambuf_iterator<char>());
+        assert(audit.find("ADMIN_TRAIN_ADDED") != std::string::npos);
+        assert(audit.find("ADMIN_TRAIN_UPDATED") != std::string::npos);
+        assert(audit.find("ADMIN_TRAIN_DELETED") != std::string::npos);
+        std::cout << "PASS: Train administration actions are audited\n";
+    }
 
     std::remove(TEST_FILE.c_str());
 
