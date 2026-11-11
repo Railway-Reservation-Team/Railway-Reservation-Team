@@ -1,6 +1,7 @@
 #include "AdminTrainManager.h"
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <fstream>
 #include <sstream>
@@ -27,26 +28,7 @@ bool validTrain(const Train& train) {
 }
 
 std::string serializeTrain(const Train& train) {
-    std::ostringstream record;
-
-    record << train.trainNumber << '|'
-           << train.trainName << '|'
-           << train.source << '|'
-           << train.destination << '|'
-           << train.departureTime << '|'
-           << train.arrivalTime << '|'
-           << train.journeyDuration << '|'
-           << train.sleeperFare << '|'
-           << train.ac3TierFare << '|'
-           << train.ac2TierFare << '|'
-           << train.chairCarFare << '|'
-           << train.sleeperSeatsAvailable << '|'
-           << train.ac3TierSeatsAvailable << '|'
-           << train.ac2TierSeatsAvailable << '|'
-           << train.chairCarSeatsAvailable << '|'
-           << train.journeyDate;
-
-    return record.str();
+    return serializeTrainRecord(train);
 }
 
 bool readRecords(
@@ -160,7 +142,9 @@ bool addTrain(
 
     records.push_back(serializeTrain(train));
 
-    return writeRecords(filename, records, errorMessage);
+    if (!writeRecords(filename, records, errorMessage)) return false;
+    AdminAuditLog::append("ADMIN_TRAIN_ADDED", train.trainNumber);
+    return true;
 }
 
 bool viewTrains(
@@ -223,9 +207,18 @@ bool updateTrain(
         return false;
     }
 
-    records[index] = serializeTrain(updatedTrain);
+    Train trainToSave = updatedTrain;
+    Train existingTrain;
+    if (!parseTrainRecord(records[index], existingTrain)) {
+        errorMessage = "Existing train record is invalid.";
+        return false;
+    }
+    trainToSave.active = existingTrain.active;
+    records[index] = serializeTrain(trainToSave);
 
-    return writeRecords(filename, records, errorMessage);
+    if (!writeRecords(filename, records, errorMessage)) return false;
+    AdminAuditLog::append("ADMIN_TRAIN_UPDATED", trainNumber);
+    return true;
 }
 
 bool deleteTrain(
@@ -250,7 +243,49 @@ bool deleteTrain(
 
     records.erase(records.begin() + index);
 
-    return writeRecords(filename, records, errorMessage);
+    if (!writeRecords(filename, records, errorMessage)) return false;
+    AdminAuditLog::append("ADMIN_TRAIN_DELETED", trainNumber);
+    return true;
+}
+
+bool deactivateTrain(
+    const std::string& filename,
+    const std::string& trainNumber,
+    std::string& errorMessage) {
+
+    errorMessage.clear();
+
+    std::vector<std::string> records;
+    if (!readRecords(filename, records, errorMessage)) {
+        return false;
+    }
+
+    std::size_t index;
+    if (!findTrain(records, trainNumber, index)) {
+        errorMessage = "Train not found.";
+        return false;
+    }
+
+    Train train;
+    if (!parseTrainRecord(records[index], train)) {
+        errorMessage = "Train record is invalid.";
+        return false;
+    }
+
+    if (!train.active) {
+        errorMessage = "Train is already deactivated.";
+        return false;
+    }
+
+    train.active = false;
+    records[index] = serializeTrain(train);
+
+    if (!writeRecords(filename, records, errorMessage)) {
+        return false;
+    }
+
+    AdminAuditLog::append("ADMIN_TRAIN_DEACTIVATED", trainNumber);
+    return true;
 }
 
 }
