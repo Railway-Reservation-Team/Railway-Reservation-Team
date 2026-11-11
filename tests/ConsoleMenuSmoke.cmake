@@ -6,10 +6,12 @@ file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}/data")
 file(WRITE "${WORK_DIR}/data/trains.dat"
 "77777|Smoke Test Express|Bengaluru|Chennai|10:00|18:00|8h|500|800|1000|400|20|20|20|20|2099-12-31\n")
+file(WRITE "${WORK_DIR}/data/bookings.dat"
+"1234567890|77777|2099-12-31|Sleeper|Seed Passenger,30,Male|1|500.00|Confirmed\n")
 
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
-"9\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n6\n7\n")
+"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n5\n5\n6\n7\n")
 
 execute_process(
     COMMAND "${APP}"
@@ -27,10 +29,15 @@ endif()
 
 foreach(expected_text
     "Invalid choice"
+    "Please register and log in before booking"
     "Registration successful"
     "Login successful"
     "BOOKING CONFIRMED"
     "Payment Status: SUCCESS"
+    "TICKET CANCELLED SUCCESSFULLY"
+    "Administrator account created"
+    "Administrator login successful"
+    "No active administrator session"
     "Passenger logged out successfully"
     "Exiting system")
     string(FIND "${app_output}" "${expected_text}" found_at)
@@ -39,4 +46,4 @@ foreach(expected_text
     endif()
 endforeach()
 
-message(STATUS "Console menu, passenger registration/login and successful booking paths passed.")
+message(STATUS "Console end-to-end passenger registration, booking, payment, cancellation and administrator login flows passed.")
