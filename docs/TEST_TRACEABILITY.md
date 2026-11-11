@@ -18,11 +18,12 @@ This matrix follows the 14 test cases and SEC-01 to SEC-05 checks in the submitt
 | TC-10 | Performance and memory targets | No dedicated benchmark suite identified | Measure the NFR thresholds using the Test Plan's seeded workload; do not infer from unit-test success. |
 | TC-11 | PNR status, history, e-ticket | `BookingManagerTests`, `BookingIntegrationTest` | Related booking tests exist; PNR/history/e-ticket end-to-end evidence needs confirmation. |
 | TC-12 / SEC-05 | Corrupt data and verify integrity/recovery | `FileStoreTests`, `TrainDataFileTests`, `AuthManagerTests` | Corrupted passenger account storage is rejected; checksum/record-count recovery for all stores is not established. |
-| TC-13 | Admin train/fare management and reports | `AdminTrainManagerTests`, `AdminFareReservationTests` | Admin management suites exist; report-generator requirements need explicit mapping/evidence. |
+| TC-13 | Admin train/fare management and reports | `AdminTrainManagerTests`, `AdminFareReservationTests`, `AdminTrainMenuTests` | Direct manager suites and an authenticated menu flow now exercise train add, view, update and delete. The report-generator requirement still needs separate evidence. |
 | TC-14 / SEC-02 / SEC-03 | Data-file confinement and malformed-input safety | `FileStoreTests`, `TrainDataFileTests`, validation suites | Relative `data/` paths and selected malformed-record checks exist; strict directory confinement and full boundary/fuzz coverage remain open. |
 | SEC-04 | Passenger session expiry after 15 minutes | `AuthManagerTests` | Passenger timeout test exists; administrator inactivity timeout not established. |
 
 | Console menu smoke | `ConsoleMenuSmoke` | Exercises invalid menu choice, passenger registration, login, logout, and exit through the built console executable. |
+| Administrator menu flow | `AdminTrainMenuTests`, `AdminTrainMenuSecurityTests` | Exercises unauthenticated access denial and authenticated add, view, update, delete, invalid-choice, and return paths. |
 
 ## Execution status
 
