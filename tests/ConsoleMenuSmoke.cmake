@@ -2,6 +2,7 @@ if(NOT DEFINED APP OR NOT DEFINED WORK_DIR)
     message(FATAL_ERROR "APP and WORK_DIR must be supplied")
 endif()
 
+file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}/data")
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
