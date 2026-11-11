@@ -301,19 +301,28 @@ int runBooking() {
                           << ". You requested " << seats << " seats.\n";
             }
 
+            const bool canJoinWaitlist =
+                seatResult == SeatRequestResult::EXCEEDS_AVAILABLE_SEATS;
+
             std::cout << "1. Enter passenger count again\n"
                       << "2. Select travel class again\n"
                       << "3. Cancel booking\n";
+            if (canJoinWaitlist) {
+                std::cout << "4. Join waitlist\n";
+            }
 
+            const int maximumRetryChoice = canJoinWaitlist ? 4 : 3;
             int retryChoice = 0;
 
             while (true) {
-                std::cout << "Choose an option (1-3): ";
+                std::cout << "Choose an option (1-"
+                          << maximumRetryChoice << "): ";
 
                 if (!readBookingInput(input)) return 1;
 
                 if (Validation::parseMenuChoice(
-                        input, 1, 3, retryChoice, errorMessage)) {
+                        input, 1, maximumRetryChoice,
+                        retryChoice, errorMessage)) {
                     break;
                 }
 
@@ -326,6 +335,11 @@ int runBooking() {
 
             if (retryChoice == 2) {
                 continue;
+            }
+
+            if (retryChoice == 4) {
+                bookingReady = true;
+                break;
             }
 
             std::cout << "Booking cancelled.\n";
@@ -420,23 +434,43 @@ int runBooking() {
             return 1;
         }
 
-        // Display booking confirmation
+        // Read the saved status so a booking that ran out of seats is
+        // displayed as waitlisted rather than incorrectly confirmed.
+        Booking savedBooking;
+        if (!BookingManager::findBooking(pnr, savedBooking)) {
+            std::cout << "Booking was saved, but its status could not be read.\n";
+            return 1;
+        }
+
         std::cout << std::fixed << std::setprecision(2);
 
-        std::cout << "\n========== BOOKING CONFIRMED ==========\n"
-                  << "PNR: " << pnr
+        if (savedBooking.status == "Waitlisted") {
+            std::cout << "\n========== BOOKING WAITLISTED ==========\n";
+        } else {
+            std::cout << "\n========== BOOKING CONFIRMED ==========\n";
+        }
+
+        std::cout << "PNR: " << pnr
                   << "\nTrain: " << selectedTrain.trainName
                   << "\nTrain Number: " << selectedTrain.trainNumber
                   << "\nJourney Date: " << journeyDate
                   << "\nPassengers: " << passengers.size()
                   << "\nTravel Class: " << travelClass
-                  << "\nSeats Allocated: " << seats
+                  << "\nSeats Allocated: "
+                  << (savedBooking.status == "Confirmed" ? seats : 0)
                   << "\nTotal Fare: Rs. " << totalFare
                   << "\nPayment Method: " << paymentMethod
                   << "\nPayment Status: " << paymentStatus
-                  << "\nBooking Status: Confirmed\n";
+                  << "\nBooking Status: " << savedBooking.status << '\n';
 
-        std::cout << "\nYour seats have been successfully allocated.\n";
+        if (savedBooking.status == "Waitlisted") {
+            std::cout << "Waitlist Position: "
+                      << savedBooking.waitlistPosition << '\n';
+            std::cout << "\nYour booking is saved on the waitlist. "
+                      << "You will be upgraded automatically when seats become available.\n";
+        } else {
+            std::cout << "\nYour seats have been successfully allocated.\n";
+        }
     }
     catch (const std::exception& e) {
         std::cout << "Booking error: " << e.what() << '\n';
