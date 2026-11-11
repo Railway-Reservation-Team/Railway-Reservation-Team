@@ -199,7 +199,7 @@ void deactivateTrain(std::istream& input, std::ostream& output) {
     if (AdminTrainManager::deactivateTrain(TRAIN_FILE, trainNumber, error))
         output << "Train deactivated successfully. Historical records are preserved.\n";
     else
-        output << "Error: " << error << '\\n';
+        output << "Error: " << error << '\n';
 }
 
 void deleteTrain(std::istream& input, std::ostream& output) {
