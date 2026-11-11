@@ -1,6 +1,7 @@
 #include "AdminTrainManager.h"
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <fstream>
 #include <sstream>
@@ -160,7 +161,9 @@ bool addTrain(
 
     records.push_back(serializeTrain(train));
 
-    return writeRecords(filename, records, errorMessage);
+    if (!writeRecords(filename, records, errorMessage)) return false;
+    AdminAuditLog::append("ADMIN_TRAIN_ADDED", train.trainNumber);
+    return true;
 }
 
 bool viewTrains(
@@ -225,7 +228,9 @@ bool updateTrain(
 
     records[index] = serializeTrain(updatedTrain);
 
-    return writeRecords(filename, records, errorMessage);
+    if (!writeRecords(filename, records, errorMessage)) return false;
+    AdminAuditLog::append("ADMIN_TRAIN_UPDATED", trainNumber);
+    return true;
 }
 
 bool deleteTrain(
@@ -250,7 +255,9 @@ bool deleteTrain(
 
     records.erase(records.begin() + index);
 
-    return writeRecords(filename, records, errorMessage);
+    if (!writeRecords(filename, records, errorMessage)) return false;
+    AdminAuditLog::append("ADMIN_TRAIN_DELETED", trainNumber);
+    return true;
 }
 
 }
