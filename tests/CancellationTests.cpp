@@ -90,6 +90,53 @@ int main() {
     assert(!Cancellation::cancelBooking(pnr, refund, charge, error));
     assert(error.find("Only confirmed bookings") != std::string::npos);
 
+    // Fill the remaining inventory, queue two passengers, then cancel a
+    // confirmed group. Both waitlisted bookings should be promoted FIFO.
+    std::vector<Passenger> sixPassengers(6, {"Group Passenger", 25, "Other"});
+    std::vector<Passenger> fourPassengers(4, {"Another Passenger", 26, "Other"});
+    std::string sixPnr;
+    std::string fourPnr;
+    std::string firstWaitlistPnr;
+    std::string secondWaitlistPnr;
+
+    assert(BookingManager::createBooking(
+        train, "Sleeper", sixPassengers, 6000.0, sixPnr, error));
+    assert(BookingManager::createBooking(
+        train, "Sleeper", fourPassengers, 4000.0, fourPnr, error));
+    assert(BookingManager::createBooking(
+        train, "Sleeper", passengers, 1000.0, firstWaitlistPnr, error));
+    assert(BookingManager::createBooking(
+        train, "Sleeper", passengers, 1000.0, secondWaitlistPnr, error));
+
+    Booking firstWaiting;
+    Booking secondWaiting;
+    assert(BookingManager::findBooking(firstWaitlistPnr, firstWaiting));
+    assert(BookingManager::findBooking(secondWaitlistPnr, secondWaiting));
+    assert(firstWaiting.status == "Waitlisted");
+    assert(firstWaiting.waitlistPosition == 1);
+    assert(secondWaiting.status == "Waitlisted");
+    assert(secondWaiting.waitlistPosition == 2);
+
+    assert(Cancellation::cancelBooking(sixPnr, refund, charge, error));
+
+    Booking firstPromoted;
+    Booking secondPromoted;
+    assert(BookingManager::findBooking(firstWaitlistPnr, firstPromoted));
+    assert(BookingManager::findBooking(secondWaitlistPnr, secondPromoted));
+    assert(firstPromoted.status == "Confirmed");
+    assert(firstPromoted.waitlistPosition == 0);
+    assert(secondPromoted.status == "Confirmed");
+    assert(secondPromoted.waitlistPosition == 0);
+
+    Train afterPromotion;
+    {
+        std::ifstream trains("data/trains.dat");
+        std::string line;
+        std::getline(trains, line);
+        assert(parseTrainRecord(line, afterPromotion));
+    }
+    assert(afterPromotion.sleeperSeatsAvailable == 4);
+
     // The within-24-hour fee tier charges 50%.
     const std::time_t nearDeparture = std::time(nullptr) + 2 * 60 * 60;
     std::tm localDeparture = *std::localtime(&nearDeparture);
@@ -154,5 +201,6 @@ int main() {
     std::cout << "Booking status update and repeat-cancel rejection: PASS\n";
     std::cout << "Within-24-hour 50% fee tier: PASS\n";
     std::cout << "Post-departure cancellation rejection: PASS\n";
+    std::cout << "FIFO waitlist promotion after cancellation: PASS\n";
     return 0;
 }
