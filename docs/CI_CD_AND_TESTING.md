@@ -35,13 +35,14 @@ CMake registers the project test executables with CTest. The two administrator s
 - `AdminAuthManagerTests`
 - `AdminTrainMenuSecurityTests`
 
-The exact number of passing suites and the coverage percentages must be taken from the latest completed workflow run, not copied from an earlier run.
+The latest verified run (43026470906) passed 20/20 CTest tests on Ubuntu and Windows. It measured 79.7% line, 96.9% function and 49.9% branch coverage. The 70% branch target remains unmet. Performance checks exercise NFR-01, NFR-02 and NFR-04; NFR-03 startup timing and NFR-05 peak memory are still unmeasured.
 
 ## 5. Reports
 
 The quality job generates and uploads:
 - Unit-test execution output
 - System-validation scope/limitations note
+- Seeded 200-train performance results for NFR-01, NFR-02 and NFR-04
 - gcovr coverage summary
 - XML coverage data
 - HTML coverage report
