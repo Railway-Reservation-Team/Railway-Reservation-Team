@@ -55,7 +55,7 @@ jobs:
               */libc.so*|*/libm.so*|*/libpthread.so*|*/libdl.so*|*/librt.so*|*/ld-linux*.so*|*/libgcc_s.so*|*/libstdc++.so*) continue ;;
             esac
             cp -L "$lib" dist/RRS/lib/
-          done < <(ldd build/railway | awk '/=> \\// {print $3} /^\\// {print $1}')
+          done < <(ldd build/railway | awk '$2 == "=>" {print $3} $1 ~ /^\\// {print $1}')
           cat > dist/RRS/run.sh <<'EOF'
           #!/usr/bin/env bash
           set -e
@@ -80,7 +80,7 @@ jobs:
           $searchDirs = @()
           if ($env:OPENSSL_ROOT_DIR) { $searchDirs += (Join-Path $env:OPENSSL_ROOT_DIR "bin") }
           if ($env:VCPKG_ROOT) { $searchDirs += (Join-Path $env:VCPKG_ROOT "installed/x64-windows/bin") }
-          $searchDirs += @("C:\\Program Files\\OpenSSL-Win64\\bin", "C:\\Program Files\\OpenSSL\\bin")
+          $searchDirs += @("C:\Program Files\OpenSSL-Win64\bin", "C:\Program Files\OpenSSL\bin")
           $searchDirs += ($env:PATH -split ';')
           $searchDirs = $searchDirs | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
           $cryptoDll = Get-ChildItem -Path $searchDirs -Filter "libcrypto-3-x64.dll" -File -ErrorAction SilentlyContinue | Select-Object -First 1
