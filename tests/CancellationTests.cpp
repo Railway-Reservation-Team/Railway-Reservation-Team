@@ -134,9 +134,12 @@ int main() {
         std::ofstream bookings("data/bookings.dat", std::ios::trunc);
     }
 
-    std::string departedPnr;
-    assert(BookingManager::createBooking(
-        departedTrain, "Sleeper", passengers, 1000.0, departedPnr, error));
+    const std::string departedPnr = "1234567891";
+    {
+        std::ofstream bookings("data/bookings.dat", std::ios::trunc);
+        bookings << departedPnr << "|77775|2000-01-01|Sleeper|"
+                 << "Test Passenger,21,Other|1|1000.00|Confirmed\\n";
+    }
     assert(!Cancellation::cancelBooking(departedPnr, refund, charge, error));
     assert(error.find("Cannot cancel after train departure") != std::string::npos);
 
