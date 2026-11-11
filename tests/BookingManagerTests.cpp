@@ -31,7 +31,7 @@ int main() {
         std::ofstream trainFile("data/trains.dat");
         trainFile
             << "TEST101|Test Express|Bengaluru|Chennai|08:00|14:00|6h|"
-            << "1000|1500|2000|800|10|10|10|10|2026-12-15\n";
+            << "1000|1500|2000|800|2|10|10|10|2026-12-15\n";
     }
 
     Train train;
@@ -77,6 +77,31 @@ int main() {
         "Generate a different PNR for a second booking"
     );
 
+    Booking secondBooking;
+    const bool secondFound = secondBookingCreated &&
+        BookingManager::findBooking(secondPNR, secondBooking);
+    check(
+        secondFound &&
+        secondBooking.status == "Waitlisted" &&
+        secondBooking.waitlistPosition == 1,
+        "Persist an insufficient-seat booking with waitlist position 1"
+    );
+
+    std::string thirdPNR;
+    std::string thirdError;
+    const bool thirdBookingCreated = BookingManager::createBooking(
+        train, "Sleeper", secondPassengers, 1000.0, thirdPNR, thirdError
+    );
+    Booking thirdBooking;
+    const bool thirdFound = thirdBookingCreated &&
+        BookingManager::findBooking(thirdPNR, thirdBooking);
+    check(
+        thirdFound &&
+        thirdBooking.status == "Waitlisted" &&
+        thirdBooking.waitlistPosition == 2,
+        "Assign increasing positions to later waitlisted bookings"
+    );
+
 
     // Test 3: Booking lookup.
     Booking booking;
@@ -120,8 +145,8 @@ int main() {
 
     check(
         updatedTrains.size() == 1 &&
-        updatedTrains[0].sleeperSeatsAvailable == 7,
-        "Deduct three seats after two bookings (two passengers, then one)"
+        updatedTrains[0].sleeperSeatsAvailable == 0,
+        "Do not deduct seats for bookings placed on the waitlist"
     );
 
     // Test 8: Reject more than six passengers.
