@@ -1,207 +1,47 @@
-\# Security Requirements Review
+# Security Requirements Review
 
+## 1. Objective
 
+This review records the security controls visible in the current CI/CD implementation branch. It is a source-code review, not a penetration test or a complete runtime security assessment.
 
-\## 1. Objective
+## 2. Security Requirements Verification
 
-
-
-The purpose of this review is to examine the existing Railway Reservation System and identify whether the required security controls are present. The review focuses on password protection, passenger and administrator access restrictions, login attempt limits, input validation, and possible security improvements.
-
-
-
-\## 2. Security Requirements Verification
-
-
-
-| Requirement | Review Result | Observation |
-
+| Requirement | Current evidence | Status / limitation |
 |---|---|---|
-
-| Password protection | Not implemented | No login or password authentication mechanism was found in the inspected source files. |
-
-| Passenger/Admin access restrictions | Not implemented | No role-based access control or separate passenger and administrator roles were found. |
-
-| Login attempt limits | Not applicable in the current implementation | The application does not currently have a login mechanism, so login attempt limits cannot be verified. |
-
-| Input validation | Partially implemented | The application validates passenger count, passenger name, age, gender, journey date, fare, and menu choices. |
-
-| Security issues and improvements | Reviewed | The findings and suggested improvements are documented below. |
-
-
-
-\## 3. Positive Security Controls Identified
-
-
-
-1\. \*\*Passenger validation:\*\* Passenger count is restricted to 1–6. Passenger names, ages, and gender values are checked before booking.
-
-2\. \*\*Date validation:\*\* Journey dates are checked for the correct format, valid month, valid day, and leap-year conditions.
-
-3\. \*\*Fare validation:\*\* Fare values are checked to ensure they are finite and greater than zero.
-
-4\. \*\*Booking validation:\*\* The booking module checks passenger details and fare values before creating a booking.
-
-5\. \*\*Special-character encoding:\*\* Passenger details are encoded before being stored in the pipe-separated booking file. This helps prevent special characters from interfering with the record format.
-
-6\. \*\*PNR generation:\*\* The system generates a random 10-digit PNR and checks existing booking records before accepting a candidate.
-
-7\. \*\*File error handling:\*\* The booking module checks whether files can be opened and whether booking data can be written. It also attempts to restore train inventory if saving a booking fails.
-
-
-
-\## 4. Security Issues Identified
-
-
-
-\### Issue 1: Missing Authentication
-
-
-
-\*\*Severity:\*\* Medium
-
-
-
-The current application does not contain a login or password authentication mechanism. Users can access the booking workflow without first verifying their identity.
-
-
-
-\*\*Suggested improvement:\*\* Introduce secure user authentication. Passwords should be stored using a suitable password-hashing algorithm rather than as plain text.
-
-
-
-\### Issue 2: Missing Role-Based Access Control
-
-
-
-\*\*Severity:\*\* Medium
-
-
-
-The inspected source files do not implement separate passenger and administrator roles. As a result, the application does not demonstrate role-based restrictions for different operations.
-
-
-
-\*\*Suggested improvement:\*\* Introduce passenger and administrator roles and restrict sensitive administrative operations to authorized administrators.
-
-
-
-\### Issue 3: No Login Attempt Limiting
-
-
-
-\*\*Severity:\*\* Not applicable currently
-
-
-
-Since the application does not have a login system, there is no login attempt counter or account lockout mechanism to verify.
-
-
-
-\*\*Suggested improvement:\*\* When authentication is introduced, implement rate limiting, temporary lockouts, and appropriate logging of repeated failed login attempts.
-
-
-
-\### Issue 4: Booking Retrieval Access Control
-
-
-
-\*\*Severity:\*\* Medium
-
-
-
-The `findBooking()` function retrieves a booking by matching the requested PNR. The function itself does not verify the identity or role of the person requesting the booking.
-
-
-
-\*\*Suggested improvement:\*\* Before displaying booking details, verify that the requester is authorized to access the booking. An administrator should have separately controlled access.
-
-
-
-\### Issue 5: Integer Overflow Risk in Numeric Input Parsing
-
-
-
-\*\*Severity:\*\* Medium
-
-
-
-The `parseSeatCount()` and `parseMenuChoice()` functions build integer values by multiplying the current value by 10 and adding the next digit. Extremely long numeric input may overflow the integer before the maximum-value check is reached.
-
-
-
-\*\*Suggested improvement:\*\* Check whether the next multiplication and addition would exceed the permitted range before performing the operation. Reject excessively long or out-of-range input safely.
-
-
-
-\### Issue 6: Passenger Data Is Not Encrypted
-
-
-
-\*\*Severity:\*\* Medium
-
-
-
-Passenger details are encoded to preserve the booking file format, but this encoding is not encryption. The booking records are stored in a local data file without application-level encryption.
-
-
-
-\*\*Suggested improvement:\*\* Protect booking files using appropriate operating-system file permissions. If sensitive passenger information needs stronger protection, use encryption at rest and restrict access to authorized components.
-
-
-
-\### Issue 7: Possible PNR Collision During Concurrent Bookings
-
-
-
-\*\*Severity:\*\* Low
-
-
-
-The application checks whether a generated PNR already exists before saving a booking. However, checking and writing are separate operations. Two simultaneous booking requests could theoretically select the same PNR.
-
-
-
-\*\*Suggested improvement:\*\* Use an atomic booking identifier allocation mechanism or a database constraint that guarantees PNR uniqueness.
-
-
-
-\## 5. Recommendations
-
-
-
-\- Implement secure login and password authentication.
-
-\- Introduce passenger and administrator roles.
-
-\- Restrict booking retrieval to authorized users.
-
-\- Add login rate limiting when authentication is implemented.
-
-\- Improve numeric input parsing to prevent integer overflow.
-
-\- Protect stored passenger information through suitable file permissions and encryption where required.
-
-\- Ensure PNR uniqueness even when multiple bookings are processed simultaneously.
-
-\- Add security-focused test cases for invalid and boundary-value inputs.
-
-
-
-\## 6. Conclusion
-
-
-
-The review found that the Railway Reservation System already includes several useful input-validation and error-handling measures. However, authentication and role-based access control are not present in the inspected implementation. The numeric input parsing logic and protection of stored passenger information also require attention.
-
-
-
-The identified issues and recommendations provide a starting point for improving the security and reliability of the system.
-
-
-
-\## 7. Scope and Limitations
-
-
-
-This review is based on static inspection of the source files in the current TASK-08 branch. It does not constitute a penetration test or a complete runtime security assessment. Requirements marked as not implemented refer to the inspected application code.
+| Passenger password protection | `AuthManager` uses a random 16-byte salt and PBKDF2-HMAC-SHA-256 (600,000 iterations) to derive a 32-byte hash. Password verification uses constant-time comparison. | Implemented in source. The passenger authentication tests check registration, login, session expiry, lockout, and corrupted account storage. |
+| Administrator authentication | `AdminAuthManager` stores a salted PBKDF2-HMAC-SHA-256 password hash, limits failed attempts, and maintains an authenticated state. | Implemented in source; a dedicated administrator authentication test suite is registered in CTest. |
+| Administrator-only train management | `AdminTrainMenu::run` checks `AdminAuthManager::isAuthenticated()` before displaying the menu. | Implemented in source; unauthenticated access is covered by `AdminTrainMenuSecurityTests`. |
+| Five failed login attempts / 15-minute lockout | Passenger and administrator authentication modules include failed-attempt lockout logic. Passenger tests use deterministic timestamps; administrator tests verify the lockout behavior. | Implemented in source and covered by dedicated tests. |
+| Passenger session inactivity timeout | Passenger authentication defines a 15-minute session timeout and supports activity refresh. | Implemented in source and covered by passenger authentication tests. A corresponding administrator inactivity timeout is not evidenced by the inspected interface. |
+| Data-file location (SEC-02) | Authentication and train data use relative paths under the application's `data/` directory. | Partially evidenced. Relative paths depend on the process working directory; this review does not establish a sandbox or prove that all data access is confined to a canonical application directory. |
+| Input and malformed-record handling (SEC-03) | Validation helpers and malformed account-storage checks exist. | Partially implemented. No comprehensive fuzzing campaign or full malformed-record test matrix has been demonstrated. |
+| Corrupted-file recovery / integrity (SEC-05) | Passenger authentication tests deliberately append a malformed record and verify that login rejects corrupted account storage. | Partial coverage only. This does not establish checksum/record-count validation and safe reinitialization for every data file. |
+| Booking retrieval authorization | Booking lookup by PNR must be reviewed separately from authentication. | Do not assume passenger ownership authorization from the existence of login. The inspected authentication interfaces alone do not prove that every booking retrieval path checks ownership. |
+
+## 3. Positive Controls Identified
+
+1. Passenger passwords are not stored as plaintext in the authentication account record; a per-account salt and PBKDF2-HMAC-SHA-256 hash are persisted.
+2. Administrator credentials use salted PBKDF2-HMAC-SHA-256 password hashing.
+3. Password comparisons use OpenSSL's constant-time comparison function.
+4. Passenger login includes failed-attempt tracking, temporary lockout, session expiry, and activity refresh.
+5. Administrator login includes failed-attempt lockout.
+6. The administrator train menu rejects calls when no administrator session is authenticated.
+7. Existing validation, booking, file-handling, and PNR checks remain relevant controls and should continue to receive separate tests.
+
+## 4. Remaining Risks and Required Follow-up
+
+- **Data-directory confinement:** Relative `data/` paths follow the current working directory. Resolve and enforce a canonical application data directory if SEC-02 requires strict confinement.
+- **Booking ownership checks:** Verify that passenger booking-history and PNR enquiry flows authorize access to the requested booking, not merely that the caller has logged in.
+- **SEC-03 test depth:** Add boundary and malformed-input tests for all persisted record formats and interactive input paths; run fuzz testing if time and tooling permit.
+- **SEC-05 requirement mismatch:** The current authentication test demonstrates rejection of a corrupted account record. It does not demonstrate checksums/record counts or safe reinitialization of trains and bookings data. Confirm whether the SRS requires those exact mechanisms and implement/test them if they remain mandatory.
+- **Administrator session lifecycle:** The inspected administrator interface does not expose an inactivity timeout equivalent to the passenger's 15-minute timeout. Confirm whether this is required for administrator sessions.
+- **Stored passenger data:** Password hashing protects credentials, not all passenger booking data. Apply appropriate OS file permissions and consider encryption at rest if required by the security requirements.
+- **PNR collision:** A check-then-write PNR allocation sequence may not be safe under simultaneous access. The SAD describes a single-user offline application, but the limitation should remain documented.
+
+## 5. Test Evidence
+
+The CMake/CTest pipeline registers dedicated passenger authentication, administrator authentication, and unauthenticated administrator-menu tests. The current workflow's result must be consulted before marking these suites as passed. The separate CI test report records the actual run outcome.
+
+## 6. Scope and Limitations
+
+This review reflects source files inspected on the `fix/cmake-missing-core-sources` branch. It does not claim a penetration test, complete SEC-01 to SEC-05 acceptance, booking-ownership enforcement, or full data-store confinement.
