@@ -70,6 +70,7 @@ if(BUILD_TESTING)
         tests/BookingIntegrationTest.cpp
         tests/BookingManagerTests.cpp
         tests/FileStoreTests.cpp
+        tests/PaymentProcessTests.cpp
         tests/PaymentStructureTests.cpp
         tests/SeatInventoryTests.cpp
         tests/US05Tests.cpp
