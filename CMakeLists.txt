@@ -62,7 +62,9 @@ add_custom_command(TARGET railway POST_BUILD
 include(CTest)
 if(BUILD_TESTING)
     set(RRS_TEST_SOURCES
+        tests/AdminAuthManagerTests.cpp
         tests/AdminFareReservationTests.cpp
+        tests/AdminTrainMenuSecurityTests.cpp
         tests/AdminTrainManagerTests.cpp
         tests/AuthManagerTests.cpp
         tests/BookingIntegrationTest.cpp
