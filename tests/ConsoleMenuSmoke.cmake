@@ -4,6 +4,8 @@ endif()
 
 file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}/data")
+file(WRITE "${WORK_DIR}/data/trains.dat"
+"77777|Smoke Test Express|Bengaluru|Chennai|10:00|18:00|8h|500|800|1000|400|20|20|20|20|2099-12-31\\n")
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
 "9\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n6\n7\n")
@@ -26,6 +28,8 @@ foreach(expected_text
     "Invalid choice"
     "Registration successful"
     "Login successful"
+    "BOOKING CONFIRMED"
+    "Payment Status: SUCCESS"
     "Passenger logged out successfully"
     "Exiting system")
     string(FIND "${app_output}" "${expected_text}" found_at)
