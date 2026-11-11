@@ -45,12 +45,27 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          mkdir -p dist/RRS/data
+          mkdir -p dist/RRS/data dist/RRS/lib
           cp build/railway dist/RRS/railway
           cp data/trains.dat dist/RRS/data/trains.dat
           cp README.md dist/RRS/README.md
-          chmod +x dist/RRS/railway
-          zip -r "${{ matrix.package }}" dist/RRS
+          # Bundle non-base-system shared libraries (including OpenSSL libcrypto).
+          while IFS= read -r lib; do
+            case "$lib" in
+              */libc.so*|*/libm.so*|*/libpthread.so*|*/libdl.so*|*/librt.so*|*/ld-linux*.so*|*/libgcc_s.so*|*/libstdc++.so*) continue ;;
+            esac
+            cp -L "$lib" dist/RRS/lib/
+          done < <(ldd build/railway | awk '/=> \\// {print $3} /^\\// {print $1}')
+          cat > dist/RRS/run.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -e
+          APP_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+          export LD_LIBRARY_PATH="$APP_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          cd "$APP_DIR"
+          exec "$APP_DIR/railway" "$@"
+          EOF
+          chmod +x dist/RRS/railway dist/RRS/run.sh
+          (cd dist && zip -r "$GITHUB_WORKSPACE/${{ matrix.package }}" RRS)
       - name: Package Windows application
         if: runner.os == 'Windows'
         shell: pwsh
@@ -61,7 +76,17 @@ jobs:
           Copy-Item $exe.FullName "dist/RRS/railway.exe"
           Copy-Item "data/trains.dat" "dist/RRS/data/trains.dat"
           Copy-Item "README.md" "dist/RRS/README.md"
-          Compress-Archive -Path "dist/RRS/*" -DestinationPath "${{ matrix.package }}" -Force
+          # The executable dynamically links OpenSSL 3; ship its runtime DLL beside the EXE.
+          $searchDirs = @()
+          if ($env:OPENSSL_ROOT_DIR) { $searchDirs += (Join-Path $env:OPENSSL_ROOT_DIR "bin") }
+          if ($env:VCPKG_ROOT) { $searchDirs += (Join-Path $env:VCPKG_ROOT "installed/x64-windows/bin") }
+          $searchDirs += @("C:\\Program Files\\OpenSSL-Win64\\bin", "C:\\Program Files\\OpenSSL\\bin")
+          $searchDirs += ($env:PATH -split ';')
+          $searchDirs = $searchDirs | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
+          $cryptoDll = Get-ChildItem -Path $searchDirs -Filter "libcrypto-3-x64.dll" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $cryptoDll) { throw "OpenSSL runtime DLL libcrypto-3-x64.dll was not found; refusing to publish an incomplete package." }
+          Copy-Item $cryptoDll.FullName "dist/RRS/libcrypto-3-x64.dll"
+          Compress-Archive -Path "dist/RRS" -DestinationPath "${{ matrix.package }}" -Force
       - name: Upload platform package
         uses: actions/upload-artifact@v4
         with:
@@ -92,7 +117,9 @@ jobs:
       - name: Generate coverage summary and report
         run: |
           mkdir -p coverage
-          $HOME/.local/bin/gcovr --root . --filter "src/" --exclude-unreachable-branches --print-summary --xml-pretty --output coverage/coverage.xml
+          $HOME/.local/bin/gcovr --root . --filter "src/" --exclude-unreachable-branches --print-summary | tee coverage/summary.txt
+          cat coverage/summary.txt >> "$GITHUB_STEP_SUMMARY"
+          $HOME/.local/bin/gcovr --root . --filter "src/" --exclude-unreachable-branches --xml-pretty --output coverage/coverage.xml
           $HOME/.local/bin/gcovr --root . --filter "src/" --exclude-unreachable-branches --html-details --output coverage/index.html
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
