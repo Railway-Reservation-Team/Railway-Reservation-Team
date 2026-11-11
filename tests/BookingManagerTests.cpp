@@ -120,8 +120,8 @@ int main() {
 
     check(
         updatedTrains.size() == 1 &&
-        updatedTrains[0].sleeperSeatsAvailable == 8,
-        "Deduct two seats after a two-passenger booking"
+        updatedTrains[0].sleeperSeatsAvailable == 7,
+        "Deduct three seats after two bookings (two passengers, then one)"
     );
 
     // Test 8: Reject more than six passengers.
