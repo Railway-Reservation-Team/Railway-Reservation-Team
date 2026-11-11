@@ -125,6 +125,27 @@ int main() {
     test("Locked administrator cannot authenticate",
          !AdminAuthManager::isAuthenticated());
 
+    // 15. Administrator security-relevant events must be timestamped.
+    {
+        std::ifstream file("data/admin_audit.log");
+        std::string audit(
+            (std::istreambuf_iterator<char>(file)),
+            std::istreambuf_iterator<char>());
+
+        test("Administrator account creation is audited",
+             audit.find("ADMIN_ACCOUNT_CREATED") != std::string::npos);
+        test("Successful administrator login is audited",
+             audit.find("ADMIN_LOGIN_SUCCESS") != std::string::npos);
+        test("Failed administrator login is audited",
+             audit.find("ADMIN_LOGIN_FAILED") != std::string::npos);
+        test("Administrator lockout is audited",
+             audit.find("ADMIN_ACCOUNT_LOCKED") != std::string::npos);
+        test("Audit records contain timestamps",
+             !audit.empty() && audit.find('|') != std::string::npos);
+        test("Audit log does not contain plaintext password",
+             audit.find(password) == std::string::npos);
+    }
+
     AdminAuthManager::resetForTesting();
 
     std::cout << "\n==============================\n";
