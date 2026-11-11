@@ -78,6 +78,7 @@ if(BUILD_TESTING)
         tests/SeatInventoryTests.cpp
         tests/US05Tests.cpp
         tests/US13Tests.cpp
+        tests/ValidationTests.cpp
         tests/test_modules.cpp
         tests/TrainDataFileTests.cpp
     )
