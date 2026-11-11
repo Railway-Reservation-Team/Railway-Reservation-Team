@@ -9,7 +9,7 @@ file(WRITE "${WORK_DIR}/data/trains.dat"
 
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
-"9\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n7\n")
+"9\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n6\n7\n")
 
 execute_process(
     COMMAND "${APP}"
