@@ -23,3 +23,10 @@ seat_inventory_tests
 
 /data/admin.dat.backup
 /data/admin.dat.backup2
+
+# Payment receipt records (sensitive transaction data)
+/data/payment_receipts.dat
+/data/payment_receipts.dat.tmp
+
+# Generated passenger e-tickets
+/generated_tickets/
