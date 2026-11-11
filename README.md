@@ -339,7 +339,7 @@ Documentation:
 - FINAL_TEST_RESULTS.md
 - TEST_REPORT.md
 
-The passenger authentication module has been implemented and integrated into the main application. Its dedicated test suite reports 20 passed and 0 failed. The complete application builds successfully. Separate administrator authentication remains pending implementation.
+The passenger authentication module is implemented and integrated into the application. Administrator authentication is also implemented in the AdminAuthManager module, with an access check in the administrator train-management menu. The dedicated passenger and administrator authentication test suites are registered separately in CTest.
 
 ### Verified Automated Test Results
 
@@ -355,7 +355,7 @@ The passenger authentication module has been implemented and integrated into the
 | Admin fare and reservations | 6 | 0 |
 | **Total** | **126** | **0** |
 
-All 12 registered CTest targets passed in the verified GitHub Actions run. The complete application compiled successfully.
+The earlier verified GitHub Actions run passed all 12 CTest targets registered at that time. Two additional administrator-security suites have now been added to CMake; their results will be confirmed by the next workflow run. The complete application compiled successfully.
 
 ## 10.1 Continuous Integration and Delivery (GitHub Actions)
 
