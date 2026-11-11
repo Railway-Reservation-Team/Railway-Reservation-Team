@@ -30,6 +30,12 @@ namespace AdminTrainManager {
         const std::string& trainNumber,
         std::string& errorMessage
     );
+
+    bool deactivateTrain(
+        const std::string& filename,
+        const std::string& trainNumber,
+        std::string& errorMessage
+    );
 }
 
 #endif

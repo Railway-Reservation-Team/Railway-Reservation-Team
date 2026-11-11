@@ -124,7 +124,24 @@ int main() {
         "Deduct three seats after two bookings (two passengers, then one)"
     );
 
-    // Test 8: Reject more than six passengers.
+    // Test 8: Deactivated trains must not accept new bookings.
+    {
+        std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+        trainFile
+            << "TEST101|Test Express|Bengaluru|Chennai|08:00|14:00|6h|"
+            << "1000|1500|2000|800|7|10|10|10|2026-12-15|0\n";
+    }
+    std::string inactivePNR;
+    std::string inactiveError;
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", secondPassengers, 1000.0,
+            inactivePNR, inactiveError
+        ) && inactiveError.find("deactivated") != std::string::npos,
+        "Reject new bookings for deactivated trains"
+    );
+
+    // Test 9: Reject more than six passengers.
     std::vector<Passenger> tooManyPassengers(7);
     for (auto& passenger : tooManyPassengers) {
         passenger = {"Test Passenger", 20, "Other"};

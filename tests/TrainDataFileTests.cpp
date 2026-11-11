@@ -56,10 +56,19 @@ int main() {
         std::ofstream file(mixed);
         file << "not|a|valid|train|record\n";
         file << "TEST101|Test Express|Bengaluru|Chennai|08:00|14:00|6h|1000|1500|2000|800|8|10|10|10|2026-12-15\n";
+        file << "TEST102|Inactive Express|Bengaluru|Chennai|09:00|15:00|6h|1000|1500|2000|800|8|10|10|10|2026-12-15|0\n";
     }
     error.clear();
     trains = loadTrains(mixed.string(), "2026-12-15", error);
-    check("Valid records load when malformed rows are present", trains.size() == 1 && trains[0].trainNumber == "TEST101");
+    check("Legacy 16-field records default to active", trains.size() == 1 && trains[0].trainNumber == "TEST101" && trains[0].active);
+    Train inactive;
+    check("17-field deactivated record parses with inactive state",
+          parseTrainRecord("TEST102|Inactive Express|Bengaluru|Chennai|09:00|15:00|6h|1000|1500|2000|800|8|10|10|10|2026-12-15|0", inactive) && !inactive.active);
+    Train roundTrip;
+    check("Activation state survives train record serialization",
+          parseTrainRecord(serializeTrainRecord(inactive), roundTrip) && !roundTrip.active);
+    check("Invalid activation flag is rejected",
+          !parseTrainRecord("TEST102|Inactive Express|Bengaluru|Chennai|09:00|15:00|6h|1000|1500|2000|800|8|10|10|10|2026-12-15|2", roundTrip));
     check("Journey date filter excludes other dates", loadTrains(mixed.string(), "2026-12-16", error).empty());
 
     fs::remove_all(root, ec);
