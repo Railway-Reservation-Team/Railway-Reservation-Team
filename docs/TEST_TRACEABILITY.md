@@ -29,9 +29,9 @@ See [REQUIREMENTS_GAP_REPORT.md](REQUIREMENTS_GAP_REPORT.md) for features that a
 
 ## Execution status
 
-Workflow run [43025657211](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43025657211) passed all **19/19 registered CTest tests** on Ubuntu and Windows. Cppcheck and coverage report generation also completed successfully. This is evidence that the registered tests passed; it is not evidence that every manual step in all 14 Test Plan cases has been executed.
+Workflow run [43026470906](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43026470906) passed all **20/20 registered CTest tests** on Ubuntu and Windows. Cppcheck, coverage generation, and the performance-report artifact also completed successfully. Automated performance checks cover the 200-train search, booking and train-file-read thresholds (NFR-01, NFR-02 and NFR-04). This is evidence that the registered tests passed; it is not evidence that every manual step in all 14 Test Plan cases has been executed.
 
-The measured coverage in that run was **77.0% line**, **96.9% function**, and **48.0% branch**. The required 70% branch-coverage target remains open. This document deliberately does not pre-mark tests as passed. Manual acceptance tests, performance measurements, and security checks not covered by automated assertions must be recorded separately with date, tester, input data, expected result, actual result, and evidence.
+The measured coverage in that run was **79.7% line**, **96.9% function**, and **49.9% branch**. The required 70% branch-coverage target remains open. This document deliberately does not pre-mark tests as passed. Manual acceptance tests, performance measurements, and security checks not covered by automated assertions must be recorded separately with date, tester, input data, expected result, actual result, and evidence.
 
 ## Coverage target
 
