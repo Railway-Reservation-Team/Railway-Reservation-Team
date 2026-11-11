@@ -1,6 +1,7 @@
 #include "AdminFareReservationManager.h"
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <fstream>
 #include <sstream>
@@ -342,6 +343,7 @@ bool updateFares(
         return false;
     }
 
+    AdminAuditLog::append("ADMIN_FARES_UPDATED", trainNumber + ":" + journeyDate);
     return true;
 }
 
@@ -440,6 +442,7 @@ bool updateReservationStatus(
         return false;
     }
 
+    AdminAuditLog::append("ADMIN_RESERVATION_CANCELLED", pnr);
     return true;
 }
 
