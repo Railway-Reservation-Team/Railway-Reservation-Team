@@ -58,6 +58,7 @@ if(BUILD_TESTING)
         tests/AuthManagerTests.cpp
         tests/BookingIntegrationTest.cpp
         tests/BookingManagerTests.cpp
+        tests/FileStoreTests.cpp
         tests/PaymentStructureTests.cpp
         tests/SeatInventoryTests.cpp
         tests/US05Tests.cpp
