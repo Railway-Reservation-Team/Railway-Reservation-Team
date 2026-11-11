@@ -140,8 +140,17 @@ int main() {
              audit.find("ADMIN_LOGIN_FAILED") != std::string::npos);
         test("Administrator lockout is audited",
              audit.find("ADMIN_ACCOUNT_LOCKED") != std::string::npos);
-        test("Audit records contain timestamps",
-             !audit.empty() && audit.find('|') != std::string::npos);
+        const std::size_t firstSeparator = audit.find('|');
+        bool timestampValid = false;
+        if (firstSeparator != std::string::npos && firstSeparator > 0) {
+            try {
+                (void)std::stoll(audit.substr(0, firstSeparator));
+                timestampValid = true;
+            } catch (...) {
+                timestampValid = false;
+            }
+        }
+        test("Audit records contain Unix timestamps", timestampValid);
         test("Audit log does not contain plaintext password",
              audit.find(password) == std::string::npos);
     }
