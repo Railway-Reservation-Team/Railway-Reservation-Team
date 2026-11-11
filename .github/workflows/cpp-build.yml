@@ -55,7 +55,7 @@ jobs:
               */libc.so*|*/libm.so*|*/libpthread.so*|*/libdl.so*|*/librt.so*|*/ld-linux*.so*|*/libgcc_s.so*|*/libstdc++.so*) continue ;;
             esac
             cp -L "$lib" dist/RRS/lib/
-          done < <(ldd build/railway | awk '$2 == "=>" {print $3} $1 ~ /^\\// {print $1}')
+          done < <(ldd build/railway | awk '$2 == "=>" {print $3} $1 ~ /^\// {print $1}')
           cat > dist/RRS/run.sh <<'EOF'
           #!/usr/bin/env bash
           set -e
