@@ -106,7 +106,7 @@ int main() {
         std::ofstream trains("data/trains.dat", std::ios::trunc);
         trains << nearTrain.trainNumber << "|Near Departure Express|Bengaluru|Chennai|"
                << nearTrain.departureTime << "|07:00|7h|500|800|1000|400|10|10|10|10|"
-               << nearTrain.journeyDate << "\\n";
+               << nearTrain.journeyDate << '\n';
     }
     {
         std::ofstream bookings("data/bookings.dat", std::ios::trunc);
@@ -149,5 +149,7 @@ int main() {
     std::cout << "Successful cancellation and 25% fee tier: PASS\n";
     std::cout << "Refund calculation and seat restoration: PASS\n";
     std::cout << "Booking status update and repeat-cancel rejection: PASS\n";
+    std::cout << "Within-24-hour 50% fee tier: PASS\n";
+    std::cout << "Post-departure cancellation rejection: PASS\n";
     return 0;
 }
