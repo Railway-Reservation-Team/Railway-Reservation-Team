@@ -1,5 +1,6 @@
 #include "AdminAuthManager.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <openssl/evp.h>
 #include <openssl/rand.h>
@@ -287,9 +288,11 @@ bool setupAdmin(const std::string& username,
 
     if (!saveRecord(record)) {
         errorMessage = "Unable to save administrator credentials.";
+        AdminAuditLog::append("ADMIN_SETUP_FAILED", record.username);
         return false;
     }
 
+    AdminAuditLog::append("ADMIN_ACCOUNT_CREATED", record.username);
     return true;
 }
 
@@ -303,6 +306,7 @@ bool login(const std::string& username,
 
     if (!loadRecord(record)) {
         errorMessage = "Administrator account not found or storage is invalid.";
+        AdminAuditLog::append("ADMIN_LOGIN_REJECTED", normalizeUsername(username));
         return false;
     }
 
@@ -310,6 +314,7 @@ bool login(const std::string& username,
 
     if (record.lockedUntil > now) {
         errorMessage = "Administrator account is locked for 15 minutes.";
+        AdminAuditLog::append("ADMIN_LOGIN_BLOCKED_LOCKOUT", record.username);
         return false;
     }
 
@@ -337,9 +342,14 @@ bool login(const std::string& username,
             return false;
         }
 
-        errorMessage = record.lockedUntil > now
+        const bool locked = record.lockedUntil > now;
+        errorMessage = locked
             ? "Administrator account locked after repeated failed attempts."
             : "Invalid administrator username or password.";
+        AdminAuditLog::append(
+            locked ? "ADMIN_ACCOUNT_LOCKED" : "ADMIN_LOGIN_FAILED",
+            record.username
+        );
 
         return false;
     }
@@ -353,6 +363,7 @@ bool login(const std::string& username,
     }
 
     authenticated = true;
+    AdminAuditLog::append("ADMIN_LOGIN_SUCCESS", record.username);
     return true;
 }
 
@@ -361,6 +372,9 @@ bool isAuthenticated() {
 }
 
 void logout() {
+    if (authenticated) {
+        AdminAuditLog::append("ADMIN_LOGOUT");
+    }
     authenticated = false;
 }
 
