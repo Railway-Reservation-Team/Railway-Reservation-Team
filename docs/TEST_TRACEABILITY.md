@@ -46,7 +46,7 @@ See [REQUIREMENTS_GAP_REPORT.md](REQUIREMENTS_GAP_REPORT.md) for the full SRS ID
 | RRS-SR-003 | Role-based admin authorization | Admin auth and guarded train menu tests exist; verify all admin operations |
 | RRS-SR-004 | Validate every user input before processing/storage | Validation suite exists; oversized and malformed-file fuzz matrix incomplete |
 | RRS-SR-005 | Transaction integrity/no duplicate commitment | Booking, cancellation and seat tests exist; failure-injection, duplicate requests and rollback consistency need broader evidence |
-| RRS-SR-006 | Timestamped authentication failures and administrator actions | PR #81 proposes audit helper/events and tests; pending CI, review and merge; ensure passenger booking/cancellation transactions are also audited |
+| RRS-SR-006 | Timestamped authentication failures and administrator actions | PR #81 merged; CI run 43071499990 passed. Tests cover administrator audit events; passenger booking/cancellation transaction coverage remains to be confirmed |
 
 ## Execution status
 
@@ -60,6 +60,8 @@ Measured baseline coverage:
 The Test Plan's 70% branch coverage target remains open. Passing registered tests do not prove every manual step in the 14 Test Plan cases or every SRS requirement.
 
 ## Tooling deviation
+
+PR #83 (SRS RRS-F-018 train deactivation) is merged; CI run 43073959982 passed on Ubuntu and Windows with 20/20 CTest tests and static-analysis/coverage successful. The post-merge main run is tracked separately.
 
 The Test Plan names Jenkins, GoogleTest and SonarQube (or equivalent). The implemented pipeline uses GitHub Actions, CMake/CTest repository test executables, Cppcheck and gcovr. The substitution is documented in `CI_CD_AND_TESTING.md`; evaluator acceptance and an approved Test Plan revision should be recorded.
 
