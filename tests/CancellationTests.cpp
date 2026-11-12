@@ -147,6 +147,16 @@ int main() {
     assert(!Cancellation::cancelBooking(
         "not-a-pnr", refund, charge, error));
 
+    // Empty PNR must be rejected.
+    assert(!Cancellation::cancelBooking(
+        "", refund, charge, error));
+
+    // PNR with an incorrect numeric length must be rejected.
+    assert(!Cancellation::cancelBooking(
+        "12345", refund, charge, error));
+
+    std::cout << "Empty and incorrectly sized PNR rejection: PASS\\n";
+
     std::cout << "Cancellation tests passed.\n";
     std::cout << "Unknown PNR rejection: PASS\n";
     std::cout << "Successful cancellation and 25% fee tier: PASS\n";
