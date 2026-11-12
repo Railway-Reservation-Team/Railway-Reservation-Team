@@ -91,7 +91,7 @@ int main() {
         trains.push_back(train);
     }
 
-    // NFR-01: train search against a seeded 200-train dataset.
+    // NFR-01: Train search benchmark.
     const auto searchStart = Clock::now();
 
     const auto results = searchTrains(
@@ -106,7 +106,7 @@ int main() {
     assert(results.size() == 1);
     assert(searchMs <= 2000);
 
-    // Seed the train file for booking and file I/O checks.
+    // Seed train data.
     {
         std::ofstream file("data/trains.dat", std::ios::trunc);
         assert(file.is_open());
@@ -136,7 +136,7 @@ int main() {
         assert(bookings.is_open());
     }
 
-    // NFR-04: read the seeded train file.
+    // NFR-04: Train file read benchmark.
     const auto ioStart = Clock::now();
 
     std::ifstream input("data/trains.dat");
@@ -161,7 +161,7 @@ int main() {
     assert(recordCount == 200);
     assert(ioMs <= 200);
 
-    // NFR-02: booking transaction against the seeded dataset.
+    // NFR-02: Booking transaction benchmark.
     const Passenger passenger{"Performance Test", 21, "Other"};
 
     std::string pnr;
@@ -191,6 +191,17 @@ int main() {
     assert(pnr.size() == 10);
     assert(bookingMs <= 3000);
 
+    std::cout << "Performance checks passed for 200 seeded trains.\n";
+    std::cout << "Search time (NFR-01): " << searchMs << " ms\n";
+    std::cout << "Booking time (NFR-02): " << bookingMs << " ms\n";
+    std::cout << "Train file read time (NFR-04): " << ioMs << " ms\n";
+    std::cout << "Startup time and peak memory require separate measurement.\n";
+
+    // Restore original directory and remove temporary test data.
+    fs::current_path(originalDirectory);
+    fs::remove_all(testDirectory);
+
+    // Write report in the original CTest working directory.
     {
         std::ofstream report("performance-results.txt", std::ios::trunc);
         assert(report.is_open());
@@ -205,16 +216,6 @@ int main() {
                << "NFR-03 startup: not measured by this test\n"
                << "NFR-05 peak memory: not measured by this test\n";
     }
-
-    std::cout << "Performance checks passed for 200 seeded trains.\n";
-    std::cout << "Search time (NFR-01): " << searchMs << " ms\n";
-    std::cout << "Booking time (NFR-02): " << bookingMs << " ms\n";
-    std::cout << "Train file read time (NFR-04): " << ioMs << " ms\n";
-    std::cout << "Startup time and peak memory require separate measurement.\n";
-
-    // Restore the original directory before removing test files.
-    fs::current_path(originalDirectory);
-    fs::remove_all(testDirectory);
 
     return 0;
 }
