@@ -1,4 +1,4 @@
-
+#include <string>
 #include "TrainSearch.h"
 
 #include <iostream>
@@ -93,8 +93,94 @@ int main() {
                      "2026-11-13").size() == 1,
         "Match correct destination"
     );
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026-99-45").empty(),
+        "Reject invalid month and day"
+    );
 
-    std::cout << "\nPassed: " << passed
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026-02-29").empty(),
+        "Reject invalid non-leap-year date"
+    );
+
+    Train leapTrain = t1;
+    leapTrain.journeyDate = "2024-02-29";
+    std::vector<Train> leapTrains = {leapTrain};
+
+    check(
+        searchTrains(leapTrains, "Bangalore", "Chennai",
+                     "2024-02-29").size() == 1,
+        "Accept valid leap-year date"
+    );
+
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026/11/13").empty(),
+        "Reject incorrect date format"
+    );
+    check(
+        searchTrains(trains, "Mumbai", "Chennai",
+                     "2026-11-13").empty(),
+        "Return empty result when no trains match"
+    );
+
+    std::vector<Train> duplicateTrains = {t1, t1};
+
+    check(
+        searchTrains(duplicateTrains, "Bangalore", "Chennai",
+                     "2026-11-13").size() == 2,
+        "Preserve duplicate matching records"
+    );
+
+    std::vector<Train> largeTrains;
+
+    for (int i = 0; i < 1000; ++i) {
+        Train generated = t1;
+        generated.trainNumber = std::to_string(20000 + i);
+        largeTrains.push_back(generated);
+    }
+
+    check(
+        searchTrains(largeTrains, "Bangalore", "Chennai",
+                     "2026-11-13").size() == 1000,
+        "Search correctly through 1000 trains"
+    );
+
+    check(
+        searchTrains(trains, "  Bangalore  ", "  Chennai  ",
+                     "2026-11-13").size() == 2,
+        "Handle additional surrounding whitespace"
+    );
+
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026-11-15").empty(),
+        "Return no results for unavailable journey date"
+    );
+ 
+   std::vector<Train> emptyTrains;
+
+   check(
+       searchTrains(emptyTrains, "Bangalore", "Chennai",
+                    "2026-11-13").empty(),
+       "Handle empty train collection"
+   );
+
+   check(
+       searchTrains(trains, "Bangalore", "Bangalore",
+                    "2026-11-13").empty(),
+       "Handle identical source and destination"
+   );
+
+   check(
+       searchTrains(trains, "   ", "Chennai",
+                    "2026-11-13").empty(),
+       "Reject whitespace-only source"
+   );
+
+   std::cout << "\nPassed: " << passed
               << "\nFailed: " << failed << '\n';
 
     return failed == 0 ? 0 : 1;

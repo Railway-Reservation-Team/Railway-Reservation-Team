@@ -302,6 +302,35 @@ int main() {
         );
     }
 
+    // Additional invalid PNR validation tests.
+    check(
+        !Cancellation::cancelBooking(
+            "not-a-pnr", refund, charge, error
+        ),
+        "Reject malformed PNR"
+    );
+
+    check(
+        !Cancellation::cancelBooking(
+            "", refund, charge, error
+        ),
+        "Reject empty PNR"
+    );
+
+    check(
+        !Cancellation::cancelBooking(
+            "12345", refund, charge, error
+        ),
+        "Reject PNR with incorrect numeric length"
+    );
+
+    check(
+        !Cancellation::cancelBooking(
+            "12345!@#$%", refund, charge, error
+        ),
+        "Reject PNR containing special characters"
+    );
+
     std::cout << "\nCancellation Test Results\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';

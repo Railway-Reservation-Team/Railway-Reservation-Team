@@ -7,6 +7,7 @@
 #include <vector>
 #include <filesystem>
 #include <cctype>
+#include <limits>
 
 int passed = 0;
 int failed = 0;
@@ -45,6 +46,106 @@ int main() {
 
     std::string pnr;
     std::string error;
+
+
+    // Test 0: Invalid fare validation.
+    std::string invalidFarePNR;
+    std::string invalidFareError;
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers, 0.0,
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject zero fare"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers, -100.0,
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject negative fare"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers,
+            std::numeric_limits<double>::quiet_NaN(),
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject NaN fare"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers,
+            std::numeric_limits<double>::infinity(),
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject infinite fare"
+    );
+
+    // Test 0b: Invalid travel class validation.
+    std::string invalidClassPNR;
+    std::string invalidClassError;
+
+    check(
+        !BookingManager::createBooking(
+            train, "First Class", passengers, 2000.0,
+            invalidClassPNR, invalidClassError
+        ),
+        "Reject unsupported travel class"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "", passengers, 2000.0,
+            invalidClassPNR, invalidClassError
+        ),
+        "Reject empty travel class"
+    );
+
+
+    // Test 0c: Passenger name whitespace validation.
+    std::string nameTestPNR;
+    std::string nameTestError;
+
+    std::vector<Passenger> tabOnlyName = {
+        {"\t\t", 25, "Female"}
+    };
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", tabOnlyName, 1000.0,
+            nameTestPNR, nameTestError
+        ),
+        "Reject passenger name containing only tabs"
+    );
+
+    std::vector<Passenger> whitespaceOnlyName = {
+        {" \t  \t ", 25, "Female"}
+    };
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", whitespaceOnlyName, 1000.0,
+            nameTestPNR, nameTestError
+        ),
+        "Reject passenger name containing only spaces and tabs"
+    );
+
+    std::vector<Passenger> paddedValidName = {
+        {" Alice Smith ", 25, "Female"}
+    };
+
+    check(
+        BookingManager::createBooking(
+            train, "Sleeper", paddedValidName, 1000.0,
+            nameTestPNR, nameTestError
+        ),
+        "Accept a non-empty passenger name with surrounding spaces"
+    );
 
     // Test 1: Multi-passenger booking.
     bool bookingCreated = BookingManager::createBooking(
@@ -120,8 +221,8 @@ int main() {
 
     check(
         updatedTrains.size() == 1 &&
-        updatedTrains[0].sleeperSeatsAvailable == 7,
-        "Deduct three seats after two bookings (two passengers, then one)"
+        updatedTrains[0].sleeperSeatsAvailable == 6,
+        "Deduct four seats after three successful bookings"
     );
 
     // Test 8: Deactivated trains must not accept new bookings.
