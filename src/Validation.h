@@ -6,38 +6,41 @@
 
 namespace Validation {
 
+    // Checks whether a string contains non-whitespace characters.
+
+
     bool isNonEmpty(const std::string& input, std::string& error);
 
-    bool isValidPassengerName(
+    // Validates a passenger name, including supported punctuation.\n    bool isValidPassengerName(
         const std::string& name,
         std::string& error
     );
 
-    bool isValidDate(
+    // Validates a date in YYYY-MM-DD format.\n    bool isValidDate(
         const std::string& date,
         std::string& error
     );
 
-    bool parseSeatCount(
+    // Parses and validates the requested passenger seat count.\n    bool parseSeatCount(
         const std::string& input,
         int& seats,
         std::string& error
     );
 
-    bool parseFare(
+    // Parses a positive, finite fare value.\n    bool parseFare(
         const std::string& input,
         double& fare,
         std::string& error
     );
 
-    bool isValidMenuChoice(
+    // Checks whether a menu choice is within the allowed range.\n    bool isValidMenuChoice(
         int choice,
         int minimum,
         int maximum,
         std::string& error
     );
 
-    bool parseMenuChoice(
+    // Parses a menu choice from user input and checks its range.\n    bool parseMenuChoice(
         const std::string& input,
         int minimum,
         int maximum,
