@@ -7,6 +7,7 @@
 #include <vector>
 #include <filesystem>
 #include <cctype>
+#include <limits>
 
 int passed = 0;
 int failed = 0;
@@ -45,6 +46,45 @@ int main() {
 
     std::string pnr;
     std::string error;
+
+
+    // Test 0: Invalid fare validation.
+    std::string invalidFarePNR;
+    std::string invalidFareError;
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers, 0.0,
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject zero fare"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers, -100.0,
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject negative fare"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers,
+            std::numeric_limits<double>::quiet_NaN(),
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject NaN fare"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "Sleeper", passengers,
+            std::numeric_limits<double>::infinity(),
+            invalidFarePNR, invalidFareError
+        ),
+        "Reject infinite fare"
+    );
 
     // Test 1: Multi-passenger booking.
     bool bookingCreated = BookingManager::createBooking(
