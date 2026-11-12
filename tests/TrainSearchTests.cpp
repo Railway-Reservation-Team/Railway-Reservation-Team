@@ -93,6 +93,33 @@ int main() {
                      "2026-11-13").size() == 1,
         "Match correct destination"
     );
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026-99-45").empty(),
+        "Reject invalid month and day"
+    );
+
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026-02-29").empty(),
+        "Reject invalid non-leap-year date"
+    );
+
+    Train leapTrain = t1;
+    leapTrain.journeyDate = "2024-02-29";
+    std::vector<Train> leapTrains = {leapTrain};
+
+    check(
+        searchTrains(leapTrains, "Bangalore", "Chennai",
+                     "2024-02-29").size() == 1,
+        "Accept valid leap-year date"
+    );
+
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026/11/13").empty(),
+        "Reject incorrect date format"
+    );
 
     std::cout << "\nPassed: " << passed
               << "\nFailed: " << failed << '\n';
