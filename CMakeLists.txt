@@ -69,6 +69,7 @@ if(BUILD_TESTING)
 tests/SeatInventoryConcurrencyTests.cpp
 tests/SeatInventoryStressTests.cpp
 tests/SeatInventoryReleaseConcurrencyTests.cpp
+tests/SeatInventoryConfirmConcurrencyTests.cpp
         tests/AdminAuthManagerTests.cpp
         tests/AdminFareReservationTests.cpp
         tests/AdminTrainMenuSecurityTests.cpp
