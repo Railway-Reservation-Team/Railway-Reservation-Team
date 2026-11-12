@@ -2,71 +2,62 @@
 
 ## 1. Objective
 
-Evaluate train search performance and selected booking and file-read
-operations against the performance requirements in the SRS.
+Verify train-search response time against the SRS and Jira performance requirements.
 
-## 2. Test Configuration
+## 2. Test Environment
 
-- Search algorithm: Linear search
-- Iterations: 100 per dataset
-- Dataset sizes: 1,000, 10,000 and 50,000 trains
-- Typical SRS dataset: 200 trains
-- Framework: CMake and CTest
-- Timing: C++ steady clock with fractional millisecond precision
+- Environment: Ubuntu WSL
+- Dataset: 200 trains for representative testing
+- Search samples: 100
+- Timing method: C++ `std::chrono::steady_clock`
+- Statistic: Nearest-rank 90th percentile (p90)
 
-## 3. Train Search Benchmark Results
+## 3. Search Scalability Benchmarks
 
-| Dataset Size | Average Search Time |
+| Dataset | Average Search Time |
 |---|---:|
-| 1,000 trains | 0.1480 ms |
-| 10,000 trains | 0.8767 ms |
-| 50,000 trains | 4.3865 ms |
+| 1,000 trains | 0.1003 ms |
+| 10,000 trains | 0.8204 ms |
+| 50,000 trains | 4.2734 ms |
 
-### Observations
+## 4. Jira RRS-56 Response-Time Verification
 
-- Search time increases as dataset size increases.
-- All three benchmark searches returned the expected result.
-- The results provide a baseline for future optimization.
+Acceptance criteria: At least 90% of requests must complete within 3 seconds under normal load.
 
-## 4. SRS Performance Verification
-
-| Requirement | SRS Limit | Measured Result | Status |
+| Metric | Measured Result | Requirement | Status |
 |---|---:|---:|---|
-| NFR-01: Search (200 trains) | 2,000 ms | 0.0286 ms | PASS |
-| NFR-02: Booking creation | 3,000 ms | 1.3492 ms | Partial |
-| NFR-03: Application startup | 3,000 ms | Not measured | Pending |
-| NFR-04: Train-file read | 200 ms | 0.0190 ms | PASS |
-| NFR-04: Other required file I/O | 200 ms | Not fully measured | Pending |
-| NFR-05: Peak memory | 128 MB | Not measured | Pending |
+| Sample count | 100 | 100 | PASS |
+| Average latency | 0.0175 ms | SRS limit: 2,000 ms | PASS |
+| P90 latency | 0.0178 ms | 3,000 ms | PASS |
+| Requests within 3 seconds | 100/100 | At least 90/100 | PASS |
+| Compliance | 100% | At least 90% | PASS |
 
-### Verification Notes
+## 5. Additional SRS Checks
 
-- NFR-01 was tested using a typical dataset of 200 trains.
-- NFR-02 measures BookingManager booking creation. Complete seat-hold-to-confirmation timing still needs verification.
-- NFR-04 currently measures train-file reading only.
-- NFR-03 and NFR-05 require separate startup and memory measurements.
+| Requirement | Measurement | Status |
+|---|---|---|
+| NFR-01: Search response | 0.0175 ms average | PASS |
+| NFR-02: Booking operation | 1.3492 ms in earlier run | Partial verification |
+| NFR-03: Startup time | Not measured | Pending |
+| NFR-04: Train-file read | 0.0190 ms in earlier run | PASS |
+| NFR-04: Other file operations | Not fully measured | Pending |
+| NFR-05: Peak memory | Not measured | Pending |
 
-## 5. Test Execution
+## 6. Test Execution
 
-Command:
+- Performance test suite: Passed.
+- Checks passed: 20.
+- Checks failed: 0.
+- CTest execution time: Approximately 0.56 seconds.
 
-`ctest --test-dir build -V -R '^PerformanceTests$'`
+## 7. Limitations
 
-Results:
+The measurements were collected in a local Ubuntu WSL environment. They represent a controlled test run and do not establish production performance under real network or multi-user load.
 
-- PerformanceTests: PASSED
-- Checks passed: 16
-- Checks failed: 0
-- CTest execution time: approximately 0.57 seconds
+Menu-operation timing, application startup time, peak memory, full booking transaction timing and additional file I/O measurements require separate verification.
 
-Explicit pass/fail checks are used instead of assert(), so checks remain active in Release builds.
+## 8. Conclusion
 
-## 6. Conclusion
+The train-search performance acceptance criteria for Jira RRS-56 were satisfied in the recorded 100-sample test. All 100 requests completed within 3 seconds, and p90 latency was 0.0178 ms.
 
-The latest performance test verified train search response time for a
-typical 200-train dataset against NFR-01. Booking creation and train-file
-reading were also within their respective SRS limits.
-
-Startup time, the complete booking transaction, remaining file I/O
-operations and peak memory still require measurement before all
-performance requirements can be considered fully verified.
+Additional SRS performance requirements remain partially verified or pending.
