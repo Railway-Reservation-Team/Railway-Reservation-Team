@@ -70,6 +70,7 @@ tests/SeatInventoryConcurrencyTests.cpp
 tests/SeatInventoryStressTests.cpp
 tests/SeatInventoryReleaseConcurrencyTests.cpp
 tests/SeatInventoryConfirmConcurrencyTests.cpp
+tests/SeatInventoryBoundaryTests.cpp
         tests/AdminAuthManagerTests.cpp
         tests/AdminFareReservationTests.cpp
         tests/AdminTrainMenuSecurityTests.cpp
