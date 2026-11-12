@@ -155,7 +155,14 @@ int main() {
     assert(!Cancellation::cancelBooking(
         "12345", refund, charge, error));
 
-    std::cout << "Empty and incorrectly sized PNR rejection: PASS\\n";
+    std::cout << "Empty and incorrectly sized PNR rejection: PASS\n";
+
+
+    // PNR containing special characters must be rejected.
+    assert(!Cancellation::cancelBooking(
+        "12345!@#$%", refund, charge, error
+    ));
+    std::cout << "Special-character PNR rejection: PASS\\n";
 
     std::cout << "Cancellation tests passed.\n";
     std::cout << "Unknown PNR rejection: PASS\n";
