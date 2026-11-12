@@ -70,7 +70,7 @@ int main() {
     check("Booking status is confirmed", booking.status == "Confirmed");
     std::cout << "[PASS] Booking retrieval using PNR\n";
 
-    // Verify eight-field booking serialization.
+    // Verify the new nine-field format includes a waitlist-position slot.
     std::ifstream savedBookings("data/bookings.dat");
     std::string savedLine;
     std::getline(savedBookings, savedLine);
@@ -84,8 +84,10 @@ int main() {
         ++fieldCount;
     }
 
-    check("Booking serialization has eight fields", fieldCount == 8);
-    std::cout << "[PASS] Existing eight-field booking format\n";
+    check(
+        "Booking serialization has nine fields including waitlist position",
+        fieldCount == 9
+    );
 
     // Verify that two AC 2-Tier seats were deducted.
     std::ifstream updatedTrains("data/trains.dat");

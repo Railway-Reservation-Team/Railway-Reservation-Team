@@ -110,7 +110,8 @@ tests/SeatInventoryBoundaryTests.cpp
         rrs_enable_coverage("${test_target}")
 
         if(MSVC)
-            target_compile_options("${test_target}" PRIVATE /W4 /permissive-)
+            # Keep assert-based test checks active in Visual Studio Release builds.
+            target_compile_options("${test_target}" PRIVATE /W4 /permissive- /UNDEBUG)
         else()
             target_compile_options("${test_target}" PRIVATE -Wall -Wextra -Wpedantic)
         endif()

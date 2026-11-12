@@ -178,6 +178,102 @@ int main() {
 
     std::tm* localDeparture = std::localtime(&nearDeparture);
 
+    // Fill the remaining inventory, queue two passengers, then cancel a
+    // confirmed group. Both waitlisted bookings should be promoted FIFO.
+    std::vector<Passenger> sixPassengers(
+        6, {"Group Passenger", 25, "Other"}
+    );
+    std::vector<Passenger> fourPassengers(
+        4, {"Another Passenger", 26, "Other"}
+    );
+    std::string sixPnr;
+    std::string fourPnr;
+    std::string firstWaitlistPnr;
+    std::string secondWaitlistPnr;
+
+    const bool sixCreated = BookingManager::createBooking(
+        train, "Sleeper", sixPassengers, 6000.0, sixPnr, error
+    );
+    check(sixCreated, "Create first confirmed group before waitlist promotion");
+
+    const bool fourCreated = sixCreated && BookingManager::createBooking(
+        train, "Sleeper", fourPassengers, 4000.0, fourPnr, error
+    );
+    check(fourCreated, "Fill remaining seats with second confirmed group");
+
+    const bool firstWaitlistCreated = fourCreated &&
+        BookingManager::createBooking(
+            train, "Sleeper", passengers, 1000.0, firstWaitlistPnr, error
+        );
+    check(firstWaitlistCreated, "Queue first passenger group");
+
+    const bool secondWaitlistCreated = firstWaitlistCreated &&
+        BookingManager::createBooking(
+            train, "Sleeper", passengers, 1000.0, secondWaitlistPnr, error
+        );
+    check(secondWaitlistCreated, "Queue second passenger group");
+
+    if (secondWaitlistCreated) {
+        Booking firstWaiting;
+        Booking secondWaiting;
+        const bool firstFound =
+            BookingManager::findBooking(firstWaitlistPnr, firstWaiting);
+        const bool secondFound =
+            BookingManager::findBooking(secondWaitlistPnr, secondWaiting);
+
+        check(
+            firstFound && firstWaiting.status == "Waitlisted" &&
+                firstWaiting.waitlistPosition == 1,
+            "First waitlisted booking receives queue position 1"
+        );
+        check(
+            secondFound && secondWaiting.status == "Waitlisted" &&
+                secondWaiting.waitlistPosition == 2,
+            "Second waitlisted booking receives queue position 2"
+        );
+
+        const bool waitlistCancellation =
+            Cancellation::cancelBooking(sixPnr, refund, charge, error);
+        check(
+            waitlistCancellation,
+            "Cancellation releases seats and triggers waitlist promotion"
+        );
+
+        if (waitlistCancellation) {
+            Booking firstPromoted;
+            Booking secondPromoted;
+            const bool firstPromotedFound =
+                BookingManager::findBooking(firstWaitlistPnr, firstPromoted);
+            const bool secondPromotedFound =
+                BookingManager::findBooking(secondWaitlistPnr, secondPromoted);
+
+            check(
+                firstPromotedFound && firstPromoted.status == "Confirmed" &&
+                    firstPromoted.waitlistPosition == 0,
+                "Promote the first waitlisted booking"
+            );
+            check(
+                secondPromotedFound && secondPromoted.status == "Confirmed" &&
+                    secondPromoted.waitlistPosition == 0,
+                "Promote the second waitlisted booking in FIFO order"
+            );
+
+            Train afterPromotion;
+            bool trainParsed = false;
+            {
+                std::ifstream trains("data/trains.dat");
+                std::string line;
+                if (std::getline(trains, line)) {
+                    trainParsed = parseTrainRecord(line, afterPromotion);
+                }
+            }
+            check(
+                trainParsed && afterPromotion.sleeperSeatsAvailable == 2,
+                "Seat inventory reflects both FIFO promotions"
+            );
+        }
+    }
+
     char nearDate[11]{};
     char nearTime[6]{};
 

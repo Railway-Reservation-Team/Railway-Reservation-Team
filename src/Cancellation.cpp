@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 #include <string>
 #include <iomanip>
 #include <cmath>
@@ -360,7 +361,9 @@ bool cancelBooking(
             fields.push_back(field);
         }
 
-        if (fields.size() == 8 && fields[0] == pnr) {
+        // Accept legacy eight-field records and new records with a waitlist position.
+        if ((fields.size() == 8 || fields.size() == 9) &&
+            fields[0] == pnr) {
 
             if (fields[7] != "Confirmed") {
                 errorMessage =
@@ -369,6 +372,11 @@ bool cancelBooking(
             }
 
             fields[7] = "Cancelled";
+            if (fields.size() == 8) {
+                fields.push_back("0");
+            } else {
+                fields[8] = "0";
+            }
 
             std::ostringstream updatedLine;
 
@@ -465,7 +473,158 @@ bool cancelBooking(
         // Restore seats.
         *availableSeats += booking.passengerCount;
 
-        // Preserve active/deactivated state while updating seat inventory.
+        // Process the waitlist in queue order. A group is promoted only when
+        // enough seats are available for the entire booking; later groups are
+        // not allowed to jump ahead of an earlier group.
+        struct WaitlistCandidate {
+            std::size_t lineIndex;
+            int position;
+        };
+
+        std::vector<WaitlistCandidate> waitlist;
+        int legacyPosition = 1;
+
+        for (std::size_t i = 0; i < bookingLines.size(); ++i) {
+            std::stringstream bookingStream(bookingLines[i]);
+            std::vector<std::string> fields;
+            std::string field;
+
+            while (std::getline(bookingStream, field, '|')) {
+                fields.push_back(field);
+            }
+
+            if ((fields.size() != 8 && fields.size() != 9) ||
+                fields[1] != booking.trainNumber ||
+                fields[2] != booking.journeyDate ||
+                fields[3] != booking.travelClass ||
+                fields[7] != "Waitlisted") {
+                continue;
+            }
+
+            int position = legacyPosition;
+            if (fields.size() == 9) {
+                try {
+                    const int storedPosition = std::stoi(fields[8]);
+                    if (storedPosition > 0) {
+                        position = storedPosition;
+                    }
+                } catch (...) {
+                    errorMessage = "Invalid waitlist position in booking data.";
+                    refundAmount = 0.0;
+                    cancellationCharge = 0.0;
+                    return false;
+                }
+            }
+
+            waitlist.push_back({i, position});
+            ++legacyPosition;
+        }
+
+        std::stable_sort(
+            waitlist.begin(),
+            waitlist.end(),
+            [](const WaitlistCandidate& left,
+               const WaitlistCandidate& right) {
+                if (left.position != right.position) {
+                    return left.position < right.position;
+                }
+                return left.lineIndex < right.lineIndex;
+            }
+        );
+
+        // Promote consecutive queue entries while the released inventory
+        // can accommodate each complete passenger group.
+        for (const WaitlistCandidate& candidate : waitlist) {
+            std::stringstream bookingStream(bookingLines[candidate.lineIndex]);
+            std::vector<std::string> fields;
+            std::string field;
+
+            while (std::getline(bookingStream, field, '|')) {
+                fields.push_back(field);
+            }
+
+            if (fields.size() != 8 && fields.size() != 9) {
+                errorMessage = "Invalid waitlisted booking record.";
+                refundAmount = 0.0;
+                cancellationCharge = 0.0;
+                return false;
+            }
+
+            if (fields[7] != "Waitlisted") {
+                continue;
+            }
+
+            int passengerCount = 0;
+            try {
+                passengerCount = std::stoi(fields[5]);
+            } catch (...) {
+                errorMessage = "Invalid passenger count in waitlisted booking.";
+                refundAmount = 0.0;
+                cancellationCharge = 0.0;
+                return false;
+            }
+
+            if (passengerCount <= 0) {
+                errorMessage = "Invalid passenger count in waitlisted booking.";
+                refundAmount = 0.0;
+                cancellationCharge = 0.0;
+                return false;
+            }
+
+            if (passengerCount > *availableSeats) {
+                break;
+            }
+
+            *availableSeats -= passengerCount;
+            fields[7] = "Confirmed";
+
+            if (fields.size() == 8) {
+                fields.push_back("0");
+            } else {
+                fields[8] = "0";
+            }
+
+            std::ostringstream promotedLine;
+            for (std::size_t j = 0; j < fields.size(); ++j) {
+                if (j > 0) promotedLine << '|';
+                promotedLine << fields[j];
+            }
+            bookingLines[candidate.lineIndex] = promotedLine.str();
+        }
+
+        // Refresh the displayed queue positions for bookings that remain
+        // waitlisted after the promotion pass.
+        int nextPosition = 1;
+        for (const WaitlistCandidate& candidate : waitlist) {
+            std::stringstream bookingStream(bookingLines[candidate.lineIndex]);
+            std::vector<std::string> fields;
+            std::string field;
+
+            while (std::getline(bookingStream, field, '|')) {
+                fields.push_back(field);
+            }
+
+            if ((fields.size() != 8 && fields.size() != 9) ||
+                fields[7] != "Waitlisted") {
+                continue;
+            }
+
+            if (fields.size() == 8) {
+                fields.push_back(std::to_string(nextPosition));
+            } else {
+                fields[8] = std::to_string(nextPosition);
+            }
+            ++nextPosition;
+
+            std::ostringstream updatedLine;
+            for (std::size_t j = 0; j < fields.size(); ++j) {
+                if (j > 0) updatedLine << '|';
+                updatedLine << fields[j];
+            }
+            bookingLines[candidate.lineIndex] = updatedLine.str();
+        }
+
+        // Preserve all train metadata, including active/deactivated state.
         line = serializeTrainRecord(train);
 
         trainUpdated = true;
@@ -510,6 +669,8 @@ bool cancelBooking(
             return false;
         }
     }
+
+    cancellationInput.close();
 
     // Create cancellation record.
     std::ostringstream cancellationRecord;

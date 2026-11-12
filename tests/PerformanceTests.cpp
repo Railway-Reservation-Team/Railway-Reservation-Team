@@ -358,9 +358,6 @@ int main() {
         fs::remove_all(testDirectory);
     }
 
-    std::cout << "\n=== Performance Test Summary ===\n";
-    std::cout << "Passed: " << passed << '\n';
-    std::cout << "Failed: " << failed << '\n';
 
     if (failed > 0) {
         std::cerr << "Performance tests FAILED.\n";

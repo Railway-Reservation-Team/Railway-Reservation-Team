@@ -159,7 +159,7 @@ int main() {
                      "2026-11-15").empty(),
         "Return no results for unavailable journey date"
     );
- 
+
    std::vector<Train> emptyTrains;
 
    check(
