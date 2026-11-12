@@ -64,7 +64,7 @@ bool readLines(
     return true;
 }
 
-// Calculate cancellation fee and refund using the SRS time slabs.
+// Calculate cancellation fee and refund using SRS time slabs.
 bool calculateRefund(
     const Train& train,
     double totalFare,
@@ -186,7 +186,6 @@ bool writeFilesAtomically(
             if (original.bad()) {
                 errorMessage =
                     "Could not read " + updates[i].filename;
-
                 return false;
             }
 
@@ -322,7 +321,6 @@ bool cancelBooking(
 
     Booking booking;
 
-    // Find booking using the existing BookingManager.
     if (!BookingManager::findBooking(pnr, booking)) {
         errorMessage = "Booking not found for the given PNR.";
         return false;
@@ -370,7 +368,6 @@ bool cancelBooking(
             if (fields[7] != "Confirmed") {
                 errorMessage =
                     "Booking is no longer eligible for cancellation.";
-
                 return false;
             }
 
@@ -428,7 +425,6 @@ bool cancelBooking(
             continue;
         }
 
-        // Calculate the correct refund for this train.
         if (!calculateRefund(
                 train,
                 booking.totalFare,
@@ -463,7 +459,6 @@ bool cancelBooking(
             return false;
         }
 
-        // Prevent integer overflow without an arbitrary capacity limit.
         if (*availableSeats < 0 ||
             *availableSeats >
                 std::numeric_limits<int>::max() -
@@ -475,7 +470,7 @@ bool cancelBooking(
             return false;
         }
 
-        // Restore seats after successful cancellation.
+        // Restore seats.
         *availableSeats += booking.passengerCount;
 
         // Process the waitlist in queue order. A group is promoted only when
@@ -629,28 +624,8 @@ bool cancelBooking(
             bookingLines[candidate.lineIndex] = updatedLine.str();
         }
 
-        // Preserve the existing 16-field train record format.
-        std::ostringstream updatedTrain;
-
-        updatedTrain
-            << train.trainNumber << '|'
-            << train.trainName << '|'
-            << train.source << '|'
-            << train.destination << '|'
-            << train.departureTime << '|'
-            << train.arrivalTime << '|'
-            << train.journeyDuration << '|'
-            << train.sleeperFare << '|'
-            << train.ac3TierFare << '|'
-            << train.ac2TierFare << '|'
-            << train.chairCarFare << '|'
-            << train.sleeperSeatsAvailable << '|'
-            << train.ac3TierSeatsAvailable << '|'
-            << train.ac2TierSeatsAvailable << '|'
-            << train.chairCarSeatsAvailable << '|'
-            << train.journeyDate;
-
-        line = updatedTrain.str();
+        // Preserve all train metadata, including active/deactivated state.
+        line = serializeTrainRecord(train);
 
         trainUpdated = true;
         break;
@@ -665,7 +640,7 @@ bool cancelBooking(
         return false;
     }
 
-    // Read previous cancellation records if the file exists.
+    // Read previous cancellation records.
     std::vector<std::string> cancellationLines;
 
     std::ifstream cancellationInput(
@@ -681,6 +656,9 @@ bool cancelBooking(
                 cancellationLines.push_back(line);
             }
         }
+
+        // Close before replacing the cancellation file.
+        cancellationInput.close();
 
         if (cancellationInput.bad()) {
             errorMessage =

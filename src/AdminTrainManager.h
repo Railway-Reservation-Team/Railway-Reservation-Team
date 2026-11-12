@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+// Provides administrative operations for managing train records.
 namespace AdminTrainManager {
     bool addTrain(
         const std::string& filename,
@@ -26,6 +27,12 @@ namespace AdminTrainManager {
     );
 
     bool deleteTrain(
+        const std::string& filename,
+        const std::string& trainNumber,
+        std::string& errorMessage
+    );
+
+    bool deactivateTrain(
         const std::string& filename,
         const std::string& trainNumber,
         std::string& errorMessage

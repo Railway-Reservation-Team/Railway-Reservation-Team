@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -104,6 +105,24 @@ int main() {
     assert(!serializePayment(invalid, record, error));
 
     invalid.amount = 0.0;
+    assert(!serializePayment(invalid, record, error));
+
+    // Reject non-finite payment amounts.
+    invalid = valid;
+    invalid.amount = std::nan("");
+    assert(!serializePayment(invalid, record, error));
+
+    invalid = valid;
+    invalid.amount = std::numeric_limits<double>::infinity();
+    assert(!serializePayment(invalid, record, error));
+
+    // Reject record delimiters in payment fields.
+    invalid = valid;
+    invalid.transactionId = "TXN|1001";
+    assert(!serializePayment(invalid, record, error));
+
+    invalid = valid;
+    invalid.paymentMethod = "UPI\\nCash";
     assert(!serializePayment(invalid, record, error));
 
     Payment invalidRecord;

@@ -13,8 +13,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(RRS_ENABLE_COVERAGE "Enable GCC coverage instrumentation" OFF)
 
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
-
+find_package(Threads REQUIRED)
 set(RRS_CORE_SOURCES
+
     src/AdminAuthManager.cpp
     src/AdminFareReservationManager.cpp
     src/AdminTrainManager.cpp
@@ -25,6 +26,8 @@ set(RRS_CORE_SOURCES
     src/FareCalculator.cpp
     src/PassengerDetails.cpp
     src/Payment.cpp
+    src/PaymentReceiptManager.cpp
+    src/ETicketManager.cpp
     src/SeatInventory.cpp
     src/TrainSearch.cpp
     src/Validation.cpp
@@ -39,7 +42,7 @@ endfunction()
 
 add_library(rrs_core STATIC ${RRS_CORE_SOURCES})
 target_include_directories(rrs_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_link_libraries(rrs_core PUBLIC OpenSSL::Crypto)
+target_link_libraries(rrs_core PUBLIC OpenSSL::Crypto Threads::Threads)
 
 if(MSVC)
     target_compile_options(rrs_core PRIVATE /W4 /permissive-)
@@ -62,6 +65,12 @@ add_custom_command(TARGET railway POST_BUILD
 include(CTest)
 if(BUILD_TESTING)
     set(RRS_TEST_SOURCES
+    tests/TrainSearchTests.cpp
+tests/SeatInventoryConcurrencyTests.cpp
+tests/SeatInventoryStressTests.cpp
+tests/SeatInventoryReleaseConcurrencyTests.cpp
+tests/SeatInventoryConfirmConcurrencyTests.cpp
+tests/SeatInventoryBoundaryTests.cpp
         tests/AdminAuthManagerTests.cpp
         tests/AdminFareReservationTests.cpp
         tests/AdminTrainMenuSecurityTests.cpp
@@ -75,6 +84,8 @@ if(BUILD_TESTING)
         tests/PaymentProcessTests.cpp
         tests/PerformanceTests.cpp
         tests/PaymentStructureTests.cpp
+        tests/ETicketTests.cpp
+        tests/PaymentReceiptTests.cpp
         tests/SeatInventoryTests.cpp
         tests/US05Tests.cpp
         tests/US13Tests.cpp

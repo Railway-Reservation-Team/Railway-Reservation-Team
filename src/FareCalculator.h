@@ -4,6 +4,7 @@
 #include "Train.h"
 #include <string>
 
+// Provides fare calculation for a selected train class and passenger count.
 namespace FareCalculator {
 
     double calculateFare(

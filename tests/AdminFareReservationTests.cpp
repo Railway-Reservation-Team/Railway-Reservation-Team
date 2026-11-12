@@ -1,6 +1,8 @@
 #include "../src/AdminFareReservationManager.h"
 
 #include <cassert>
+#include <filesystem>
+#include <iterator>
 #include "../src/TrainData.h"
 #include <cstdio>
 #include <fstream>
@@ -130,6 +132,11 @@ void testRejectInvalidStatus() {
 }
 
 int main() {
+    std::error_code auditFsError;
+    std::filesystem::create_directories("data", auditFsError);
+    if (auditFsError) return 1;
+    std::filesystem::remove("data/admin_audit.log", auditFsError);
+
     prepareFiles();
 
     testViewReservations();
@@ -138,6 +145,16 @@ int main() {
     testCancelReservation();
     testRejectRepeatedCancellation();
     testRejectInvalidStatus();
+
+    {
+        std::ifstream auditFile("data/admin_audit.log");
+        const std::string audit(
+            (std::istreambuf_iterator<char>(auditFile)),
+            std::istreambuf_iterator<char>());
+        assert(audit.find("ADMIN_FARES_UPDATED") != std::string::npos);
+        assert(audit.find("ADMIN_RESERVATION_CANCELLED") != std::string::npos);
+        std::cout << "PASS: Fare and reservation administration actions are audited\n";
+    }
 
     std::remove(TRAIN_FILE.c_str());
     std::remove(BOOKING_FILE.c_str());

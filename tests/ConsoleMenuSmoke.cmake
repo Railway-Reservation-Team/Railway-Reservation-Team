@@ -11,7 +11,7 @@ file(WRITE "${WORK_DIR}/data/bookings.dat"
 
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
-"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n5\n5\n6\n7\n")
+"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n6\n5\n6\n7\n")
 
 execute_process(
     COMMAND "${APP}"

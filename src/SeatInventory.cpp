@@ -97,6 +97,7 @@ SeatRequestResult validateSeatRequest(
 void SeatInventoryManager::removeExpiredHolds(
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     holds.erase(
         std::remove_if(
             holds.begin(),
@@ -113,6 +114,7 @@ void SeatInventoryManager::removeExpiredHolds(
 void SeatInventoryManager::expireHolds(
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 }
 
@@ -122,6 +124,7 @@ int SeatInventoryManager::getLiveAvailableSeats(
     const std::string& travelClass,
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
     const std::string selectedClass = canonicalClass(travelClass);
@@ -157,6 +160,7 @@ SeatHoldResponse SeatInventoryManager::holdSeats(
     int requestedSeats,
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
     const std::string selectedClass = canonicalClass(travelClass);
@@ -211,6 +215,7 @@ SeatHoldResponse SeatInventoryManager::holdSeats(
 bool SeatInventoryManager::releaseHold(
     const std::string& holdId
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     const auto it = std::find_if(
         holds.begin(),
         holds.end(),
@@ -234,6 +239,7 @@ bool SeatInventoryManager::confirmHold(
     const std::string& holdId,
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
     const auto it = std::find_if(
@@ -280,6 +286,7 @@ bool SeatInventoryManager::confirmHold(
 int SeatInventoryManager::getActiveHoldCount(
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
     return static_cast<int>(holds.size());

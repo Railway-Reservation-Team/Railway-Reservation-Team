@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+// Stores the reservation details associated with a passenger booking.
 struct Booking {
     std::string pnr;
     std::string trainNumber;
@@ -19,6 +20,7 @@ struct Booking {
     int waitlistPosition = 0;
 };
 
+// Provides functions to create and retrieve railway reservations.
 namespace BookingManager {
 
     bool createBooking(

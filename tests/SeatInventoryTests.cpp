@@ -260,6 +260,64 @@ int main() {
     check("Hold release on another train succeeds",
           inventory.releaseHold(anotherHold.holdId));
 
+
+    // 10. Additional inventory edge cases
+    std::cout << "\\n--- Additional Inventory Edge Cases ---\\n";
+
+    SeatInventoryManager edgeInventory;
+
+    Train dateTrain = train;
+    dateTrain.trainNumber = "DATE-TEST";
+    dateTrain.journeyDate = "2026-11-01";
+    dateTrain.ac3TierSeatsAvailable = 10;
+
+    SeatHoldResponse dateHold =
+        edgeInventory.holdSeats(dateTrain, "3A", 3, startTime);
+
+    Train differentDateTrain = dateTrain;
+    differentDateTrain.journeyDate = "2026-11-02";
+
+    check("Different journey date has independent availability",
+          edgeInventory.getLiveAvailableSeats(
+              differentDateTrain, "3A", startTime
+          ) == 10);
+
+    Train wrongNumberTrain = dateTrain;
+    wrongNumberTrain.trainNumber = "OTHER-TRAIN";
+
+    check("Hold cannot be confirmed for another train",
+          !edgeInventory.confirmHold(
+              wrongNumberTrain, dateHold.holdId, startTime
+          ));
+
+    Train wrongDateTrain = dateTrain;
+    wrongDateTrain.journeyDate = "2026-11-03";
+
+    check("Hold cannot be confirmed for another journey date",
+          !edgeInventory.confirmHold(
+              wrongDateTrain, dateHold.holdId, startTime
+          ));
+
+    check("Original hold remains active after invalid confirmations",
+          edgeInventory.getLiveAvailableSeats(
+              dateTrain, "3A", startTime
+          ) == 7);
+
+    check("Zero-seat hold request is rejected",
+          edgeInventory.holdSeats(
+              dateTrain, "3A", 0, startTime
+          ).result == SeatHoldResult::INVALID_REQUEST);
+
+    check("Negative-seat hold request is rejected",
+          edgeInventory.holdSeats(
+              dateTrain, "3A", -1, startTime
+          ).result == SeatHoldResult::INVALID_REQUEST);
+
+    check("Valid original hold can still be confirmed",
+          edgeInventory.confirmHold(
+              dateTrain, dateHold.holdId, startTime
+          ));
+
     // Final summary
     std::cout << "\n===== TEST SUMMARY =====\n";
 

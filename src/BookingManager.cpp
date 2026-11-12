@@ -222,6 +222,11 @@ bool createBooking(
         if (train.trainNumber == selectedTrain.trainNumber &&
             train.journeyDate == selectedTrain.journeyDate) {
 
+            if (!train.active) {
+                errorMessage = "Selected train is deactivated and unavailable for new bookings.";
+                return false;
+            }
+
             if (found) {
                 errorMessage = "Duplicate train record found.";
                 return false;
@@ -334,22 +339,7 @@ bool createBooking(
         std::ostringstream updatedData;
 
         for (const Train& train : trains) {
-            updatedData << train.trainNumber << '|'
-                        << train.trainName << '|'
-                        << train.source << '|'
-                        << train.destination << '|'
-                        << train.departureTime << '|'
-                        << train.arrivalTime << '|'
-                        << train.journeyDuration << '|'
-                        << train.sleeperFare << '|'
-                        << train.ac3TierFare << '|'
-                        << train.ac2TierFare << '|'
-                        << train.chairCarFare << '|'
-                        << train.sleeperSeatsAvailable << '|'
-                        << train.ac3TierSeatsAvailable << '|'
-                        << train.ac2TierSeatsAvailable << '|'
-                        << train.chairCarSeatsAvailable << '|'
-                        << train.journeyDate << '\n';
+            updatedData << serializeTrainRecord(train) << '\n';
         }
 
         const std::string TEMP_FILE = "data/trains.tmp";
