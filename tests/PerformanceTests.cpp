@@ -2,6 +2,7 @@
 #include "TrainSearch.h"
 #include "TrainData.h"
 
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -120,14 +121,87 @@ int main() {
             trains.push_back(train);
         }
 
-        // NFR-01: Search response time for 200 trains.
-        const auto searchStart = Clock::now();
+        // RRS-56: Repeatable response-time and p90 measurement.
+        constexpr int SAMPLE_COUNT = 100;
+        constexpr double JIRA_LIMIT_MS = 3000.0;
+
+        std::vector<double> searchSamples;
+        searchSamples.reserve(SAMPLE_COUNT);
+
+        for (int i = 0; i < SAMPLE_COUNT; ++i) {
+            const auto sampleStart = Clock::now();
+
+            const auto sampleResult = searchTrains(
+                trains, " Bengaluru ", "Chennai", "2099-12-31"
+            );
+
+            searchSamples.push_back(elapsedMs(sampleStart));
+
+            if (sampleResult.size() != 1) {
+                check(false, "Search returns the expected result");
+                break;
+            }
+        }
+
+        check(
+            searchSamples.size() == SAMPLE_COUNT,
+            "Completed all 100 search measurements"
+        );
+
+        double searchMs = 0.0;
+        double p90Ms = 0.0;
+        int requestsWithinLimit = 0;
+
+        if (searchSamples.size() == SAMPLE_COUNT) {
+            for (double sample : searchSamples) {
+                searchMs += sample;
+
+                if (sample <= JIRA_LIMIT_MS) {
+                    ++requestsWithinLimit;
+                }
+            }
+
+            searchMs /= SAMPLE_COUNT;
+
+            std::sort(searchSamples.begin(), searchSamples.end());
+
+            // Nearest-rank p90: the 90th observation in 100 samples.
+            p90Ms = searchSamples[89];
+
+            const double compliance =
+                (requestsWithinLimit * 100.0) / SAMPLE_COUNT;
+
+            std::cout << "\n=== RRS-56 Response-Time Results ===\n"
+                      << "Environment: Ubuntu WSL, local test execution\n"
+                      << "Dataset: 200 trains\n"
+                      << "Sample count: " << SAMPLE_COUNT << '\n'
+                      << "Average search latency: " << searchMs << " ms\n"
+                      << "P90 search latency: " << p90Ms << " ms\n"
+                      << "Requests within 3000 ms: "
+                      << requestsWithinLimit << "/" << SAMPLE_COUNT << '\n'
+                      << "Compliance: " << compliance << "%\n";
+
+            check(
+                p90Ms <= JIRA_LIMIT_MS,
+                "Jira RRS-56: p90 latency is within 3000 ms"
+            );
+
+            check(
+                compliance >= 90.0,
+                "Jira RRS-56: At least 90% of requests meet 3000 ms"
+            );
+
+            check(
+                searchMs <= 2000.0,
+                "SRS NFR-01: Average search time is within 2000 ms"
+            );
+        } else {
+            check(false, "Response-time measurements completed");
+        }
 
         const auto results = searchTrains(
             trains, " Bengaluru ", "Chennai", "2099-12-31"
         );
-
-        const double searchMs = elapsedMs(searchStart);
 
         check(
             results.size() == 1,
