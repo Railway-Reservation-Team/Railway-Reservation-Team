@@ -98,6 +98,18 @@ int main() {
 
     std::cout << "[PASS] Empty passenger booking rejection\n";
 
+    // Reject bookings exceeding the maximum passenger limit.
+    std::vector<Passenger> tooManyPassengers(7, {"Test Passenger", 20, "Male"});
+    std::string rejectedLimitPnr;
+
+    assert(!BookingManager::createBooking(
+        train, "AC 2-Tier", tooManyPassengers, 7000.0,
+        rejectedLimitPnr, error
+    ));
+
+    std::cout << "[PASS] Maximum passenger limit enforcement\\n";
+
+
     std::cout << "\nALL BOOKING INTEGRATION TESTS PASSED!\n";
     return 0;
 }
