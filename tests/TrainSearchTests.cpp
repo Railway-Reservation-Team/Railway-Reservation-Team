@@ -159,7 +159,28 @@ int main() {
                      "2026-11-15").empty(),
         "Return no results for unavailable journey date"
     );
-    std::cout << "\nPassed: " << passed
+ 
+   std::vector<Train> emptyTrains;
+
+   check(
+       searchTrains(emptyTrains, "Bangalore", "Chennai",
+                    "2026-11-13").empty(),
+       "Handle empty train collection"
+   );
+
+   check(
+       searchTrains(trains, "Bangalore", "Bangalore",
+                    "2026-11-13").empty(),
+       "Handle identical source and destination"
+   );
+
+   check(
+       searchTrains(trains, "   ", "Chennai",
+                    "2026-11-13").empty(),
+       "Reject whitespace-only source"
+   );
+
+   std::cout << "\nPassed: " << passed
               << "\nFailed: " << failed << '\n';
 
     return failed == 0 ? 0 : 1;
