@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+// Stores the complete information displayed on a generated e-ticket.
 struct ETicket {
     std::string pnr;
     std::string trainNumber;
