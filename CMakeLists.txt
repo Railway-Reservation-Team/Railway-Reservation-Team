@@ -67,6 +67,7 @@ if(BUILD_TESTING)
     set(RRS_TEST_SOURCES
     tests/TrainSearchTests.cpp
     tests/SeatInventoryConcurrencyTests.cpp
+    tests/SeatInventoryStressTests.cpp
         tests/AdminAuthManagerTests.cpp
         tests/AdminFareReservationTests.cpp
         tests/AdminTrainMenuSecurityTests.cpp
