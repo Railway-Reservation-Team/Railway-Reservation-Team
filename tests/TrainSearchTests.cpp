@@ -1,4 +1,4 @@
-
+#include <string>
 #include "TrainSearch.h"
 
 #include <iostream>
@@ -120,7 +120,45 @@ int main() {
                      "2026/11/13").empty(),
         "Reject incorrect date format"
     );
+    check(
+        searchTrains(trains, "Mumbai", "Chennai",
+                     "2026-11-13").empty(),
+        "Return empty result when no trains match"
+    );
 
+    std::vector<Train> duplicateTrains = {t1, t1};
+
+    check(
+        searchTrains(duplicateTrains, "Bangalore", "Chennai",
+                     "2026-11-13").size() == 2,
+        "Preserve duplicate matching records"
+    );
+
+    std::vector<Train> largeTrains;
+
+    for (int i = 0; i < 1000; ++i) {
+        Train generated = t1;
+        generated.trainNumber = std::to_string(20000 + i);
+        largeTrains.push_back(generated);
+    }
+
+    check(
+        searchTrains(largeTrains, "Bangalore", "Chennai",
+                     "2026-11-13").size() == 1000,
+        "Search correctly through 1000 trains"
+    );
+
+    check(
+        searchTrains(trains, "  Bangalore  ", "  Chennai  ",
+                     "2026-11-13").size() == 2,
+        "Handle additional surrounding whitespace"
+    );
+
+    check(
+        searchTrains(trains, "Bangalore", "Chennai",
+                     "2026-11-15").empty(),
+        "Return no results for unavailable journey date"
+    );
     std::cout << "\nPassed: " << passed
               << "\nFailed: " << failed << '\n';
 
