@@ -15,10 +15,12 @@ bool runStressTest(int iteration) {
 
     SeatInventoryManager inventory;
 
-    constexpr int THREAD_COUNT = 50;
+    constexpr int THREAD_COUNT = 100;
 
+    std::atomic<int> ready{0};
     std::atomic<int> successful{0};
     std::atomic<int> rejected{0};
+    std::atomic<bool> start{false};
 
     const auto testTime = std::chrono::steady_clock::now();
 
@@ -26,19 +28,31 @@ bool runStressTest(int iteration) {
 
     for (int i = 0; i < THREAD_COUNT; ++i) {
         workers.emplace_back([&]() {
+            ready++;
+
+            while (!start.load()) {
+                std::this_thread::yield();
+            }
+
             SeatHoldResponse response =
                 inventory.holdSeats(train, "3A", 1, testTime);
 
             if (response.result == SeatHoldResult::SUCCESS) {
-                ++successful;
+                successful++;
             } else if (
                 response.result ==
                 SeatHoldResult::EXCEEDS_AVAILABLE_SEATS
             ) {
-                ++rejected;
+                rejected++;
             }
         });
     }
+
+    while (ready.load() != THREAD_COUNT) {
+        std::this_thread::yield();
+    }
+
+    start.store(true);
 
     for (auto& worker : workers) {
         worker.join();
@@ -51,12 +65,13 @@ bool runStressTest(int iteration) {
 
     bool passed =
         successful == 25 &&
-        rejected == 25 &&
+        rejected == 75 &&
         remaining == 0 &&
         active == 25;
 
     std::cout << "Iteration " << iteration
               << ": " << (passed ? "PASS" : "FAIL")
+              << " | Threads: " << THREAD_COUNT
               << " | Successful: " << successful
               << " | Rejected: " << rejected
               << " | Remaining: " << remaining
@@ -76,7 +91,7 @@ int main() {
         }
     }
 
-    std::cout << "\nStress Test Summary\n";
+    std::cout << "\n100-Thread Stress Test Summary\n";
     std::cout << "Total iterations: " << ITERATIONS << '\n';
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << ITERATIONS - passed << '\n';

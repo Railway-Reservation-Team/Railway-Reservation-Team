@@ -63,3 +63,56 @@ only once. Boundary checks also verified invalid seat requests and restoration
 of seats after releasing a hold.
 
 Total CTest execution time: approximately 0.16 seconds.
+
+## RRS-58: 100-Thread Concurrency Verification
+
+### Test Environment
+- Environment: Ubuntu WSL
+- Test framework: CTest / C++
+- Concurrent reservation threads: 100
+- Available seats: 25
+- Stress-test iterations: 20
+
+### 1. Concurrent Reservation Stress Test
+
+Each iteration launched 100 threads simultaneously to reserve one seat each.
+
+| Metric | Result |
+|---|---:|
+| Total requests per iteration | 100 |
+| Successful holds | 25 |
+| Rejected requests | 75 |
+| Remaining seats | 0 |
+| Active holds | 25 |
+| Iterations passed | 20/20 |
+
+Total reservation attempts: 2,000.
+
+### 2. Concurrent Hold Confirmation Test
+
+100 threads simultaneously attempted to confirm the same hold.
+
+| Metric | Result |
+|---|---:|
+| Confirmation attempts | 100 |
+| Successful confirmations | 1 |
+| Unsuccessful confirmations | 99 |
+| Remaining seats | 20 |
+| Active holds | 0 |
+
+Only one confirmation succeeded, preventing the same hold from being confirmed multiple times.
+
+### 3. Full Regression Testing
+
+Command: `ctest --test-dir build --output-on-failure`
+
+- Total test cases: 28
+- Passed: 28
+- Failed: 0
+- Total execution time: 6.30 seconds
+
+### 4. Conclusion
+
+The 100-thread reservation stress test maintained the correct seat inventory across all 20 iterations. Concurrent confirmation also allowed exactly one successful confirmation of the same hold.
+
+These tests provide evidence of concurrent seat-hold consistency and duplicate-confirmation prevention. They do not independently verify 100 unique confirmed bookings or production-scale multi-user performance.
