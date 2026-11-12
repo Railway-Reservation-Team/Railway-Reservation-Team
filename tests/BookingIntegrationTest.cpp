@@ -2,12 +2,25 @@
 #include "../src/BookingManager.h"
 #include "../src/TrainData.h"
 
-#include <cassert>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+
+int passed = 0;
+int failed = 0;
+
+void check(const std::string& name, bool condition) {
+    if (condition) {
+        std::cout << "[PASS] " << name << '\n';
+        ++passed;
+    } else {
+        std::cout << "[FAIL] " << name << '\n';
+        ++failed;
+    }
+}
 
 int main() {
     std::cout << "Starting Booking Integration Tests...\n";
@@ -27,7 +40,7 @@ int main() {
         "99999|Test Express|Bengaluru|Chennai|10:00|18:00|8h|"
         "500|800|1000|400|20|20|20|20|2026-11-01";
 
-    assert(parseTrainRecord(trainRecord, train));
+    check("Train record parsing", parseTrainRecord(trainRecord, train));
     std::cout << "[PASS] Train record parsing\n";
 
     std::vector<Passenger> passengers;
@@ -42,19 +55,19 @@ int main() {
         train, "AC 2-Tier", passengers, 2000.0, pnr, error
     );
 
-    assert(created);
-    assert(pnr.size() == 10);
+    check("Booking creation", created);
+    check("PNR contains 10 digits", pnr.size() == 10);
     std::cout << "[PASS] Booking creation and PNR generation\n";
 
     // Test existing booking retrieval.
     Booking booking;
     bool retrieved = BookingManager::findBooking(pnr, booking);
 
-    assert(retrieved);
-    assert(booking.pnr == pnr);
-    assert(booking.trainNumber == "99999");
-    assert(booking.passengerCount == 2);
-    assert(booking.status == "Confirmed");
+    check("Booking retrieval", retrieved);
+    check("Retrieved PNR matches", booking.pnr == pnr);
+    check("Retrieved train number matches", booking.trainNumber == "99999");
+    check("Retrieved passenger count matches", booking.passengerCount == 2);
+    check("Booking status is confirmed", booking.status == "Confirmed");
     std::cout << "[PASS] Booking retrieval using PNR\n";
 
     // Verify eight-field booking serialization.
@@ -71,7 +84,7 @@ int main() {
         ++fieldCount;
     }
 
-    assert(fieldCount == 8);
+    check("Booking serialization has eight fields", fieldCount == 8);
     std::cout << "[PASS] Existing eight-field booking format\n";
 
     // Verify that two AC 2-Tier seats were deducted.
@@ -81,33 +94,31 @@ int main() {
     updatedTrains.close();
 
     Train updatedTrain;
-    assert(parseTrainRecord(updatedLine, updatedTrain));
-    assert(updatedTrain.ac2TierSeatsAvailable == 18);
+    check("Updated train record parses", parseTrainRecord(updatedLine, updatedTrain));
+    check("Two seats deducted", updatedTrain.ac2TierSeatsAvailable == 18);
 
-    std::cout << "[PASS] Seat inventory deduction (20 to 18)\n";
 
 
     // Reject booking creation without passengers.
     std::vector<Passenger> emptyPassengers;
     std::string rejectedPnr;
 
-    assert(!BookingManager::createBooking(
-        train, "AC 2-Tier", emptyPassengers, 0.0,
+    check("Empty passenger booking rejected", !BookingManager::createBooking(
+        train, "AC 2-Tier", emptyPassengers, 1000.0,
         rejectedPnr, error
     ));
 
-    std::cout << "[PASS] Empty passenger booking rejection\n";
 
     // Reject bookings exceeding the maximum passenger limit.
     std::vector<Passenger> tooManyPassengers(7, {"Test Passenger", 20, "Male"});
     std::string rejectedLimitPnr;
 
-    assert(!BookingManager::createBooking(
+    check("Maximum passenger limit enforced", !BookingManager::createBooking(
         train, "AC 2-Tier", tooManyPassengers, 7000.0,
         rejectedLimitPnr, error
     ));
 
-    std::cout << "[PASS] Maximum passenger limit enforcement\\n";
+
 
 
 
@@ -115,23 +126,24 @@ int main() {
     std::vector<Passenger> invalidName = {{"   ", 20, "Male"}};
     std::string invalidPnr;
 
-    assert(!BookingManager::createBooking(
+    check("Blank passenger name rejected", !BookingManager::createBooking(
         train, "AC 2-Tier", invalidName, 1000.0, invalidPnr, error
     ));
-    std::cout << "[PASS] Empty passenger name rejection\n";
 
     std::vector<Passenger> invalidAge = {{"Test Passenger", 0, "Male"}};
-    assert(!BookingManager::createBooking(
+    check("Invalid passenger age rejected", !BookingManager::createBooking(
         train, "AC 2-Tier", invalidAge, 1000.0, invalidPnr, error
     ));
-    std::cout << "[PASS] Invalid passenger age rejection\n";
 
     std::vector<Passenger> invalidGender = {{"Test Passenger", 20, "Unknown"}};
-    assert(!BookingManager::createBooking(
+    check("Invalid passenger gender rejected", !BookingManager::createBooking(
         train, "AC 2-Tier", invalidGender, 1000.0, invalidPnr, error
     ));
-    std::cout << "[PASS] Invalid passenger gender rejection\n";
 
-    std::cout << "\nALL BOOKING INTEGRATION TESTS PASSED!\n";
-    return 0;
+    std::cout << "\n===== BOOKING TEST SUMMARY =====\n";
+    std::cout << "Total: " << passed + failed << '\n';
+    std::cout << "Passed: " << passed << '\n';
+    std::cout << "Failed: " << failed << '\n';
+
+    return failed == 0 ? 0 : 1;
 }
