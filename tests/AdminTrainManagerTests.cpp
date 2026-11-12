@@ -1,6 +1,9 @@
 #include "../src/AdminTrainManager.h"
+#include "../src/TrainData.h"
 
 #include <cassert>
+#include <filesystem>
+#include <iterator>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -38,6 +41,11 @@ void prepareFile() {
 }
 
 int main() {
+    std::error_code auditFsError;
+    std::filesystem::create_directories("data", auditFsError);
+    if (auditFsError) return 1;
+    std::filesystem::remove("data/admin_audit.log", auditFsError);
+
     std::string error;
     std::vector<Train> trains;
 
@@ -75,6 +83,21 @@ int main() {
     ));
     std::cout << "PASS: Reject update for missing train\n";
 
+    assert(AdminTrainManager::deactivateTrain(TEST_FILE, "12345", error));
+    assert(!AdminTrainManager::deactivateTrain(TEST_FILE, "12345", error));
+    trains.clear();
+    assert(AdminTrainManager::viewTrains(TEST_FILE, trains, error));
+    assert(trains.size() == 1 && !trains[0].active);
+    assert(loadTrains(TEST_FILE, "2026-12-01", error).empty());
+    std::cout << "PASS: Deactivate train and exclude it from passenger search\n";
+
+    updatedTrain.trainName = "Updated Deactivated Express";
+    assert(AdminTrainManager::updateTrain(TEST_FILE, "12345", updatedTrain, error));
+    trains.clear();
+    assert(AdminTrainManager::viewTrains(TEST_FILE, trains, error));
+    assert(trains.size() == 1 && !trains[0].active);
+    std::cout << "PASS: Train updates preserve deactivated state\n";
+
     assert(AdminTrainManager::deleteTrain(TEST_FILE, "12345", error));
 
     trains.clear();
@@ -91,9 +114,21 @@ int main() {
     assert(!AdminTrainManager::addTrain(TEST_FILE, invalidTrain, error));
     std::cout << "PASS: Reject invalid train details\n";
 
+    {
+        std::ifstream auditFile("data/admin_audit.log");
+        const std::string audit(
+            (std::istreambuf_iterator<char>(auditFile)),
+            std::istreambuf_iterator<char>());
+        assert(audit.find("ADMIN_TRAIN_ADDED") != std::string::npos);
+        assert(audit.find("ADMIN_TRAIN_UPDATED") != std::string::npos);
+        assert(audit.find("ADMIN_TRAIN_DEACTIVATED") != std::string::npos);
+        assert(audit.find("ADMIN_TRAIN_DELETED") != std::string::npos);
+        std::cout << "PASS: Train administration actions are audited\n";
+    }
+
     std::remove(TEST_FILE.c_str());
 
-    std::cout << "\nAll 8 admin train management tests passed!\n";
+    std::cout << "\nAll admin train management tests passed!\n";
 
     return 0;
 }

@@ -9,6 +9,7 @@
 #include <vector>
 #include <filesystem>
 #include <cmath>
+#include <ctime>
 
 int passed = 0;
 int failed = 0;
@@ -168,6 +169,138 @@ int main() {
         cancellationFile.peek() != std::ifstream::traits_type::eof(),
         "Persist cancellation record"
     );
+
+    cancellationFile.close();
+
+    // Test 11: Verify cancellation within 24 hours.
+    const std::time_t nearDeparture =
+        std::time(nullptr) + 2 * 60 * 60;
+
+    std::tm* localDeparture = std::localtime(&nearDeparture);
+
+    char nearDate[11]{};
+    char nearTime[6]{};
+
+    bool validTime = localDeparture != nullptr &&
+        std::strftime(
+            nearDate, sizeof(nearDate), "%Y-%m-%d", localDeparture
+        ) > 0 &&
+        std::strftime(
+            nearTime, sizeof(nearTime), "%H:%M", localDeparture
+        ) > 0;
+
+    check(validTime, "Prepare a train departing within 24 hours");
+
+    if (validTime) {
+        Train nearTrain{};
+        nearTrain.trainNumber = "TEST102";
+        nearTrain.trainName = "Near Departure Express";
+        nearTrain.source = "Bengaluru";
+        nearTrain.destination = "Chennai";
+        nearTrain.departureTime = nearTime;
+        nearTrain.arrivalTime = "07:00";
+        nearTrain.journeyDuration = "7h";
+        nearTrain.sleeperFare = 500;
+        nearTrain.ac3TierFare = 800;
+        nearTrain.ac2TierFare = 1000;
+        nearTrain.chairCarFare = 400;
+        nearTrain.sleeperSeatsAvailable = 10;
+        nearTrain.ac3TierSeatsAvailable = 10;
+        nearTrain.ac2TierSeatsAvailable = 10;
+        nearTrain.chairCarSeatsAvailable = 10;
+        nearTrain.journeyDate = nearDate;
+
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "TEST102|Near Departure Express|Bengaluru|Chennai|"
+                << nearTime << "|07:00|7h|500|800|1000|400|"
+                << "10|10|10|10|" << nearDate << '\n';
+        }
+
+        {
+            std::ofstream bookingsFile(
+                "data/bookings.dat", std::ios::trunc
+            );
+        }
+
+        std::string nearPnr;
+        std::string nearError;
+
+        bool nearCreated = BookingManager::createBooking(
+            nearTrain, "Sleeper", passengers, 1000.0,
+            nearPnr, nearError
+        );
+
+        check(
+            nearCreated,
+            "Create a booking within 24 hours of departure"
+        );
+
+        if (nearCreated) {
+            double nearRefund = 0.0;
+            double nearCharge = 0.0;
+
+            bool nearCancelled = Cancellation::cancelBooking(
+                nearPnr, nearRefund, nearCharge, nearError
+            );
+
+            check(
+                nearCancelled,
+                "Cancel a booking within 24 hours"
+            );
+
+            if (nearCancelled) {
+                check(
+                    std::abs(nearCharge - 500.0) < 0.01,
+                    "Within-24-hour cancellation fee is 50%"
+                );
+
+                check(
+                    std::abs(nearRefund - 500.0) < 0.01,
+                    "Within-24-hour refund is 50%"
+                );
+            }
+        }
+    }
+
+    // Test 12: Reject cancellation after departure.
+    {
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "TEST103|Departed Express|Bengaluru|Chennai|"
+                << "00:00|07:00|7h|500|800|1000|400|"
+                << "10|10|10|10|2000-01-01\n";
+        }
+
+        const std::string departedPnr = "1234567891";
+
+        {
+            std::ofstream bookingsFile(
+                "data/bookings.dat", std::ios::trunc
+            );
+
+            bookingsFile
+                << departedPnr
+                << "|TEST103|2000-01-01|Sleeper|"
+                << "Test Passenger,21,Other|1|1000.00|Confirmed\n";
+        }
+
+        double departedRefund = 0.0;
+        double departedCharge = 0.0;
+        std::string departedError;
+
+        check(
+            !Cancellation::cancelBooking(
+                departedPnr,
+                departedRefund,
+                departedCharge,
+                departedError
+            ),
+            "Reject cancellation after train departure"
+        );
+    }
 
     std::cout << "\nCancellation Test Results\n";
     std::cout << "Passed: " << passed << '\n';

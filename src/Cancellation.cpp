@@ -465,28 +465,8 @@ bool cancelBooking(
         // Restore seats.
         *availableSeats += booking.passengerCount;
 
-        // Preserve the existing 16-field train record format.
-        std::ostringstream updatedTrain;
-
-        updatedTrain
-            << train.trainNumber << '|'
-            << train.trainName << '|'
-            << train.source << '|'
-            << train.destination << '|'
-            << train.departureTime << '|'
-            << train.arrivalTime << '|'
-            << train.journeyDuration << '|'
-            << train.sleeperFare << '|'
-            << train.ac3TierFare << '|'
-            << train.ac2TierFare << '|'
-            << train.chairCarFare << '|'
-            << train.sleeperSeatsAvailable << '|'
-            << train.ac3TierSeatsAvailable << '|'
-            << train.ac2TierSeatsAvailable << '|'
-            << train.chairCarSeatsAvailable << '|'
-            << train.journeyDate;
-
-        line = updatedTrain.str();
+        // Preserve active/deactivated state while updating seat inventory.
+        line = serializeTrainRecord(train);
 
         trainUpdated = true;
         break;
