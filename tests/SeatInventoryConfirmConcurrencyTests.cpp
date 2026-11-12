@@ -25,7 +25,7 @@ int main() {
         return 1;
     }
 
-    constexpr int THREAD_COUNT = 20;
+    constexpr int THREAD_COUNT = 100;
 
     std::atomic<int> ready{0};
     std::atomic<int> successful{0};
@@ -72,7 +72,7 @@ int main() {
         train.ac3TierSeatsAvailable == expectedRemainingSeats &&
         activeHolds == 0;
 
-    std::cout << "\n===== CONCURRENT HOLD CONFIRMATION TEST =====\n";
+    std::cout << "\n===== 100-THREAD CONCURRENT HOLD CONFIRMATION TEST =====\n";
     std::cout << "Total threads: " << THREAD_COUNT << '\n';
     std::cout << "Successful confirmations: " << successful << '\n';
     std::cout << "Unsuccessful confirmations: " << unsuccessful << '\n';
