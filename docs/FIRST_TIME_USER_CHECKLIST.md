@@ -13,8 +13,8 @@ Note: This checklist reflects a manual walkthrough by a project team member. Ind
 - [x] User can enter a journey date.
 - [x] Matching trains are displayed.
 - [x] No-result message is displayed when no records match.
-- [ ] Empty source input is handled and tested.
-- [ ] Invalid date format is rejected and tested.
+- [x] Empty source input is handled and tested.
+- [x] Invalid date format is rejected and tested.
 
 ## Booking
 - [x] User can select a train.
@@ -38,9 +38,9 @@ Note: This checklist reflects a manual walkthrough by a project team member. Ind
 ## Error Handling
 - [x] Invalid passenger count is rejected.
 - [x] Unavailable travel class is handled.
-- [ ] Empty inputs are fully tested.
-- [ ] Invalid date formats are tested.
-- [ ] Invalid train selections are tested.
+- [x] Empty source input is handled and tested.
+- [x] Invalid date format is rejected and tested.
+- [x] Invalid train selections are tested.
 
 ## Evaluation Notes
 
