@@ -86,6 +86,26 @@ int main() {
         "Reject infinite fare"
     );
 
+    // Test 0b: Invalid travel class validation.
+    std::string invalidClassPNR;
+    std::string invalidClassError;
+
+    check(
+        !BookingManager::createBooking(
+            train, "First Class", passengers, 2000.0,
+            invalidClassPNR, invalidClassError
+        ),
+        "Reject unsupported travel class"
+    );
+
+    check(
+        !BookingManager::createBooking(
+            train, "", passengers, 2000.0,
+            invalidClassPNR, invalidClassError
+        ),
+        "Reject empty travel class"
+    );
+
     // Test 1: Multi-passenger booking.
     bool bookingCreated = BookingManager::createBooking(
         train, "Sleeper", passengers, 2000.0, pnr, error
