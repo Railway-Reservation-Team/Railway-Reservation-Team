@@ -26,6 +26,11 @@ int main() {
 
     fs::create_directories("data");
 
+    // Clear previous test data to ensure an isolated test run.
+    {
+        std::ofstream bookingFile("data/bookings.dat", std::ios::trunc);
+    }
+
     // Isolated test fixture. Run this executable from a temporary directory.
     {
         std::ofstream trainFile("data/trains.dat");

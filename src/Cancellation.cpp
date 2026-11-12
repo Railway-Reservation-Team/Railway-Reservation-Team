@@ -692,6 +692,8 @@ bool cancelBooking(
         }
     }
 
+    cancellationInput.close();
+
     // Create cancellation record.
     std::ostringstream cancellationRecord;
 

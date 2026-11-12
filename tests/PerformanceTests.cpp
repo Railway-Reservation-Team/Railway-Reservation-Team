@@ -84,6 +84,8 @@ int main() {
     while (std::getline(input, line)) {
         if (!line.empty()) ++recordCount;
     }
+    input.close();
+
     const auto ioMs =
         std::chrono::duration_cast<std::chrono::milliseconds>(
             Clock::now() - ioStart).count();
