@@ -171,6 +171,9 @@ int main() {
 
     assert(exportedContent.find(pnr) != std::string::npos);
 
+    // Close the file before deleting the test directory.
+    exportedTicket.close();
+
     std::cout << "[PASS] Ticket file export\n";
 
     // Test invalid PNR.

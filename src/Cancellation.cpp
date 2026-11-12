@@ -63,7 +63,7 @@ bool readLines(
     return true;
 }
 
-// Calculate cancellation fee and refund using the SRS time slabs.
+// Calculate cancellation fee and refund using SRS time slabs.
 bool calculateRefund(
     const Train& train,
     double totalFare,
@@ -185,7 +185,6 @@ bool writeFilesAtomically(
             if (original.bad()) {
                 errorMessage =
                     "Could not read " + updates[i].filename;
-
                 return false;
             }
 
@@ -321,7 +320,6 @@ bool cancelBooking(
 
     Booking booking;
 
-    // Find booking using the existing BookingManager.
     if (!BookingManager::findBooking(pnr, booking)) {
         errorMessage = "Booking not found for the given PNR.";
         return false;
@@ -362,13 +360,11 @@ bool cancelBooking(
             fields.push_back(field);
         }
 
-        // Existing BookingManager format contains 8 fields.
         if (fields.size() == 8 && fields[0] == pnr) {
 
             if (fields[7] != "Confirmed") {
                 errorMessage =
                     "Booking is no longer eligible for cancellation.";
-
                 return false;
             }
 
@@ -421,7 +417,6 @@ bool cancelBooking(
             continue;
         }
 
-        // Calculate the correct refund for this train.
         if (!calculateRefund(
                 train,
                 booking.totalFare,
@@ -456,7 +451,6 @@ bool cancelBooking(
             return false;
         }
 
-        // Prevent integer overflow without an arbitrary capacity limit.
         if (*availableSeats < 0 ||
             *availableSeats >
                 std::numeric_limits<int>::max() -
@@ -468,7 +462,7 @@ bool cancelBooking(
             return false;
         }
 
-        // Restore seats after successful cancellation.
+        // Restore seats.
         *availableSeats += booking.passengerCount;
 
         // Preserve active/deactivated state while updating seat inventory.
@@ -487,7 +481,7 @@ bool cancelBooking(
         return false;
     }
 
-    // Read previous cancellation records if the file exists.
+    // Read previous cancellation records.
     std::vector<std::string> cancellationLines;
 
     std::ifstream cancellationInput(
@@ -503,6 +497,9 @@ bool cancelBooking(
                 cancellationLines.push_back(line);
             }
         }
+
+        // Close before replacing the cancellation file.
+        cancellationInput.close();
 
         if (cancellationInput.bad()) {
             errorMessage =
