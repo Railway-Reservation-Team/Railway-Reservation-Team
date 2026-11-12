@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(RRS_ENABLE_COVERAGE "Enable GCC coverage instrumentation" OFF)
 
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
-
+find_package(Threads REQUIRED)
 set(RRS_CORE_SOURCES
 
     src/AdminAuthManager.cpp
@@ -42,7 +42,7 @@ endfunction()
 
 add_library(rrs_core STATIC ${RRS_CORE_SOURCES})
 target_include_directories(rrs_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_link_libraries(rrs_core PUBLIC OpenSSL::Crypto)
+target_link_libraries(rrs_core PUBLIC OpenSSL::Crypto Threads::Threads)
 
 if(MSVC)
     target_compile_options(rrs_core PRIVATE /W4 /permissive-)
