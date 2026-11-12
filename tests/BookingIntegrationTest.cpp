@@ -110,6 +110,28 @@ int main() {
     std::cout << "[PASS] Maximum passenger limit enforcement\\n";
 
 
+
+    // Reject invalid passenger details.
+    std::vector<Passenger> invalidName = {{"   ", 20, "Male"}};
+    std::string invalidPnr;
+
+    assert(!BookingManager::createBooking(
+        train, "AC 2-Tier", invalidName, 1000.0, invalidPnr, error
+    ));
+    std::cout << "[PASS] Empty passenger name rejection\n";
+
+    std::vector<Passenger> invalidAge = {{"Test Passenger", 0, "Male"}};
+    assert(!BookingManager::createBooking(
+        train, "AC 2-Tier", invalidAge, 1000.0, invalidPnr, error
+    ));
+    std::cout << "[PASS] Invalid passenger age rejection\n";
+
+    std::vector<Passenger> invalidGender = {{"Test Passenger", 20, "Unknown"}};
+    assert(!BookingManager::createBooking(
+        train, "AC 2-Tier", invalidGender, 1000.0, invalidPnr, error
+    ));
+    std::cout << "[PASS] Invalid passenger gender rejection\n";
+
     std::cout << "\nALL BOOKING INTEGRATION TESTS PASSED!\n";
     return 0;
 }
