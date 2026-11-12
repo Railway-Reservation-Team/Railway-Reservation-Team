@@ -52,6 +52,8 @@ SeatRequestResult validateSeatRequest(
     int requestedSeats
 );
 
+// Thread-safe manager for temporary seat holds and confirmations.
+// Inventory operations are protected by a recursive mutex.
 class SeatInventoryManager {
 private:
     mutable std::recursive_mutex inventoryMutex;
