@@ -86,6 +86,18 @@ int main() {
 
     std::cout << "[PASS] Seat inventory deduction (20 to 18)\n";
 
+
+    // Reject booking creation without passengers.
+    std::vector<Passenger> emptyPassengers;
+    std::string rejectedPnr;
+
+    assert(!BookingManager::createBooking(
+        train, "AC 2-Tier", emptyPassengers, 0.0,
+        rejectedPnr, error
+    ));
+
+    std::cout << "[PASS] Empty passenger booking rejection\n";
+
     std::cout << "\nALL BOOKING INTEGRATION TESTS PASSED!\n";
     return 0;
 }
