@@ -1,3 +1,4 @@
+#include <mutex>
 #ifndef SEATINVENTORY_H
 #define SEATINVENTORY_H
 
@@ -53,6 +54,7 @@ SeatRequestResult validateSeatRequest(
 
 class SeatInventoryManager {
 private:
+    mutable std::recursive_mutex inventoryMutex;
     std::vector<SeatHold> holds;
     unsigned long nextHoldNumber = 1;
 

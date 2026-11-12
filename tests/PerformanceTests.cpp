@@ -11,6 +11,48 @@
 #include <vector>
 
 int main() {
+  using Clock = std::chrono::steady_clock;
+    // RRS-56: Train search response-time benchmark.
+    std::cout << "\n=== RRS-56 Search Benchmarks ===\n";
+
+    for (int size : {1000, 10000, 50000}) {
+        std::vector<Train> benchmarkTrains;
+        benchmarkTrains.reserve(size);
+
+        for (int i = 0; i < size; ++i) {
+            Train train{};
+            train.trainNumber = std::to_string(10000 + i);
+            train.source = "Bengaluru";
+            train.destination =
+                (i == size - 1) ? "Chennai" : "Other City";
+            train.journeyDate = "2099-12-31";
+            train.active = true;
+            benchmarkTrains.push_back(train);
+        }
+
+        constexpr int ITERATIONS = 100;
+        const auto start = Clock::now();
+
+        for (int i = 0; i < ITERATIONS; ++i) {
+            auto result = searchTrains(
+                benchmarkTrains,
+                "Bengaluru",
+                "Chennai",
+                "2099-12-31"
+            );
+
+            assert(result.size() == 1);
+        }
+
+        const auto elapsed =
+            std::chrono::duration<double, std::milli>(
+                Clock::now() - start
+            ).count();
+
+        std::cout << "Trains: " << size
+                  << " | Average search: "
+                  << elapsed / ITERATIONS << " ms\n";
+    }
     using Clock = std::chrono::steady_clock;
     std::vector<Train> trains;
     trains.reserve(200);
