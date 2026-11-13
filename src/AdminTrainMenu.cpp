@@ -1,4 +1,5 @@
 #include "AdminTrainMenu.h"
+#include "AdminAuthManager.h"
 #include "AdminTrainManager.h"
 #include "Train.h"
 #include <cmath>
@@ -161,6 +162,7 @@ void viewTrains(std::ostream& output) {
                << "\nAC 3-Tier Fare: Rs. " << train.ac3TierFare
                << "\nAC 2-Tier Fare: Rs. " << train.ac2TierFare
                << "\nChair Car Fare: Rs. " << train.chairCarFare
+               << "\nStatus: " << (train.active ? "Active" : "Deactivated")
                << "\n";
     }
 }
@@ -187,6 +189,19 @@ void updateTrain(std::istream& input, std::ostream& output) {
         output << "Error: " << error << '\n';
 }
 
+void deactivateTrain(std::istream& input, std::ostream& output) {
+    std::string trainNumber;
+    std::string error;
+
+    output << "Enter train number to deactivate: ";
+    if (!std::getline(input, trainNumber)) return;
+
+    if (AdminTrainManager::deactivateTrain(TRAIN_FILE, trainNumber, error))
+        output << "Train deactivated successfully. Historical records are preserved.\n";
+    else
+        output << "Error: " << error << '\n';
+}
+
 void deleteTrain(std::istream& input, std::ostream& output) {
     std::string trainNumber;
     std::string error;
@@ -205,6 +220,11 @@ void deleteTrain(std::istream& input, std::ostream& output) {
 namespace AdminTrainMenu {
 
 void run(std::istream& input, std::ostream& output) {
+    if (!AdminAuthManager::isAuthenticated()) {
+        output << "Access denied. Administrator login required.\n";
+        return;
+    }
+
     std::string choice;
 
     while (true) {
@@ -213,7 +233,8 @@ void run(std::istream& input, std::ostream& output) {
                << "2. View All Trains\n"
                << "3. Update Train\n"
                << "4. Delete Train\n"
-               << "5. Back to Main Menu\n"
+               << "5. Deactivate Train\n"
+               << "6. Back to Main Menu\n"
                << "Enter choice: ";
 
         if (!std::getline(input, choice)) return;
@@ -227,6 +248,8 @@ void run(std::istream& input, std::ostream& output) {
         else if (choice == "4")
             deleteTrain(input, output);
         else if (choice == "5")
+            deactivateTrain(input, output);
+        else if (choice == "6")
             return;
         else
             output << "Invalid choice. Please try again.\n";

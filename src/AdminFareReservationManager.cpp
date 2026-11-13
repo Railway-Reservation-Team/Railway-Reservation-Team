@@ -1,6 +1,7 @@
 #include "AdminFareReservationManager.h"
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <fstream>
 #include <sstream>
@@ -171,26 +172,7 @@ bool updateTrainSeats(
             found = true;
         }
 
-        std::ostringstream record;
-
-        record << train.trainNumber << '|'
-               << train.trainName << '|'
-               << train.source << '|'
-               << train.destination << '|'
-               << train.departureTime << '|'
-               << train.arrivalTime << '|'
-               << train.journeyDuration << '|'
-               << train.sleeperFare << '|'
-               << train.ac3TierFare << '|'
-               << train.ac2TierFare << '|'
-               << train.chairCarFare << '|'
-               << train.sleeperSeatsAvailable << '|'
-               << train.ac3TierSeatsAvailable << '|'
-               << train.ac2TierSeatsAvailable << '|'
-               << train.chairCarSeatsAvailable << '|'
-               << train.journeyDate;
-
-        records.push_back(record.str());
+        records.push_back(serializeTrainRecord(train));
     }
 
     file.close();
@@ -288,26 +270,7 @@ bool updateFares(
             found = true;
         }
 
-        std::ostringstream record;
-
-        record << train.trainNumber << '|'
-               << train.trainName << '|'
-               << train.source << '|'
-               << train.destination << '|'
-               << train.departureTime << '|'
-               << train.arrivalTime << '|'
-               << train.journeyDuration << '|'
-               << train.sleeperFare << '|'
-               << train.ac3TierFare << '|'
-               << train.ac2TierFare << '|'
-               << train.chairCarFare << '|'
-               << train.sleeperSeatsAvailable << '|'
-               << train.ac3TierSeatsAvailable << '|'
-               << train.ac2TierSeatsAvailable << '|'
-               << train.chairCarSeatsAvailable << '|'
-               << train.journeyDate;
-
-        records.push_back(record.str());
+        records.push_back(serializeTrainRecord(train));
     }
 
     file.close();
@@ -342,6 +305,7 @@ bool updateFares(
         return false;
     }
 
+    AdminAuditLog::append("ADMIN_FARES_UPDATED", trainNumber + ":" + journeyDate);
     return true;
 }
 
@@ -440,6 +404,7 @@ bool updateReservationStatus(
         return false;
     }
 
+    AdminAuditLog::append("ADMIN_RESERVATION_CANCELLED", pnr);
     return true;
 }
 
