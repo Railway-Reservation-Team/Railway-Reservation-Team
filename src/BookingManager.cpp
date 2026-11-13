@@ -205,7 +205,7 @@ std::vector<Booking> getBookingHistory(
             booking.trainNumber = fields[1];
             booking.journeyDate = fields[2];
             booking.travelClass = fields[3];
-            booking.passengerDetails = decodeField(fields[4]);
+            booking.passengerDetails = fields[4];
             booking.passengerCount = std::stoi(fields[5]);
             booking.totalFare = std::stod(fields[6]);
             booking.status = fields[7];
