@@ -550,6 +550,28 @@ int runBooking() {
                       << "You will be upgraded automatically when seats become available.\n";
         } else {
             std::cout << "\nYour seats have been successfully allocated.\n";
+
+            ETicket ticket;
+            std::string ticketError;
+            std::string ticketPath;
+
+            if (ETicketManager::generateTicket(pnr, ticket, ticketError)) {
+                std::cout << "\n========== GENERATED E-TICKET ==========\n";
+
+                if (!ETicketManager::displayTicket(ticket, ticketError)) {
+                    std::cout << "Ticket display warning: " << ticketError << '\n';
+                }
+
+                if (ETicketManager::exportTicket(ticket, ticketPath, ticketError)) {
+                    std::cout << "\nE-ticket saved successfully: "
+                              << ticketPath << '\n';
+                } else {
+                    std::cout << "Ticket export warning: " << ticketError << '\n';
+                }
+            } else {
+                std::cout << "\nE-ticket generation warning: "
+                          << ticketError << '\n';
+            }
         }
     }
     catch (const std::exception& e) {
