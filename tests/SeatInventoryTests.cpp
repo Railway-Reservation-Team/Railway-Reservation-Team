@@ -1,3 +1,4 @@
+
 #include "../src/SeatInventory.h"
 
 #include <iostream>
@@ -57,6 +58,18 @@ int main() {
     check("Class name with extra spaces",
           getAvailableSeats(train, "  AC 2-Tier  ") == 35);
 
+    check("AC 3-Tier with hyphen and no spaces",
+          getAvailableSeats(train, "AC-3-Tier") == 65);
+
+    check("AC 3-Tier without spaces",
+          getAvailableSeats(train, "AC3Tier") == 65);
+
+    check("AC 2-Tier with hyphen and no spaces",
+          getAvailableSeats(train, "AC-2-Tier") == 35);
+
+    check("AC 2-Tier without spaces",
+          getAvailableSeats(train, "AC2Tier") == 35);
+
     check("AC 3-Tier alias",
           getAvailableSeats(train, "3A") == 65);
 
@@ -74,6 +87,9 @@ int main() {
 
     check("Empty class returns -1",
           getAvailableSeats(train, "") == -1);
+
+    check("Whitespace-only class returns -1",
+          getAvailableSeats(train, "   ") == -1);
 
     // 4. Seat request tests
     std::cout << "\n--- Seat Request Tests ---\n";
@@ -134,25 +150,29 @@ int main() {
           inventory.getActiveHoldCount(startTime) == 1);
 
     Train limitedTrain = train;
-limitedTrain.trainNumber = "LIMITED";
-limitedTrain.ac3TierSeatsAvailable = 5;
+    limitedTrain.trainNumber = "LIMITED";
+    limitedTrain.ac3TierSeatsAvailable = 5;
 
-SeatHoldResponse limitedHold =
-    inventory.holdSeats(limitedTrain, "3A", 3, startTime);
+    SeatHoldResponse limitedHold =
+        inventory.holdSeats(limitedTrain, "3A", 3, startTime);
 
-check("Second hold cannot exceed remaining availability",
-      limitedHold.result == SeatHoldResult::SUCCESS &&
-      inventory.holdSeats(
-          limitedTrain, "3A", 3, startTime
-      ).result == SeatHoldResult::EXCEEDS_AVAILABLE_SEATS);
+    check("First limited hold succeeds",
+          limitedHold.result == SeatHoldResult::SUCCESS);
+
+    check("Second hold cannot exceed remaining availability",
+          inventory.holdSeats(
+              limitedTrain, "3A", 3, startTime
+          ).result == SeatHoldResult::EXCEEDS_AVAILABLE_SEATS);
 
     check("Invalid class cannot be held",
-          inventory.holdSeats(train, "First Class", 1, startTime).result ==
-              SeatHoldResult::INVALID_CLASS);
+          inventory.holdSeats(
+              train, "First Class", 1, startTime
+          ).result == SeatHoldResult::INVALID_CLASS);
 
     check("Seven passengers cannot be held",
-          inventory.holdSeats(train, "3A", 7, startTime).result ==
-              SeatHoldResult::EXCEEDS_MAX_PASSENGERS);
+          inventory.holdSeats(
+              train, "3A", 7, startTime
+          ).result == SeatHoldResult::EXCEEDS_MAX_PASSENGERS);
 
     // 6. Hold release tests
     std::cout << "\n--- Hold Release Tests ---\n";
@@ -239,6 +259,64 @@ check("Second hold cannot exceed remaining availability",
 
     check("Hold release on another train succeeds",
           inventory.releaseHold(anotherHold.holdId));
+
+
+    // 10. Additional inventory edge cases
+    std::cout << "\\n--- Additional Inventory Edge Cases ---\\n";
+
+    SeatInventoryManager edgeInventory;
+
+    Train dateTrain = train;
+    dateTrain.trainNumber = "DATE-TEST";
+    dateTrain.journeyDate = "2026-11-01";
+    dateTrain.ac3TierSeatsAvailable = 10;
+
+    SeatHoldResponse dateHold =
+        edgeInventory.holdSeats(dateTrain, "3A", 3, startTime);
+
+    Train differentDateTrain = dateTrain;
+    differentDateTrain.journeyDate = "2026-11-02";
+
+    check("Different journey date has independent availability",
+          edgeInventory.getLiveAvailableSeats(
+              differentDateTrain, "3A", startTime
+          ) == 10);
+
+    Train wrongNumberTrain = dateTrain;
+    wrongNumberTrain.trainNumber = "OTHER-TRAIN";
+
+    check("Hold cannot be confirmed for another train",
+          !edgeInventory.confirmHold(
+              wrongNumberTrain, dateHold.holdId, startTime
+          ));
+
+    Train wrongDateTrain = dateTrain;
+    wrongDateTrain.journeyDate = "2026-11-03";
+
+    check("Hold cannot be confirmed for another journey date",
+          !edgeInventory.confirmHold(
+              wrongDateTrain, dateHold.holdId, startTime
+          ));
+
+    check("Original hold remains active after invalid confirmations",
+          edgeInventory.getLiveAvailableSeats(
+              dateTrain, "3A", startTime
+          ) == 7);
+
+    check("Zero-seat hold request is rejected",
+          edgeInventory.holdSeats(
+              dateTrain, "3A", 0, startTime
+          ).result == SeatHoldResult::INVALID_REQUEST);
+
+    check("Negative-seat hold request is rejected",
+          edgeInventory.holdSeats(
+              dateTrain, "3A", -1, startTime
+          ).result == SeatHoldResult::INVALID_REQUEST);
+
+    check("Valid original hold can still be confirmed",
+          edgeInventory.confirmHold(
+              dateTrain, dateHold.holdId, startTime
+          ));
 
     // Final summary
     std::cout << "\n===== TEST SUMMARY =====\n";
