@@ -19,6 +19,40 @@
 #include <exception>
 #include <iomanip>
 
+void viewBookingHistory() {
+    std::string passengerName;
+
+    std::cout << "\n========== BOOKING HISTORY ==========\n";
+    std::cout << "Enter passenger name: ";
+
+    if (!std::getline(std::cin, passengerName)) return;
+
+    const std::vector<Booking> history =
+        BookingManager::getBookingHistory(passengerName);
+
+    if (history.empty()) {
+        std::cout << "\nNo bookings found for " << passengerName << ".\n";
+        return;
+    }
+
+    std::cout << "\nFound " << history.size() << " booking(s).\n";
+
+    for (const Booking& booking : history) {
+        std::cout << "\n------------------------------------\n"
+                  << "PNR: " << booking.pnr
+                  << "\nTrain Number: " << booking.trainNumber
+                  << "\nJourney Date: " << booking.journeyDate
+                  << "\nTravel Class: " << booking.travelClass
+                  << "\nPassengers: " << booking.passengerCount
+                  << "\nTotal Fare: Rs. "
+                  << std::fixed << std::setprecision(2)
+                  << booking.totalFare
+                  << "\nStatus: " << booking.status << '\n';
+    }
+
+    std::cout << "------------------------------------\n";
+}
+
 bool readBookingInput(std::string& value) {
     if (!std::getline(std::cin, value)) {
         return false;
@@ -578,7 +612,8 @@ int main() {
                   << "4. Administrator Login\n"
                   << "5. Administrator Logout\n"
                   << "6. Passenger Logout\n"
-                  << "7. Exit\n";
+                  << "7. View Booking History\n"
+                  << "8. Exit\n";
 
         if (loggedIn) {
             std::cout << "Logged-in passenger: "
@@ -721,13 +756,16 @@ int main() {
             }
         }
         else if (choice == "7") {
+            viewBookingHistory();
+        }
+        else if (choice == "8") {
             AuthManager::logout();
             AdminAuthManager::logout();
             std::cout << "Exiting system. Goodbye!\n";
             break;
         }
         else {
-            std::cout << "Invalid choice. Please enter 1-7.\n";
+            std::cout << "Invalid choice. Please enter 1-8.\n";
         }
     }
 

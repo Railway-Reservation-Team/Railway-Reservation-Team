@@ -1,5 +1,7 @@
 
 #include "BookingManager.h"
+
+#include <algorithm>
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
 
@@ -153,7 +155,89 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
     return false;
 }
 
-// Create a booking and update seat inventory.
+std::string normalizeName(std::string name) {
+    std::transform(name.begin(), name.end(), name.begin(),
+        [](unsigned char ch) {
+            return static_cast<char>(std::tolower(ch));
+        });
+
+    return name;
+}
+
+std::vector<Booking> getBookingHistory(
+    const std::string& passengerName) {
+
+    std::vector<Booking> history;
+    std::ifstream file(BOOKING_FILE);
+    std::string line;
+
+    if (!file.is_open() || passengerName.empty()) {
+        return history;
+    }
+
+    while (std::getline(file, line)) {
+        std::stringstream stream(line);
+        std::vector<std::string> fields;
+        std::string field;
+
+        while (std::getline(stream, field, '|')) {
+            fields.push_back(field);
+        }
+
+        if (fields.size() != 8) {
+            continue;
+        }
+
+        try {
+            std::stringstream passengerStream(fields[4]);
+            std::string passenger;
+            bool found = false;
+
+            while (std::getline(passengerStream, passenger, ';')) {
+                std::size_t firstComma = passenger.find(',');
+                std::size_t secondComma =
+                    firstComma == std::string::npos
+                    ? std::string::npos
+                    : passenger.find(',', firstComma + 1);
+
+                if (firstComma == std::string::npos ||
+                    secondComma == std::string::npos) {
+                    continue;
+                }
+
+                std::string name =
+                    decodeField(passenger.substr(0, firstComma));
+
+                if (normalizeName(name) == normalizeName(passengerName)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                continue;
+            }
+
+            Booking booking;
+            booking.pnr = fields[0];
+            booking.trainNumber = fields[1];
+            booking.journeyDate = fields[2];
+            booking.travelClass = fields[3];
+            booking.passengerDetails = fields[4];
+            booking.passengerCount = std::stoi(fields[5]);
+            booking.totalFare = std::stod(fields[6]);
+            booking.status = fields[7];
+
+            history.push_back(booking);
+
+        } catch (...) {
+            continue;
+        }
+    }
+
+    return history;
+}
+
 bool createBooking(
     const Train& selectedTrain,
     const std::string& travelClass,
