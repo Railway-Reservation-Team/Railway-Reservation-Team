@@ -59,7 +59,7 @@ inline bool parseTrainRecord(const std::string& line, Train& train) {
         fields.push_back(field);
     }
 
-    if (fields.size() != 16) {
+    if (fields.size() != 16 && fields.size() != 17) {
         return false;
     }
 
@@ -85,6 +85,12 @@ inline bool parseTrainRecord(const std::string& line, Train& train) {
 
         train.journeyDate = fields[15];
         train.active = true;
+        if (fields.size() == 17) {
+            if (fields[16] != "0" && fields[16] != "1") {
+                return false;
+            }
+            train.active = fields[16] == "1";
+        }
     } catch (...) {
         return false;
     }
@@ -109,6 +115,30 @@ inline bool parseTrainRecord(const std::string& line, Train& train) {
     }
 
     return true;
+}
+
+// Serialize train records with an explicit active flag. Legacy 16-field
+// records remain readable and are treated as active by parseTrainRecord().
+inline std::string serializeTrainRecord(const Train& train) {
+    std::ostringstream record;
+    record << train.trainNumber << '|'
+           << train.trainName << '|'
+           << train.source << '|'
+           << train.destination << '|'
+           << train.departureTime << '|'
+           << train.arrivalTime << '|'
+           << train.journeyDuration << '|'
+           << train.sleeperFare << '|'
+           << train.ac3TierFare << '|'
+           << train.ac2TierFare << '|'
+           << train.chairCarFare << '|'
+           << train.sleeperSeatsAvailable << '|'
+           << train.ac3TierSeatsAvailable << '|'
+           << train.ac2TierSeatsAvailable << '|'
+           << train.chairCarSeatsAvailable << '|'
+           << train.journeyDate << '|'
+           << (train.active ? '1' : '0');
+    return record.str();
 }
 
 // Load trains and report the file status separately.
