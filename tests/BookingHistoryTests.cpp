@@ -28,6 +28,7 @@ int main() {
     file << "1234567891|1002|2026-11-12|AC 3-Tier|Dinesh,20,Male|1|900.00|Confirmed\n";
     file << "1234567892|1003|2026-11-15|Sleeper|Test%20Passenger,22,Other|1|400.00|Confirmed\n";
     file << "1234567893|1004|2026-11-20|Sleeper|Dinesh%2C%20Kumar,21,Male|1|600.00|Confirmed\n";
+    file << "1234567894|1005|2026-11-22|Sleeper|Dinesh%3B Kumar,22,Male|1|650.00|Confirmed\n";
 
     file.close();
 
@@ -67,6 +68,15 @@ int main() {
 
     check(commaHistory.size() == 1,
           "Handle passenger names containing commas");
+
+    auto semicolonHistory =
+        BookingManager::getBookingHistory("Dinesh; Kumar");
+
+    check(
+        semicolonHistory.size() == 1 &&
+        semicolonHistory[0].passengerDetails == "Dinesh%3B Kumar,22,Male",
+        "Preserve encoded semicolons in passenger details"
+    );
 
     auto unknown =
         BookingManager::getBookingHistory("Unknown Person");
