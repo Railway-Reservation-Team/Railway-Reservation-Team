@@ -7,6 +7,7 @@
 #include <vector>
 #include <iomanip>
 #include <filesystem>
+#include <cctype>
 
 namespace {
 
@@ -37,6 +38,24 @@ std::string decodeField(const std::string& value) {
 
     return result;
 }
+
+std::string trim(const std::string& value) {
+    std::size_t start = value.find_first_not_of(" \t\r\n");
+
+    if (start == std::string::npos) {
+        return "";
+    }
+
+    std::size_t end = value.find_last_not_of(" \t\r\n");
+
+    return value.substr(start, end - start + 1);
+}
+
+struct PassengerRecord {
+    std::string name;
+    int age;
+    std::string gender;
+};
 
 }
 
@@ -81,7 +100,79 @@ bool generateETicket(
         return false;
     }
 
+    if (booking.passengerCount <= 0 ||
+        booking.passengerDetails.empty() ||
+        booking.passengerDetails.back() == ';') {
+        errorMessage = "Invalid passenger details in booking record.";
+        return false;
+    }
+
+    std::vector<PassengerRecord> passengers;
+    std::stringstream passengerStream(booking.passengerDetails);
+    std::string passenger;
+
+    while (std::getline(passengerStream, passenger, ';')) {
+        std::stringstream fields(passenger);
+
+        std::string name;
+        std::string ageText;
+        std::string gender;
+        std::string extra;
+
+        if (!std::getline(fields, name, ',') ||
+            !std::getline(fields, ageText, ',') ||
+            !std::getline(fields, gender)) {
+            errorMessage = "Invalid passenger details in booking record.";
+            return false;
+        }
+
+        if (std::getline(fields, extra, ',')) {
+            errorMessage = "Invalid passenger details in booking record.";
+            return false;
+        }
+
+        name = trim(decodeField(name));
+        ageText = trim(ageText);
+        gender = trim(decodeField(gender));
+
+        if (name.empty() || ageText.empty() || gender.empty()) {
+            errorMessage = "Invalid passenger details in booking record.";
+            return false;
+        }
+
+        int age = 0;
+
+        try {
+            std::size_t position = 0;
+            age = std::stoi(ageText, &position);
+
+            if (position != ageText.size() || age < 1 || age > 120) {
+                errorMessage = "Invalid passenger age.";
+                return false;
+            }
+        } catch (...) {
+            errorMessage = "Invalid passenger age.";
+            return false;
+        }
+
+        if (gender != "Male" &&
+            gender != "Female" &&
+            gender != "Other") {
+            errorMessage = "Invalid passenger gender.";
+            return false;
+        }
+
+        passengers.push_back({name, age, gender});
+    }
+
+    if (passengers.size() !=
+        static_cast<std::size_t>(booking.passengerCount)) {
+        errorMessage = "Passenger count does not match booking record.";
+        return false;
+    }
+
     std::error_code filesystemError;
+
     std::filesystem::create_directories("tickets", filesystemError);
 
     if (filesystemError) {
@@ -121,40 +212,13 @@ bool generateETicket(
     ticket << "PASSENGER DETAILS\n";
     ticket << "--------------------------------------------\n";
 
-    std::stringstream passengerStream(booking.passengerDetails);
-    std::string passenger;
     int passengerNumber = 1;
 
-    while (std::getline(passengerStream, passenger, ';')) {
-        std::size_t firstComma = passenger.find(',');
-        std::size_t secondComma =
-            firstComma == std::string::npos
-            ? std::string::npos
-            : passenger.find(',', firstComma + 1);
-
-        if (firstComma == std::string::npos ||
-            secondComma == std::string::npos) {
-            ticket.close();
-            std::filesystem::remove(ticketPath);
-            ticketPath.clear();
-            errorMessage = "Invalid passenger details in booking record.";
-            return false;
-        }
-
-        std::string name =
-            decodeField(passenger.substr(0, firstComma));
-
-        std::string age =
-            passenger.substr(firstComma + 1,
-                             secondComma - firstComma - 1);
-
-        std::string gender =
-            decodeField(passenger.substr(secondComma + 1));
-
+    for (const PassengerRecord& record : passengers) {
         ticket << "Passenger " << passengerNumber++ << '\n';
-        ticket << "Name             : " << name << '\n';
-        ticket << "Age              : " << age << '\n';
-        ticket << "Gender           : " << gender << "\n\n";
+        ticket << "Name             : " << record.name << '\n';
+        ticket << "Age              : " << record.age << '\n';
+        ticket << "Gender           : " << record.gender << "\n\n";
     }
 
     ticket << "BOOKING DETAILS\n";

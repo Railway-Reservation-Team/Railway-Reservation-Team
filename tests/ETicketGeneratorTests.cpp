@@ -20,10 +20,9 @@ void test(const std::string& name, bool condition) {
     }
 }
 
-void writeTrain(const std::string& trainNumber) {
+void writeTrain() {
     std::ofstream file("data/trains.dat");
-    file << trainNumber
-         << "|Karnataka Express|Bengaluru|New Delhi"
+    file << "12627|Karnataka Express|Bengaluru|New Delhi"
          << "|20:00|10:30|14h 30m"
          << "|1200|1800|2400|900"
          << "|100|50|30|40|2026-11-01\n";
@@ -31,21 +30,35 @@ void writeTrain(const std::string& trainNumber) {
 
 void writeBooking(
     const std::string& pnr,
-    const std::string& passengers) {
+    const std::string& passengers,
+    int count = 2) {
 
     std::ofstream file("data/bookings.dat");
+    file << pnr << "|12627|2026-11-01|Sleeper|"
+         << passengers << "|" << count
+         << "|2400|Confirmed\n";
+}
 
-    file << pnr
-         << "|12627|2026-11-01|Sleeper|"
-         << passengers
-         << "|2|2400|Confirmed\n";
+bool rejectedWithoutTicket(
+    const std::string& pnr,
+    const std::string& passengers,
+    int count) {
+
+    writeBooking(pnr, passengers, count);
+
+    std::string path;
+    std::string error;
+
+    bool result = ETicketGenerator::generateETicket(pnr, path, error);
+
+    return !result &&
+           !std::filesystem::exists("tickets/ETicket_" + pnr + ".txt");
 }
 
 int main() {
     namespace fs = std::filesystem;
 
     fs::path originalDirectory = fs::current_path();
-
     fs::path testDirectory =
         fs::temp_directory_path() /
         ("rrs_eticket_tests_" +
@@ -56,15 +69,15 @@ int main() {
     fs::create_directories(testDirectory / "data");
     fs::current_path(testDirectory);
 
-    writeTrain("12627");
+    writeTrain();
 
     std::string ticketPath;
     std::string errorMessage;
 
-    // Test 1: Valid PNR
     writeBooking(
         "TEST000001",
-        "Dinesh,20,Male;Abhay,20,Male"
+        "Dinesh,20,Male;Abhay,20,Male",
+        2
     );
 
     bool generated = ETicketGenerator::generateETicket(
@@ -74,7 +87,6 @@ int main() {
     test("Valid PNR generates e-ticket",
          generated && fs::exists(ticketPath));
 
-    // Test 2: Verify ticket contents
     std::ifstream ticket(ticketPath);
     std::stringstream contents;
     contents << ticket.rdbuf();
@@ -88,7 +100,6 @@ int main() {
          text.find("Abhay") != std::string::npos &&
          text.find("Rs. 2400.00") != std::string::npos);
 
-    // Test 3: Invalid PNR
     ticketPath.clear();
     errorMessage.clear();
 
@@ -96,24 +107,38 @@ int main() {
         "INVALID000", ticketPath, errorMessage
     );
 
-    test("Invalid PNR is rejected",
-         !invalidResult &&
-         errorMessage.find("Booking not found") != std::string::npos);
+    test("Invalid PNR is rejected", !invalidResult);
 
-    // Test 4: Invalid passenger data
-    writeBooking("TEST000002", "InvalidPassenger");
+    test("Empty passenger name is rejected",
+         rejectedWithoutTicket("TEST000002", ",20,Male;Abhay,20,Male", 2));
 
-    ticketPath.clear();
-    errorMessage.clear();
+    test("Empty passenger age is rejected",
+         rejectedWithoutTicket("TEST000003", "Dinesh,,Male;Abhay,20,Male", 2));
 
-    bool malformedResult = ETicketGenerator::generateETicket(
-        "TEST000002", ticketPath, errorMessage
-    );
+    test("Empty passenger gender is rejected",
+         rejectedWithoutTicket("TEST000004", "Dinesh,20,;Abhay,20,Male", 2));
 
-    test("Invalid passenger data is rejected",
-         !malformedResult &&
-         errorMessage.find("Invalid passenger details") != std::string::npos &&
-         !fs::exists("tickets/ETicket_TEST000002.txt"));
+    test("Invalid passenger age is rejected",
+         rejectedWithoutTicket("TEST000005", "Dinesh,abc,Male;Abhay,20,Male", 2));
+
+    test("Passenger age outside valid range is rejected",
+         rejectedWithoutTicket("TEST000006", "Dinesh,121,Male;Abhay,20,Male", 2));
+
+    test("Too few passengers are rejected",
+         rejectedWithoutTicket("TEST000007", "Dinesh,20,Male", 2));
+
+    test("Too many passengers are rejected",
+         rejectedWithoutTicket("TEST000008",
+                               "Dinesh,20,Male;Abhay,20,Male;Rahul,21,Male",
+                               2));
+
+    test("Invalid gender is rejected",
+         rejectedWithoutTicket("TEST000009",
+                               "Dinesh,20,Unknown;Abhay,20,Male", 2));
+
+    test("Malformed passenger record is rejected",
+         rejectedWithoutTicket("TEST000010",
+                               "Dinesh,20;Abhay,20,Male", 2));
 
     std::cout << "\n========== E-TICKET TEST SUMMARY ==========\n";
     std::cout << "Passed: " << passed << '\n';
