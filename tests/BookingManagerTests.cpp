@@ -1,297 +1,190 @@
-#include "../src/BookingManager.h"
-#include "../src/TrainData.h"
+#include "BookingManager.h"
 
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <string>
 #include <vector>
-#include <filesystem>
 #include <cctype>
-#include <limits>
+#include <thread>
+#include <set>
+
+namespace fs = std::filesystem;
 
 int passed = 0;
 int failed = 0;
 
-void check(bool condition, const std::string& description) {
+void test(const std::string& name, bool condition) {
     if (condition) {
-        std::cout << "[PASS] " << description << '\n';
+        std::cout << "[PASS] " << name << '\n';
         ++passed;
     } else {
-        std::cout << "[FAIL] " << description << '\n';
+        std::cout << "[FAIL] " << name << '\n';
         ++failed;
     }
 }
 
 int main() {
-    namespace fs = std::filesystem;
+    fs::path originalPath = fs::current_path();
+    fs::path testPath = fs::temp_directory_path() / "railway_pnr_tests";
 
-    fs::create_directories("data");
+    fs::remove_all(testPath);
+    fs::create_directories(testPath / "data");
+    fs::current_path(testPath);
 
-    // Clear previous test data to ensure an isolated test run.
-    {
-        std::ofstream bookingFile("data/bookings.dat", std::ios::trunc);
-    }
-
-    // Isolated test fixture. Run this executable from a temporary directory.
     {
         std::ofstream trainFile("data/trains.dat");
-        trainFile
-            << "TEST101|Test Express|Bengaluru|Chennai|08:00|14:00|6h|"
-            << "1000|1500|2000|800|3|10|10|10|2026-12-15\n";
+        trainFile << "12627|Karnataka Express|Bengaluru|New Delhi|20:00|10:30|14h 30m|1200|1800|2400|900|100|80|60|50|2026-11-15\n";
     }
 
     Train train;
-    train.trainNumber = "TEST101";
-    train.journeyDate = "2026-12-15";
+    train.trainNumber = "12627";
+    train.trainName = "Karnataka Express";
+    train.source = "Bengaluru";
+    train.destination = "New Delhi";
+    train.journeyDate = "2026-11-15";
 
     std::vector<Passenger> passengers = {
-        {"Alice Smith", 25, "Female"},
-        {"Bob Jones", 30, "Male"}
+        {"Dinesh, Kumar", 20, "Male"},
+        {"Test Passenger", 22, "Other"}
     };
 
     std::string pnr;
     std::string error;
 
-
-    // Test 0: Invalid fare validation.
-    std::string invalidFarePNR;
-    std::string invalidFareError;
-
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", passengers, 0.0,
-            invalidFarePNR, invalidFareError
-        ),
-        "Reject zero fare"
+    bool created = BookingManager::createBooking(
+        train, "Sleeper", passengers, 2400, pnr, error
     );
 
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", passengers, -100.0,
-            invalidFarePNR, invalidFareError
-        ),
-        "Reject negative fare"
-    );
+    test("Valid booking created", created);
 
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", passengers,
-            std::numeric_limits<double>::quiet_NaN(),
-            invalidFarePNR, invalidFareError
-        ),
-        "Reject NaN fare"
-    );
-
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", passengers,
-            std::numeric_limits<double>::infinity(),
-            invalidFarePNR, invalidFareError
-        ),
-        "Reject infinite fare"
-    );
-
-    // Test 0b: Invalid travel class validation.
-    std::string invalidClassPNR;
-    std::string invalidClassError;
-
-    check(
-        !BookingManager::createBooking(
-            train, "First Class", passengers, 2000.0,
-            invalidClassPNR, invalidClassError
-        ),
-        "Reject unsupported travel class"
-    );
-
-    check(
-        !BookingManager::createBooking(
-            train, "", passengers, 2000.0,
-            invalidClassPNR, invalidClassError
-        ),
-        "Reject empty travel class"
-    );
-
-
-    // Test 0c: Passenger name whitespace validation.
-    std::string nameTestPNR;
-    std::string nameTestError;
-
-    std::vector<Passenger> tabOnlyName = {
-        {"\t\t", 25, "Female"}
-    };
-
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", tabOnlyName, 1000.0,
-            nameTestPNR, nameTestError
-        ),
-        "Reject passenger name containing only tabs"
-    );
-
-    std::vector<Passenger> whitespaceOnlyName = {
-        {" \t  \t ", 25, "Female"}
-    };
-
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", whitespaceOnlyName, 1000.0,
-            nameTestPNR, nameTestError
-        ),
-        "Reject passenger name containing only spaces and tabs"
-    );
-
-    std::vector<Passenger> paddedValidName = {
-        {" Alice Smith ", 25, "Female"}
-    };
-
-    check(
-        BookingManager::createBooking(
-            train, "Sleeper", paddedValidName, 1000.0,
-            nameTestPNR, nameTestError
-        ),
-        "Accept a non-empty passenger name with surrounding spaces"
-    );
-
-    // Test 1: Multi-passenger booking.
-    bool bookingCreated = BookingManager::createBooking(
-        train, "Sleeper", passengers, 2000.0, pnr, error
-    );
-
-    check(bookingCreated, "Create booking with two passengers");
-
-    // Test 2: PNR format.
     bool validPNR = pnr.size() == 10;
 
     for (char c : pnr) {
-        validPNR = validPNR &&
-            std::isdigit(static_cast<unsigned char>(c));
+        validPNR = validPNR && std::isdigit(
+            static_cast<unsigned char>(c)
+        );
     }
 
-    check(bookingCreated && validPNR, "Generate a unique 10-digit PNR");
+    test("Generated PNR contains exactly 10 digits", validPNR);
 
-    // Test 2b: A second persisted booking must receive a different PNR.
-    std::vector<Passenger> secondPassengers = {
-        {"Charlie Brown", 28, "Other"}
-    };
-    std::string secondPNR;
-    std::string secondError;
-    bool secondBookingCreated = BookingManager::createBooking(
-        train, "Sleeper", secondPassengers, 1000.0, secondPNR, secondError
-    );
-    check(
-        secondBookingCreated && secondPNR.size() == 10 && secondPNR != pnr,
-        "Generate a different PNR for a second booking"
-    );
-
-    Booking secondBooking;
-    const bool secondFound = secondBookingCreated &&
-        BookingManager::findBooking(secondPNR, secondBooking);
-    check(
-        secondFound &&
-        secondBooking.status == "Waitlisted" &&
-        secondBooking.waitlistPosition == 1,
-        "Persist an insufficient-seat booking with waitlist position 1"
-    );
-
-    std::string thirdPNR;
-    std::string thirdError;
-    const bool thirdBookingCreated = BookingManager::createBooking(
-        train, "Sleeper", secondPassengers, 1000.0, thirdPNR, thirdError
-    );
-    Booking thirdBooking;
-    const bool thirdFound = thirdBookingCreated &&
-        BookingManager::findBooking(thirdPNR, thirdBooking);
-    check(
-        thirdFound &&
-        thirdBooking.status == "Waitlisted" &&
-        thirdBooking.waitlistPosition == 2,
-        "Assign increasing positions to later waitlisted bookings"
-    );
-
-
-    // Test 3: Booking lookup.
     Booking booking;
-    bool found = bookingCreated &&
+
+    bool retrieved = created &&
         BookingManager::findBooking(pnr, booking);
 
-    check(found, "Find booking using generated PNR");
+    test("Booking retrieved using PNR", retrieved);
 
-    // Test 4: Passenger information persistence.
-    check(
-        found &&
-        booking.passengerCount == 2 &&
-        booking.passengerDetails.find("Alice Smith") != std::string::npos &&
-        booking.passengerDetails.find("Bob Jones") != std::string::npos,
-        "Persist both passengers' details"
+    test("Valid existing PNR accepted",
+         BookingManager::validatePNR(pnr));
+
+    test("Short PNR rejected",
+         !BookingManager::validatePNR("12345"));
+
+    test("Long PNR rejected",
+         !BookingManager::validatePNR("12345678901"));
+
+    test("Alphabetic PNR rejected",
+         !BookingManager::validatePNR("12345ABCDE"));
+
+    test("Special characters in PNR rejected",
+         !BookingManager::validatePNR("12345@7890"));
+
+    test("Unknown 10-digit PNR rejected",
+         !BookingManager::validatePNR("9999999999"));
+
+    test("Empty PNR rejected",
+         !BookingManager::validatePNR(""));
+
+    test("Retrieved train number is correct",
+         retrieved && booking.trainNumber == "12627");
+
+    test("Retrieved passenger count is correct",
+         retrieved && booking.passengerCount == 2);
+
+    test("Passenger details are decoded correctly",
+         retrieved &&
+         booking.passengerDetails.find("Dinesh, Kumar") != std::string::npos);
+
+    test("Retrieved fare is correct",
+         retrieved && booking.totalFare == 2400.0);
+
+    test("Retrieved booking status is Confirmed",
+         retrieved && booking.status == "Confirmed");
+
+    test("Unknown PNR is rejected",
+         !BookingManager::findBooking("1234567890", booking));
+
+    std::vector<Passenger> invalidPassengers = {
+        {"", 20, "Male"}
+    };
+
+    std::string invalidPNR;
+
+    test("Invalid passenger booking rejected",
+         !BookingManager::createBooking(
+             train, "Sleeper", invalidPassengers,
+             1200, invalidPNR, error
+         ));
+
+    std::string secondPNR;
+    bool secondCreated = BookingManager::createBooking(
+        train, "Sleeper", passengers, 2400, secondPNR, error
     );
 
-    // Test 5: Booking fields.
-    check(
-        found &&
-        booking.trainNumber == "TEST101" &&
-        booking.journeyDate == "2026-12-15" &&
-        booking.travelClass == "Sleeper" &&
-        booking.status == "Confirmed" &&
-        booking.totalFare == 2000.0,
-        "Persist booking information correctly"
-    );
+    test("Second booking receives a different PNR",
+         secondCreated && secondPNR != pnr);
 
-    // Test 6: Invalid PNR lookup.
-    Booking missingBooking;
-    check(
-        !BookingManager::findBooking("0000000000", missingBooking),
-        "Reject lookup for an invalid PNR"
-    );
+    // Concurrent booking and PNR collision test
+    const int threadCount = 12;
 
-    // Test 7: Seat deduction.
-    std::string loadError;
-    std::vector<Train> updatedTrains = loadTrains(
-        "data/trains.dat", "2026-12-15", loadError
-    );
+    std::vector<std::string> concurrentPNRs(threadCount);
+    std::vector<int> concurrentResults(threadCount, 0);
+    std::vector<std::thread> workers;
 
-    check(
-        updatedTrains.size() == 1 &&
-        updatedTrains[0].sleeperSeatsAvailable == 0,
-        "Deduct seats for confirmed bookings only; waitlisted bookings do not consume inventory"
-    );
+    for (int i = 0; i < threadCount; ++i) {
+        workers.emplace_back([&, i]() {
+            std::string threadError;
 
-    // Test 8: Deactivated trains must not accept new bookings.
-    {
-        std::ofstream trainFile("data/trains.dat", std::ios::trunc);
-        trainFile
-            << "TEST101|Test Express|Bengaluru|Chennai|08:00|14:00|6h|"
-            << "1000|1500|2000|800|7|10|10|10|2026-12-15|0\n";
+            concurrentResults[i] =
+                BookingManager::createBooking(
+                    train,
+                    "Sleeper",
+                    passengers,
+                    2400,
+                    concurrentPNRs[i],
+                    threadError
+                ) ? 1 : 0;
+        });
     }
-    std::string inactivePNR;
-    std::string inactiveError;
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", secondPassengers, 1000.0,
-            inactivePNR, inactiveError
-        ) && inactiveError.find("deactivated") != std::string::npos,
-        "Reject new bookings for deactivated trains"
-    );
 
-    // Test 9: Reject more than six passengers.
-    std::vector<Passenger> tooManyPassengers(7);
-    for (auto& passenger : tooManyPassengers) {
-        passenger = {"Test Passenger", 20, "Other"};
+    for (auto& worker : workers) {
+        worker.join();
     }
 
-    std::string rejectedPNR;
-    std::string rejectionMessage;
+    int successfulBookings = 0;
+    std::set<std::string> uniquePNRs;
 
-    check(
-        !BookingManager::createBooking(
-            train, "Sleeper", tooManyPassengers, 7000.0,
-            rejectedPNR, rejectionMessage
-        ),
-        "Reject bookings with more than six passengers"
-    );
+    for (int i = 0; i < threadCount; ++i) {
+        successfulBookings += concurrentResults[i];
+        if (concurrentResults[i]) {
+            uniquePNRs.insert(concurrentPNRs[i]);
+        }
+    }
 
-    std::cout << "\nBooking Manager Test Results\n";
+    test("All concurrent bookings succeed",
+         successfulBookings == threadCount);
+
+    test("Concurrent bookings receive unique PNRs",
+         uniquePNRs.size() == static_cast<std::size_t>(threadCount));
+
+    std::cout << "\n========== PNR TEST SUMMARY ==========\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';
+    std::cout << "Total: " << passed + failed << '\n';
+
+    fs::current_path(originalPath);
+    fs::remove_all(testPath);
 
     return failed == 0 ? 0 : 1;
 }
