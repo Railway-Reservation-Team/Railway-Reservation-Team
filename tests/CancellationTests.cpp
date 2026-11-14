@@ -427,6 +427,24 @@ int main() {
         "Reject PNR containing special characters"
     );
 
+    // Successful cancellation must be auditable without passenger details.
+    {
+        std::ifstream auditFile("data/admin_audit.log");
+        std::string audit(
+            (std::istreambuf_iterator<char>(auditFile)),
+            std::istreambuf_iterator<char>()
+        );
+        check(
+            audit.find("PASSENGER_CANCELLATION_SUCCESS") != std::string::npos,
+            "Successful passenger cancellation is recorded in the audit log"
+        );
+        check(
+            audit.find("Alice Smith") == std::string::npos &&
+            audit.find("Bob Jones") == std::string::npos,
+            "Passenger names are not written to the cancellation audit log"
+        );
+    }
+
     std::cout << "\nCancellation Test Results\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';
