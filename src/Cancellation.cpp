@@ -3,6 +3,7 @@
 #include "BookingManager.h"
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <fstream>
 #include <sstream>
@@ -61,6 +62,8 @@ bool readLines(
         return false;
     }
 
+    // Record the successful passenger cancellation without personal details.
+    AdminAuditLog::append("PASSENGER_CANCELLATION_SUCCESS", pnr);
     return true;
 }
 
