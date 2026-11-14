@@ -82,6 +82,29 @@ int main() {
              content.find(password) == std::string::npos);
     }
 
+    // Verify the administrator credential file stores a random salt and derived hash.
+    {
+        std::ifstream file("data/admin.dat");
+        std::string usernameLine;
+        std::string salt;
+        std::string hash;
+        std::getline(file, usernameLine);
+        std::getline(file, salt);
+        std::getline(file, hash);
+
+        const auto isHex = [](const std::string& value) {
+            return !value.empty() && value.find_first_not_of(
+                "0123456789abcdefABCDEF") == std::string::npos;
+        };
+
+        test("Administrator salt is 16 bytes encoded as hexadecimal",
+             salt.size() == 32 && isHex(salt));
+        test("Administrator PBKDF2 hash is 32 bytes encoded as hexadecimal",
+             hash.size() == 64 && isHex(hash));
+        test("Administrator salt and hash are distinct",
+             !salt.empty() && !hash.empty() && salt != hash);
+    }
+
     // 8. Reject incorrect credentials.
     test("Incorrect administrator password rejected",
          !AdminAuthManager::login(username, "WrongPassword123", error));
@@ -152,6 +175,8 @@ int main() {
         }
         test("Audit records contain Unix timestamps", timestampValid);
         test("Audit log does not contain plaintext password",
+             audit.find(password) == std::string::npos);
+        test("Administrator audit log excludes plaintext password",
              audit.find(password) == std::string::npos);
     }
 
