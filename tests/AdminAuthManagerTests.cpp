@@ -176,8 +176,6 @@ int main() {
         test("Audit records contain Unix timestamps", timestampValid);
         test("Audit log does not contain plaintext password",
              audit.find(password) == std::string::npos);
-        test("Administrator audit log excludes plaintext password",
-             audit.find(password) == std::string::npos);
     }
 
     AdminAuthManager::resetForTesting();
