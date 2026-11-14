@@ -289,6 +289,28 @@ int main() {
         "Reject bookings with more than six passengers"
     );
 
+    // Passenger booking events must be timestamped without exposing passenger data.
+    {
+        std::ifstream auditFile("data/admin_audit.log");
+        std::string audit(
+            (std::istreambuf_iterator<char>(auditFile)),
+            std::istreambuf_iterator<char>()
+        );
+        check(
+            audit.find("PASSENGER_BOOKING_CONFIRMED") != std::string::npos,
+            "Confirmed passenger booking is recorded in the audit log"
+        );
+        check(
+            audit.find("PASSENGER_BOOKING_WAITLISTED") != std::string::npos,
+            "Waitlisted passenger booking is recorded in the audit log"
+        );
+        check(
+            audit.find("Alice Smith") == std::string::npos &&
+            audit.find("Bob Jones") == std::string::npos,
+            "Passenger names are not written to the transaction audit log"
+        );
+    }
+
     std::cout << "\nBooking Manager Test Results\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';

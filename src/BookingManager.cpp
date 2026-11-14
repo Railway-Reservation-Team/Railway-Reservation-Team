@@ -2,6 +2,7 @@
 #include "BookingManager.h"
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <fstream>
 #include <algorithm>
@@ -448,6 +449,13 @@ bool createBooking(
         errorMessage = "Could not save waitlisted booking.";
         return false;
     }
+
+    // Record only the transaction identifier and outcome; never log passenger data.
+    AdminAuditLog::append(
+        waitlisted ? "PASSENGER_BOOKING_WAITLISTED"
+                   : "PASSENGER_BOOKING_CONFIRMED",
+        pnr
+    );
 
     return true;
 }
