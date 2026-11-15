@@ -79,6 +79,7 @@ if(BUILD_TESTING)
         tests/BookingIntegrationTest.cpp
         tests/BookingHistoryTests.cpp
         tests/CancellationTests.cpp
+        tests/CancellationWaitlistTests.cpp
         tests/BookingManagerTests.cpp
         tests/FileStoreTests.cpp
         tests/PaymentProcessTests.cpp
