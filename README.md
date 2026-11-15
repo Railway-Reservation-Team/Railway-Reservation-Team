@@ -48,7 +48,7 @@ The application uses local data files for persistent storage and does not requir
 - E-ticket generation and local saving/printing
 
 ### Administrator Features
-- Separate administrator authentication (specified; implementation pending)
+- Separate administrator authentication and protected administrator operations
 - Add, edit and delete train schedules
 - Manage train fares
 - Configure seat quotas
@@ -339,7 +339,7 @@ Documentation:
 - FINAL_TEST_RESULTS.md
 - TEST_REPORT.md
 
-The passenger authentication module is implemented and integrated into the application. Administrator authentication is also implemented in the AdminAuthManager module, with an access check in the administrator train-management menu. The dedicated passenger and administrator authentication test suites are registered separately in CTest.
+Passenger and administrator authentication are implemented and integrated into the application. Administrator authentication is handled by AdminAuthManager, with access checks in the administrator train-management menu. The dedicated passenger and administrator authentication test suites are registered separately in CTest.
 
 ### Verified Automated Test Results
 
@@ -355,7 +355,7 @@ The passenger authentication module is implemented and integrated into the appli
 | Admin fare and reservations | 6 | 0 |
 | **Total** | **126** | **0** |
 
-The earlier verified GitHub Actions run passed all 12 CTest targets registered at that time. Two additional administrator-security suites have now been added to CMake; their results will be confirmed by the next workflow run. The complete application compiled successfully.
+The CI workflow runs the current CTest suite on Ubuntu and Windows. Consult the latest successful GitHub Actions run and its uploaded reports for the current test count and coverage; do not use historical totals as current results.
 
 ## 10.1 Continuous Integration and Delivery (GitHub Actions)
 
