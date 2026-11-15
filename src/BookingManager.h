@@ -32,6 +32,8 @@ namespace BookingManager {
         std::string& errorMessage
     );
 
+    bool validatePNR(const std::string& pnr);
+
     bool findBooking(
         const std::string& pnr,
         Booking& booking

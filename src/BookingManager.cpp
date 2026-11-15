@@ -13,11 +13,13 @@
 #include <cmath>
 #include <string>
 #include <cctype>
+#include <mutex>
 
 namespace BookingManager {
 
 static const std::string BOOKING_FILE = "data/bookings.dat";
 static const std::string TRAIN_FILE = "data/trains.dat";
+static std::mutex bookingMutex;
 
 // Encode special characters in passenger details.
 std::string encodeField(const std::string& value) {
@@ -103,8 +105,24 @@ bool generateUniquePNR(std::string& pnr) {
     return false;
 }
 
+// Validate the format and existence of a PNR.
+bool validatePNR(const std::string& pnr) {
+    if (pnr.size() != 10 ||
+        !std::all_of(pnr.begin(), pnr.end(),
+            [](unsigned char c) { return std::isdigit(c); })) {
+        return false;
+    }
+
+    return isPNRUsed(pnr);
+}
 // Find a booking using its PNR.
 bool findBooking(const std::string& requestedPNR, Booking& booking) {
+    if (requestedPNR.size() != 10 ||
+        !std::all_of(requestedPNR.begin(), requestedPNR.end(),
+            [](unsigned char c) { return std::isdigit(c); })) {
+        return false;
+    }
+
     std::ifstream file(BOOKING_FILE);
 
     if (!file.is_open()) {
@@ -134,7 +152,7 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
             booking.trainNumber = fields[1];
             booking.journeyDate = fields[2];
             booking.travelClass = fields[3];
-            booking.passengerDetails = fields[4];
+            booking.passengerDetails = decodeField(fields[4]);
             booking.passengerCount = std::stoi(fields[5]);
             booking.totalFare = std::stod(fields[6]);
             booking.status = fields[7];
@@ -188,6 +206,8 @@ bool createBooking(
         }
     }
 
+    // Serialize booking creation so PNR checks and writes cannot race.
+    std::lock_guard<std::mutex> bookingGuard(bookingMutex);
     // Generate a unique PNR.
     if (!generateUniquePNR(pnr)) {
         errorMessage = "Could not generate a unique PNR.";
