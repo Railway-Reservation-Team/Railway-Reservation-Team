@@ -7,7 +7,6 @@
 #include "AdminAuditLog.h"
 
 #include <fstream>
-#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <random>
@@ -117,6 +116,7 @@ bool validatePNR(const std::string& pnr) {
 
     return isPNRUsed(pnr);
 }
+
 // Find a booking using its PNR.
 bool findBooking(const std::string& requestedPNR, Booking& booking) {
     if (requestedPNR.size() != 10 ||
@@ -142,8 +142,7 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
             fields.push_back(field);
         }
 
-        // Eight-field records remain supported for existing saved bookings.
-        // New records append a ninth field containing the waitlist position.
+        // Support both old 8-field and new 9-field records.
         if ((fields.size() != 8 && fields.size() != 9) ||
             fields[0] != requestedPNR) {
             continue;
@@ -158,6 +157,7 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
             booking.passengerCount = std::stoi(fields[5]);
             booking.totalFare = std::stod(fields[6]);
             booking.status = fields[7];
+
             booking.waitlistPosition =
                 fields.size() == 9 ? std::stoi(fields[8]) : 0;
 
@@ -203,7 +203,8 @@ std::vector<Booking> getBookingHistory(
             fields.push_back(field);
         }
 
-        if (fields.size() != 8) {
+        // Accept legacy 8-field and current 9-field records.
+        if (fields.size() != 8 && fields.size() != 9) {
             continue;
         }
 
@@ -246,6 +247,14 @@ std::vector<Booking> getBookingHistory(
             booking.passengerCount = std::stoi(fields[5]);
             booking.totalFare = std::stod(fields[6]);
             booking.status = fields[7];
+
+            // Old records do not contain a waitlist position.
+            booking.waitlistPosition =
+                fields.size() == 9 ? std::stoi(fields[8]) : 0;
+
+            if (booking.waitlistPosition < 0) {
+                continue;
+            }
 
             history.push_back(booking);
 
@@ -292,6 +301,7 @@ bool createBooking(
 
     // Serialize booking creation so PNR checks and writes cannot race.
     std::lock_guard<std::mutex> bookingGuard(bookingMutex);
+
     // Generate a unique PNR.
     if (!generateUniquePNR(pnr)) {
         errorMessage = "Could not generate a unique PNR.";
@@ -357,8 +367,7 @@ bool createBooking(
                 return false;
             }
 
-            // Insufficient seats do not reject the booking. The booking is
-            // persisted on the waitlist without changing seat inventory.
+            // Insufficient seats place the booking on the waitlist.
             if (*available < static_cast<int>(passengers.size())) {
                 waitlisted = true;
             } else {
@@ -382,7 +391,7 @@ bool createBooking(
     bool inventoryUpdated = false;
 
     if (waitlisted) {
-        // Position is the next number in this train/date/class queue.
+        // Find the next position in this train/date/class queue.
         std::ifstream existingBookings(BOOKING_FILE);
         int highestPosition = 0;
 
@@ -407,6 +416,7 @@ bool createBooking(
                 }
 
                 int position = highestPosition + 1;
+
                 if (fields.size() >= 9) {
                     try {
                         position = std::stoi(fields[8]);
@@ -426,6 +436,7 @@ bool createBooking(
         }
 
         waitlistPosition = highestPosition + 1;
+
     } else {
         // Read original train data for rollback.
         std::ifstream originalFile(TRAIN_FILE, std::ios::binary);
@@ -554,7 +565,7 @@ bool createBooking(
         return false;
     }
 
-    // Record only the transaction identifier and outcome; never log passenger data.
+    // Record only the transaction identifier and outcome.
     AdminAuditLog::append(
         waitlisted ? "PASSENGER_BOOKING_WAITLISTED"
                    : "PASSENGER_BOOKING_CONFIRMED",

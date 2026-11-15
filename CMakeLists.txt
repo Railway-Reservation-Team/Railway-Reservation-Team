@@ -1,10 +1,6 @@
-cmake_minimum_required(VERSION 3.16)
 
-project(RailwayReservationSystem
-    VERSION 1.0.0
-    DESCRIPTION "Console-based Railway Reservation System"
-    LANGUAGES CXX
-)
+cmake_minimum_required(VERSION 3.16)
+project(RailwayReservationSystem LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,8 +10,8 @@ option(RRS_ENABLE_COVERAGE "Enable GCC coverage instrumentation" OFF)
 
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 find_package(Threads REQUIRED)
-set(RRS_CORE_SOURCES
 
+set(RRS_CORE_SOURCES
     src/AdminAuthManager.cpp
     src/AdminFareReservationManager.cpp
     src/AdminTrainManager.cpp
@@ -49,6 +45,7 @@ if(MSVC)
 else()
     target_compile_options(rrs_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
 rrs_enable_coverage(rrs_core)
 
 add_executable(railway src/main.cpp)
@@ -63,14 +60,16 @@ add_custom_command(TARGET railway POST_BUILD
 )
 
 include(CTest)
+
 if(BUILD_TESTING)
+
     set(RRS_TEST_SOURCES
-    tests/TrainSearchTests.cpp
-tests/SeatInventoryConcurrencyTests.cpp
-tests/SeatInventoryStressTests.cpp
-tests/SeatInventoryReleaseConcurrencyTests.cpp
-tests/SeatInventoryConfirmConcurrencyTests.cpp
-tests/SeatInventoryBoundaryTests.cpp
+        tests/TrainSearchTests.cpp
+        tests/SeatInventoryConcurrencyTests.cpp
+        tests/SeatInventoryStressTests.cpp
+        tests/SeatInventoryReleaseConcurrencyTests.cpp
+        tests/SeatInventoryConfirmConcurrencyTests.cpp
+        tests/SeatInventoryBoundaryTests.cpp
         tests/AdminAuthManagerTests.cpp
         tests/AdminFareReservationTests.cpp
         tests/AdminTrainMenuSecurityTests.cpp
@@ -78,6 +77,7 @@ tests/SeatInventoryBoundaryTests.cpp
         tests/AdminTrainManagerTests.cpp
         tests/AuthManagerTests.cpp
         tests/BookingIntegrationTest.cpp
+        tests/BookingHistoryTests.cpp
         tests/CancellationTests.cpp
         tests/BookingManagerTests.cpp
         tests/FileStoreTests.cpp
@@ -100,17 +100,19 @@ tests/SeatInventoryBoundaryTests.cpp
             "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/test-work/ConsoleMenuSmoke"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/ConsoleMenuSmoke.cmake"
     )
+
     set_tests_properties(ConsoleMenuSmoke PROPERTIES TIMEOUT 30)
 
     foreach(test_source IN LISTS RRS_TEST_SOURCES)
+
         get_filename_component(test_name "${test_source}" NAME_WE)
         set(test_target "rrs_${test_name}")
+
         add_executable("${test_target}" "${test_source}")
         target_link_libraries("${test_target}" PRIVATE rrs_core)
         rrs_enable_coverage("${test_target}")
 
         if(MSVC)
-            # Keep assert-based test checks active in Visual Studio Release builds.
             target_compile_options("${test_target}" PRIVATE /W4 /permissive- /UNDEBUG)
         else()
             target_compile_options("${test_target}" PRIVATE -Wall -Wextra -Wpedantic)
@@ -118,10 +120,14 @@ tests/SeatInventoryBoundaryTests.cpp
 
         set(test_work_dir "${CMAKE_CURRENT_BINARY_DIR}/test-work/${test_name}")
         file(MAKE_DIRECTORY "${test_work_dir}/data")
+
         add_test(NAME "${test_name}" COMMAND "${test_target}")
+
         set_tests_properties("${test_name}" PROPERTIES
             WORKING_DIRECTORY "${test_work_dir}"
             TIMEOUT 30
         )
+
     endforeach()
+
 endif()
