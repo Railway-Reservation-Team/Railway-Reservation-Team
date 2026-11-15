@@ -178,6 +178,20 @@ int main() {
     test("Concurrent bookings receive unique PNRs",
          uniquePNRs.size() == static_cast<std::size_t>(threadCount));
 
+    // Passenger booking events must be timestamped without exposing passenger data.
+    {
+        std::ifstream auditFile("data/admin_audit.log");
+        std::string audit(
+            (std::istreambuf_iterator<char>(auditFile)),
+            std::istreambuf_iterator<char>()
+        );
+        test("Confirmed passenger booking is recorded in the audit log",
+             audit.find("PASSENGER_BOOKING_CONFIRMED") != std::string::npos);
+        test("Passenger names are not written to the transaction audit log",
+             audit.find("Dinesh, Kumar") == std::string::npos &&
+             audit.find("Test Passenger") == std::string::npos);
+    }
+
     std::cout << "\n========== PNR TEST SUMMARY ==========\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';
