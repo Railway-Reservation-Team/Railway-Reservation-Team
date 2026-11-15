@@ -445,6 +445,70 @@ int main() {
         );
     }
 
+
+    // Additional cancellation failure-path tests.
+
+    // Test: Reject cancellation when the train does not exist.
+    {
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "OTHER101|Other Express|Bengaluru|Chennai|08:00|14:00|6h|"
+                << "1000|1500|2000|800|10|10|10|10|2026-12-15\n";
+        }
+
+        {
+            std::ofstream bookingsFile(
+                "data/bookings.dat", std::ios::trunc
+            );
+            bookingsFile
+                << "1234567892|MISSING101|2026-12-15|Sleeper|"
+                << "Test Passenger,21,Other|1|500.00|Confirmed\n";
+        }
+
+        double testRefund = 0.0;
+        double testCharge = 0.0;
+        std::string testError;
+
+        check(
+            !Cancellation::cancelBooking(
+                "1234567892", testRefund, testCharge, testError
+            ),
+            "Reject cancellation when the train record is missing"
+        );
+    }
+
+    // Test: Reject cancellation when the booking has an invalid class.
+    {
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "TEST104|Class Test Express|Bengaluru|Chennai|"
+                << "08:00|14:00|6h|1000|1500|2000|800|"
+                << "10|10|10|10|2026-12-15\n";
+        }
+
+        {
+            std::ofstream bookingsFile(
+                "data/bookings.dat", std::ios::trunc
+            );
+            bookingsFile
+                << "1234567893|TEST104|2026-12-15|InvalidClass|"
+                << "Test Passenger,21,Other|1|500.00|Confirmed\n";
+        }
+
+        double testRefund = 0.0;
+        double testCharge = 0.0;
+        std::string testError;
+
+        check(
+            !Cancellation::cancelBooking(
+                "1234567893", testRefund, testCharge, testError
+            ),
+            "Reject cancellation for an invalid travel class"
+        );
+    }
+
     std::cout << "\nCancellation Test Results\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';
