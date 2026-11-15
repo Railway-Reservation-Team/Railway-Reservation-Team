@@ -1,62 +1,41 @@
+
 #include "SeatInventory.h"
 
 #include <algorithm>
 #include <cctype>
 #include <string>
 
-// Removes leading/trailing spaces and converts input to lowercase.
+// Normalize class names by removing spaces and hyphens
+// and converting characters to lowercase.
 static std::string normalizeClass(const std::string& travelClass) {
-    std::string result = travelClass;
+    std::string result;
 
-    result.erase(
-        result.begin(),
-        std::find_if(result.begin(), result.end(),
-            [](unsigned char ch) {
-                return !std::isspace(ch);
-            })
-    );
-
-    result.erase(
-        std::find_if(result.rbegin(), result.rend(),
-            [](unsigned char ch) {
-                return !std::isspace(ch);
-            }).base(),
-        result.end()
-    );
-
-    std::transform(
-        result.begin(), result.end(), result.begin(),
-        [](unsigned char ch) {
-            return static_cast<char>(std::tolower(ch));
+    for (unsigned char ch : travelClass) {
+        if (!std::isspace(ch) && ch != '-') {
+            result += static_cast<char>(std::tolower(ch));
         }
-    );
+    }
 
     return result;
 }
 
-// Converts class aliases into one standard class name.
+// Convert class aliases into standard class names.
 static std::string canonicalClass(const std::string& travelClass) {
-    std::string selectedClass = normalizeClass(travelClass);
+    const std::string selectedClass = normalizeClass(travelClass);
 
     if (selectedClass == "sleeper") {
         return "sleeper";
     }
 
-    if (selectedClass == "ac 3-tier" ||
-        selectedClass == "ac3tier" ||
-        selectedClass == "3a") {
+    if (selectedClass == "ac3tier" || selectedClass == "3a") {
         return "ac 3-tier";
     }
 
-    if (selectedClass == "ac 2-tier" ||
-        selectedClass == "ac2tier" ||
-        selectedClass == "2a") {
+    if (selectedClass == "ac2tier" || selectedClass == "2a") {
         return "ac 2-tier";
     }
 
-    if (selectedClass == "chair car" ||
-        selectedClass == "chaircar" ||
-        selectedClass == "cc") {
+    if (selectedClass == "chaircar" || selectedClass == "cc") {
         return "chair car";
     }
 
@@ -64,7 +43,7 @@ static std::string canonicalClass(const std::string& travelClass) {
 }
 
 // Returns available seats for the selected class.
-// Returns -1 for an invalid class.
+// Returns -1 if the class is invalid.
 int getAvailableSeats(
     const Train& train,
     const std::string& travelClass
@@ -90,7 +69,7 @@ int getAvailableSeats(
     return -1;
 }
 
-// Validates a requested number of seats/passengers.
+// Validate the requested number of seats.
 SeatRequestResult validateSeatRequest(
     int availableSeats,
     int requestedSeats
@@ -114,10 +93,11 @@ SeatRequestResult validateSeatRequest(
     return SeatRequestResult::VALID;
 }
 
-// Removes expired holds from the inventory.
+// Remove expired holds from the inventory.
 void SeatInventoryManager::removeExpiredHolds(
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     holds.erase(
         std::remove_if(
             holds.begin(),
@@ -130,28 +110,31 @@ void SeatInventoryManager::removeExpiredHolds(
     );
 }
 
-// Removes expired holds.
+// Public function to remove expired holds.
 void SeatInventoryManager::expireHolds(
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 }
 
-// Returns the live availability after active holds.
+// Return available seats after subtracting active holds.
 int SeatInventoryManager::getLiveAvailableSeats(
     const Train& train,
     const std::string& travelClass,
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
-    std::string selectedClass = canonicalClass(travelClass);
+    const std::string selectedClass = canonicalClass(travelClass);
 
     if (selectedClass.empty()) {
         return -1;
     }
 
-    int totalAvailable = getAvailableSeats(train, selectedClass);
+    const int totalAvailable =
+        getAvailableSeats(train, selectedClass);
 
     if (totalAvailable < 0) {
         return -1;
@@ -170,28 +153,29 @@ int SeatInventoryManager::getLiveAvailableSeats(
     return totalAvailable - heldSeats;
 }
 
-// Temporarily reserves seats for five minutes.
+// Temporarily reserve seats for five minutes.
 SeatHoldResponse SeatInventoryManager::holdSeats(
     const Train& train,
     const std::string& travelClass,
     int requestedSeats,
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
-    std::string selectedClass = canonicalClass(travelClass);
+    const std::string selectedClass = canonicalClass(travelClass);
 
     if (selectedClass.empty()) {
         return {SeatHoldResult::INVALID_CLASS, ""};
     }
 
-    int availableSeats = getLiveAvailableSeats(
+    const int availableSeats = getLiveAvailableSeats(
         train,
         selectedClass,
         currentTime
     );
 
-    SeatRequestResult validation =
+    const SeatRequestResult validation =
         validateSeatRequest(availableSeats, requestedSeats);
 
     if (validation == SeatRequestResult::INVALID_REQUEST ||
@@ -207,7 +191,8 @@ SeatHoldResponse SeatInventoryManager::holdSeats(
         return {SeatHoldResult::EXCEEDS_AVAILABLE_SEATS, ""};
     }
 
-    std::string holdId = "HOLD-" + std::to_string(nextHoldNumber++);
+    const std::string holdId =
+        "HOLD-" + std::to_string(nextHoldNumber++);
 
     SeatHold newHold;
 
@@ -226,11 +211,12 @@ SeatHoldResponse SeatInventoryManager::holdSeats(
     return {SeatHoldResult::SUCCESS, holdId};
 }
 
-// Manually releases a temporary hold.
+// Manually release a temporary hold.
 bool SeatInventoryManager::releaseHold(
     const std::string& holdId
 ) {
-    auto it = std::find_if(
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
+    const auto it = std::find_if(
         holds.begin(),
         holds.end(),
         [&holdId](const SeatHold& hold) {
@@ -243,18 +229,20 @@ bool SeatInventoryManager::releaseHold(
     }
 
     holds.erase(it);
+
     return true;
 }
 
-// Confirms a valid hold and updates the in-memory Train seat count.
+// Confirm a valid hold and update the in-memory Train seat count.
 bool SeatInventoryManager::confirmHold(
     Train& train,
     const std::string& holdId,
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
-    auto it = std::find_if(
+    const auto it = std::find_if(
         holds.begin(),
         holds.end(),
         [&holdId, &train](const SeatHold& hold) {
@@ -272,11 +260,14 @@ bool SeatInventoryManager::confirmHold(
 
     if (it->travelClass == "sleeper") {
         seatCount = &train.sleeperSeatsAvailable;
-    } else if (it->travelClass == "ac 3-tier") {
+    }
+    else if (it->travelClass == "ac 3-tier") {
         seatCount = &train.ac3TierSeatsAvailable;
-    } else if (it->travelClass == "ac 2-tier") {
+    }
+    else if (it->travelClass == "ac 2-tier") {
         seatCount = &train.ac2TierSeatsAvailable;
-    } else if (it->travelClass == "chair car") {
+    }
+    else if (it->travelClass == "chair car") {
         seatCount = &train.chairCarSeatsAvailable;
     }
 
@@ -291,10 +282,11 @@ bool SeatInventoryManager::confirmHold(
     return true;
 }
 
-// Returns the number of active holds.
+// Return the number of active holds.
 int SeatInventoryManager::getActiveHoldCount(
     std::chrono::steady_clock::time_point currentTime
 ) {
+    std::lock_guard<std::recursive_mutex> lock(inventoryMutex);
     removeExpiredHolds(currentTime);
 
     return static_cast<int>(holds.size());

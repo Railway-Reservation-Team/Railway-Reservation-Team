@@ -1,13 +1,39 @@
-# Compiled executables
+# Compiled executables and object files
 railway
 railway.exe
+tests/test_modules
+tests/test_modules.exe
 seat_inventory_tests
-
-# Other build outputs
 *.o
 *.obj
 *.exe
 
+# Build output
+build/
+cmake-build-*/
+
+# Runtime temporary and generated data
+*.tmp
+
 # IDE and editor files
 .vscode/
 .vs/
+
+# Passenger authentication data (never commit account records or audit logs)
+/data/users.dat
+/data/users.dat.tmp
+/data/auth_audit.log
+
+# Administrator authentication data (never commit account records)
+/data/admin.dat
+/data/admin.dat.tmp
+
+/data/admin.dat.backup
+/data/admin.dat.backup2
+
+# Payment receipt records (sensitive transaction data)
+/data/payment_receipts.dat
+/data/payment_receipts.dat.tmp
+
+# Generated passenger e-tickets
+/generated_tickets/

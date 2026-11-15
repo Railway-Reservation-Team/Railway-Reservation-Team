@@ -48,7 +48,7 @@ The application uses local data files for persistent storage and does not requir
 - E-ticket generation and local saving/printing
 
 ### Administrator Features
-- Separate administrator login
+- Separate administrator authentication (specified; implementation pending)
 - Add, edit and delete train schedules
 - Manage train fares
 - Configure seat quotas
@@ -76,10 +76,11 @@ The application uses local data files for persistent storage and does not requir
 - **Programming Language:** C++17
 - **Build System:** CMake 3.16+ or Makefile
 - **Compiler:** GCC 9+, MSVC 2019+, or equivalent
-- **Testing:** GoogleTest 1.14+
-- **CI/CD:** Jenkins
-- **Static Analysis:** SonarQube or equivalent
-- **Coverage:** gcov/lcov
+- **Cryptography:** OpenSSL (libcrypto), used by passenger authentication
+- **Testing:** CTest-managed C++ unit and integration test executables
+- **CI/CD:** GitHub Actions (cross-platform build, automated tests, static analysis, coverage, downloadable artifacts and tagged releases)
+- **Static Analysis:** Cppcheck (automated in GitHub Actions)
+- **Coverage:** GCC gcov with gcovr HTML/XML reports (current branch-coverage target: 70%; progress is reported by CI)
 - **Storage:** Local text/binary data files
 - **Version Control:** Git and GitHub
 
@@ -90,43 +91,73 @@ The application uses local data files for persistent storage and does not requir
 Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd Railway-Reservation-System
+git clone https://github.com/Railway-Reservation-Team/Railway-Reservation-Team.git
+cd Railway-Reservation-Team
 ```
 
-Create and enter the build directory:
+Configure and build from the repository root:
 
 ```bash
-mkdir build
-cd build
-cmake ..
-cmake --build .
+cmake -S . -B build
+cmake --build build
 ```
 
-Run the generated executable according to the executable name configured in `CMakeLists.txt`.
+Run the application from the repository root so the relative `data/` paths resolve:
 
-### Using Makefile
+```bash
+# Windows PowerShell
+.\\build\\Debug\\railway.exe
 
-If a Makefile is provided:
+# Linux / Ubuntu / WSL
+./build/railway
+```
+
+Run the included module tests:
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+### Using Makefile (Linux / Ubuntu / WSL with GNU Make)
+
+Build the application:
 
 ```bash
 make
 ```
 
-Then run the generated executable.
+Run it from the repository root:
 
-> Replace `<repository-url>` with your actual GitHub repository URL.
+```bash
+./railway
+```
+
+Build and run the included module tests:
+
+```bash
+make test
+```
+
+Remove generated binaries:
+
+```bash
+make clean
+```
+
+
 
 ## 6. Usage
 
 The application starts with a console-based main menu containing options such as:
 
 ```text
-1. Register
-2. Login
-3. Search Trains
-4. Admin Login
-5. Exit
+
+1. Passenger Registration
+2. Passenger Login
+3. Passenger Booking
+4. Admin Train Management
+5. Passenger Logout
+6. Exit
 ```
 
 ### Passenger Booking Flow
@@ -217,10 +248,12 @@ The system specifies:
 
 The project is designed to support:
 
-- Unit testing using GoogleTest
-- At least 70% branch coverage using gcov/lcov
-- Jenkins-based automated build and testing
-- SonarQube static analysis
+- Unit and integration testing using CTest-registered C++ test executables
+- Target at least 70% branch coverage; the current measured coverage is below this target and remains an improvement item
+- GitHub Actions build and test matrix on Ubuntu and Windows
+- Cppcheck static analysis and gcovr coverage reports on Ubuntu
+- Downloadable platform-specific build artifacts for each successful pipeline run
+- GitHub Releases published from version tags (for example, `v1.0.0`) after build, test and quality jobs pass
 - Branch-based development and pull-request reviews
 - Modular C++ design with testable business logic
 
@@ -290,7 +323,7 @@ All team members should understand and be able to explain the submitted code dur
 
 Requirements: g++, C++17, Linux/Ubuntu/WSL, Git.
 
-Compile: `g++ -std=c++17 -Wall -Wextra -pedantic src/*.cpp -o railway`
+Compile: `g++ -std=c++17 -Wall -Wextra -pedantic -Isrc src/*.cpp -o railway -lcrypto` (requires OpenSSL development libraries)
 
 Run: `./railway`
 
@@ -306,4 +339,54 @@ Documentation:
 - FINAL_TEST_RESULTS.md
 - TEST_REPORT.md
 
-Automated regression result: 18 passed, 0 failed. Booking, PNR and seat inventory checks are documented for the TASK-09 development branch. Authentication, payment, cancellation and administrator functionality remain pending implementation or verification.
+The passenger authentication module is implemented and integrated into the application. Administrator authentication is also implemented in the AdminAuthManager module, with an access check in the administrator train-management menu. The dedicated passenger and administrator authentication test suites are registered separately in CTest.
+
+### Verified Automated Test Results
+
+| Test Suite | Passed | Failed |
+|---|---:|---:|
+| Passenger authentication | 20 | 0 |
+| US-13 passenger-count validation | 11 | 0 |
+| Seat inventory | 42 | 0 |
+| Validation, search and fare calculation | 18 | 0 |
+| Passenger details and fare calculation | 13 | 0 |
+| Booking manager | 8 | 0 |
+| Admin train management | 8 | 0 |
+| Admin fare and reservations | 6 | 0 |
+| **Total** | **126** | **0** |
+
+The earlier verified GitHub Actions run passed all 12 CTest targets registered at that time. Two additional administrator-security suites have now been added to CMake; their results will be confirmed by the next workflow run. The complete application compiled successfully.
+
+## 10.1 Continuous Integration and Delivery (GitHub Actions)
+
+The workflow is defined in `.github/workflows/cpp-build.yml`.
+
+- Pull requests targeting `main` run the CI pipeline on every update; pushes to `main` and version tags also trigger the workflow. A manual run is available through GitHub Actions.
+- The application is configured and built with CMake, then all registered CTest suites are executed on Ubuntu and Windows.
+- The quality job runs Cppcheck and generates a gcovr coverage report from the test run.
+- The latest verified coverage report (workflow run 43073959982) measured **79.3% line coverage**, **97.0% function coverage**, and **50.0% branch coverage**. The required 70% branch-coverage target remains open; the report is published so the team can track improvements.
+- The same run passed **20/20 registered CTest tests** on both Ubuntu and Windows, including full console booking/cancellation/admin flows, payment processing, input-validation boundaries, and performance checks for NFR-01, NFR-02 and NFR-04.
+- Successful platform builds are packaged with the sample train data, README and required OpenSSL runtime library, then uploaded as workflow artifacts. The Linux package includes a `run.sh` launcher that sets its bundled-library path.
+- Pushing a version tag such as `v1.0.0` runs the same build, test and quality gates. Only when those jobs pass does the release job publish the Windows and Ubuntu ZIP packages as a GitHub Release.
+- Workflow artifacts are temporary CI downloads; GitHub Releases are the versioned delivery channel.
+
+Run the downloaded application from its extracted folder:
+
+- Linux: `./run.sh`
+- Windows: `railway.exe` (the OpenSSL 3 runtime DLL is included; the Microsoft Visual C++ runtime may need to be installed on machines that do not already have it).
+
+To create a release after reviewing and merging the intended code into the release branch:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The release workflow requires no custom deployment server because this project is a standalone console application.
+
+See `FINAL_TEST_RESULTS.md` and `TEST_REPORT.md` for detailed results.
+
+
+### Project build configuration (TASK-01)
+
+The repository includes a root-level `CMakeLists.txt` and `Makefile`. Both use the C++17 standard, compile the application sources under `src/`, and provide a target for the existing `tests/test_modules.cpp` module test program. CMake copies the `data/` directory into the build directory; launch the application from the repository root when using the documented commands so runtime data paths remain consistent.

@@ -1,3 +1,4 @@
+#include <mutex>
 #ifndef SEATINVENTORY_H
 #define SEATINVENTORY_H
 
@@ -51,8 +52,11 @@ SeatRequestResult validateSeatRequest(
     int requestedSeats
 );
 
+// Thread-safe manager for temporary seat holds and confirmations.
+// Inventory operations are protected by a recursive mutex.
 class SeatInventoryManager {
 private:
+    mutable std::recursive_mutex inventoryMutex;
     std::vector<SeatHold> holds;
     unsigned long nextHoldNumber = 1;
 

@@ -13,7 +13,8 @@ bool collectPassengerDetails(
     int requestedSeatCount,
     std::vector<Passenger>& passengers,
     std::istream& input,
-    std::ostream& output) {
+    std::ostream& output,
+    const std::function<bool()>& onActivity) {
 
     if (requestedSeatCount < 1 || requestedSeatCount > 6) {
         output << "Passenger count must be between 1 and 6.\n";
@@ -21,6 +22,19 @@ bool collectPassengerDetails(
     }
 
     passengers.clear();
+
+    auto readPassengerInput = [&](std::string& value) {
+        if (!std::getline(input, value)) {
+            return false;
+        }
+
+        if (onActivity && !onActivity()) {
+            output << "Session expired. Please log in again.\n";
+            return false;
+        }
+
+        return true;
+    };
 
     output << "\n========== PASSENGER DETAILS ==========\n";
     output << "Enter details for " << requestedSeatCount
@@ -35,7 +49,7 @@ bool collectPassengerDetails(
         // Validate passenger name
         while (true) {
             output << "Enter name: ";
-            if (!std::getline(input, passenger.name)) {
+            if (!readPassengerInput(passenger.name)) {
                 return false;
             }
 
@@ -51,7 +65,7 @@ bool collectPassengerDetails(
             std::string ageInput;
             output << "Enter age: ";
 
-            if (!std::getline(input, ageInput)) {
+            if (!readPassengerInput(ageInput)) {
                 return false;
             }
 
@@ -75,7 +89,7 @@ bool collectPassengerDetails(
         while (true) {
             output << "Enter gender (Male/Female/Other): ";
 
-            if (!std::getline(input, passenger.gender)) {
+            if (!readPassengerInput(passenger.gender)) {
                 return false;
             }
 
