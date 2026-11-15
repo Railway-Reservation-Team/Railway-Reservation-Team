@@ -39,6 +39,10 @@ namespace BookingManager {
         Booking& booking
     );
 
+    std::vector<Booking> getBookingHistory(
+        const std::string& passengerName
+    );
+
 }
 
 #endif
