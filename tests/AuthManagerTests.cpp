@@ -7,6 +7,7 @@
 #include <random>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace {
 
@@ -100,6 +101,36 @@ int main() {
              header.rfind("RRS_USERS_V1|1|", 0) == 0);
     }
 
+    // Verify the persisted credential record contains a salt and a derived hash.
+    {
+        std::ifstream file("data/users.dat");
+        std::string header;
+        std::string record;
+        std::getline(file, header);
+        std::getline(file, record);
+
+        std::vector<std::string> fields;
+        std::stringstream stream(record);
+        std::string field;
+        while (std::getline(stream, field, '|')) {
+            fields.push_back(field);
+        }
+
+        const auto isHex = [](const std::string& value) {
+            return !value.empty() && value.find_first_not_of(
+                "0123456789abcdefABCDEF") == std::string::npos;
+        };
+
+        test("Passenger credential record has seven fields",
+             fields.size() == 7);
+        test("Passenger password uses a 16-byte hexadecimal salt",
+             fields.size() == 7 && fields[3].size() == 32 && isHex(fields[3]));
+        test("Passenger password uses a 32-byte hexadecimal PBKDF2 hash",
+             fields.size() == 7 && fields[4].size() == 64 && isHex(fields[4]));
+        test("Passenger salt and derived hash are not identical",
+             fields.size() == 7 && fields[3] != fields[4]);
+    }
+
     // 5. Reject an invalid email address.
     test("Invalid email rejected",
          !AuthManager::registerPassenger(
@@ -179,6 +210,15 @@ int main() {
              content.str().find(
                  "ACCOUNT_LOCKED_AFTER_FAILED_LOGINS"
              ) != std::string::npos);
+    }
+
+    // Authentication logs must never contain the plaintext password.
+    {
+        std::ifstream file("data/auth_audit.log");
+        std::stringstream content;
+        content << file.rdbuf();
+        test("Passenger authentication log excludes plaintext password",
+             content.str().find(password) == std::string::npos);
     }
 
     AuthManager::logout();

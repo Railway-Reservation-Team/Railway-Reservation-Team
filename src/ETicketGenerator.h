@@ -9,6 +9,11 @@ namespace ETicketGenerator {
         std::string& ticketPath,
         std::string& errorMessage
     );
+
+    bool displayETicket(
+        const std::string& pnr,
+        std::string& errorMessage
+    );
 }
 
 #endif

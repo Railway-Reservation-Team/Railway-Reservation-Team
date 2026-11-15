@@ -1,12 +1,14 @@
 #include "ETicketGenerator.h"
 #include "BookingManager.h"
 #include "TrainData.h"
+#include "Validation.h"
 
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <iomanip>
 #include <filesystem>
+#include <iostream>
 #include <cctype>
 
 namespace {
@@ -38,24 +40,6 @@ std::string decodeField(const std::string& value) {
 
     return result;
 }
-
-std::string trim(const std::string& value) {
-    std::size_t start = value.find_first_not_of(" \t\r\n");
-
-    if (start == std::string::npos) {
-        return "";
-    }
-
-    std::size_t end = value.find_last_not_of(" \t\r\n");
-
-    return value.substr(start, end - start + 1);
-}
-
-struct PassengerRecord {
-    std::string name;
-    int age;
-    std::string gender;
-};
 
 }
 
@@ -100,79 +84,69 @@ bool generateETicket(
         return false;
     }
 
-    if (booking.passengerCount <= 0 ||
-        booking.passengerDetails.empty() ||
-        booking.passengerDetails.back() == ';') {
-        errorMessage = "Invalid passenger details in booking record.";
-        return false;
-    }
-
-    std::vector<PassengerRecord> passengers;
+    // Validate all records before creating or truncating the ticket file.
+    struct TicketPassenger {
+        std::string name;
+        std::string age;
+        std::string gender;
+    };
+    std::vector<TicketPassenger> passengers;
     std::stringstream passengerStream(booking.passengerDetails);
     std::string passenger;
 
     while (std::getline(passengerStream, passenger, ';')) {
-        std::stringstream fields(passenger);
+        const auto firstComma = passenger.find(',');
+        const auto secondComma = firstComma == std::string::npos
+            ? std::string::npos : passenger.find(',', firstComma + 1);
 
-        std::string name;
-        std::string ageText;
-        std::string gender;
-        std::string extra;
-
-        if (!std::getline(fields, name, ',') ||
-            !std::getline(fields, ageText, ',') ||
-            !std::getline(fields, gender)) {
+        if (firstComma == std::string::npos || secondComma == std::string::npos ||
+            passenger.find(',', secondComma + 1) != std::string::npos) {
             errorMessage = "Invalid passenger details in booking record.";
             return false;
         }
 
-        if (std::getline(fields, extra, ',')) {
-            errorMessage = "Invalid passenger details in booking record.";
-            return false;
-        }
-
-        name = trim(decodeField(name));
-        ageText = trim(ageText);
-        gender = trim(decodeField(gender));
-
-        if (name.empty() || ageText.empty() || gender.empty()) {
-            errorMessage = "Invalid passenger details in booking record.";
-            return false;
-        }
-
+        TicketPassenger parsed{
+            decodeField(passenger.substr(0, firstComma)),
+            passenger.substr(firstComma + 1, secondComma - firstComma - 1),
+            decodeField(passenger.substr(secondComma + 1))
+        };
+        std::string nameError;
+        const bool validName =
+            Validation::isValidPassengerName(parsed.name, nameError);
         int age = 0;
-
         try {
             std::size_t position = 0;
-            age = std::stoi(ageText, &position);
-
-            if (position != ageText.size() || age < 1 || age > 120) {
-                errorMessage = "Invalid passenger age.";
-                return false;
-            }
-        } catch (...) {
-            errorMessage = "Invalid passenger age.";
-            return false;
+            age = std::stoi(parsed.age, &position);
+            if (position != parsed.age.size()) age = 0;
+        } catch (const std::exception&) {
+            age = 0;
         }
 
-        if (gender != "Male" &&
-            gender != "Female" &&
-            gender != "Other") {
-            errorMessage = "Invalid passenger gender.";
+        // Use the same passenger constraints as the booking input flow.
+        if (!validName ||
+            age < 1 || age > 120 ||
+            (parsed.gender != "Male" && parsed.gender != "Female" &&
+             parsed.gender != "Other")) {
+            errorMessage = "Invalid passenger details in booking record.";
             return false;
         }
-
-        passengers.push_back({name, age, gender});
+        passengers.push_back(parsed);
     }
 
-    if (passengers.size() !=
-        static_cast<std::size_t>(booking.passengerCount)) {
-        errorMessage = "Passenger count does not match booking record.";
+    if (!booking.passengerDetails.empty() && booking.passengerDetails.back() == ';') {
+        errorMessage = "Invalid passenger details in booking record.";
+        return false;
+    }
+
+    if (passengers.empty() || booking.passengerCount < 1 ||
+        passengers.size() != static_cast<std::size_t>(booking.passengerCount)) {
+        errorMessage = "Passenger count mismatch: booking specifies " +
+            std::to_string(booking.passengerCount) + " but parsed " +
+            std::to_string(passengers.size()) + " valid passenger records.";
         return false;
     }
 
     std::error_code filesystemError;
-
     std::filesystem::create_directories("tickets", filesystemError);
 
     if (filesystemError) {
@@ -212,13 +186,11 @@ bool generateETicket(
     ticket << "PASSENGER DETAILS\n";
     ticket << "--------------------------------------------\n";
 
-    int passengerNumber = 1;
-
-    for (const PassengerRecord& record : passengers) {
-        ticket << "Passenger " << passengerNumber++ << '\n';
-        ticket << "Name             : " << record.name << '\n';
-        ticket << "Age              : " << record.age << '\n';
-        ticket << "Gender           : " << record.gender << "\n\n";
+    for (std::size_t i = 0; i < passengers.size(); ++i) {
+        ticket << "Passenger " << i + 1 << '\n';
+        ticket << "Name             : " << passengers[i].name << '\n';
+        ticket << "Age              : " << passengers[i].age << '\n';
+        ticket << "Gender           : " << passengers[i].gender << "\n\n";
     }
 
     ticket << "BOOKING DETAILS\n";
@@ -242,6 +214,41 @@ bool generateETicket(
     }
 
     ticket.close();
+    return true;
+}
+
+bool displayETicket(
+    const std::string& pnr,
+    std::string& errorMessage) {
+
+    errorMessage.clear();
+
+    if (pnr.size() != 10) {
+        errorMessage = "Invalid PNR format.";
+        return false;
+    }
+
+    for (unsigned char c : pnr) {
+        if (!std::isdigit(c)) {
+            errorMessage = "Invalid PNR format.";
+            return false;
+        }
+    }
+
+    std::ifstream ticket("tickets/ETicket_" + pnr + ".txt");
+
+    if (!ticket.is_open()) {
+        errorMessage = "E-ticket not found. Generate the ticket first.";
+        return false;
+    }
+
+    std::cout << ticket.rdbuf();
+
+    if (ticket.bad()) {
+        errorMessage = "Failed to read e-ticket.";
+        return false;
+    }
+
     return true;
 }
 
