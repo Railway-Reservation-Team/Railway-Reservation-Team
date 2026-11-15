@@ -1,8 +1,11 @@
 #include "AuthManager.h"
 
 #include <chrono>
+#include <cstdint>
+#include <iomanip>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -22,6 +25,57 @@ void test(const std::string& name, bool condition) {
         std::cout << "[FAIL] " << name << '\n';
         ++failed;
     }
+}
+
+
+std::string testChecksum(const std::vector<std::string>& records) {
+    std::uint64_t hash = 14695981039346656037ULL;
+
+    for (const auto& record : records) {
+        for (unsigned char ch : record) {
+            hash ^= ch;
+            hash *= 1099511628211ULL;
+        }
+        hash ^= static_cast<unsigned char>('\n');
+        hash *= 1099511628211ULL;
+    }
+
+    std::ostringstream output;
+    output << std::hex << std::setfill('0') << std::setw(16) << hash;
+    return output.str();
+}
+
+void writeAccountFile(const std::vector<std::string>& records) {
+    std::ofstream file("data/users.dat", std::ios::trunc);
+    file << "RRS_USERS_V1|" << records.size()
+         << "|" << testChecksum(records) << '\n';
+
+    for (const auto& record : records) {
+        file << record << '\n';
+    }
+}
+
+std::vector<std::string> splitAccountRecord(const std::string& record) {
+    std::vector<std::string> fields;
+    std::stringstream stream(record);
+    std::string field;
+
+    while (std::getline(stream, field, '|')) {
+        fields.push_back(field);
+    }
+
+    return fields;
+}
+
+std::string joinAccountFields(const std::vector<std::string>& fields) {
+    std::ostringstream output;
+
+    for (std::size_t i = 0; i < fields.size(); ++i) {
+        if (i != 0) output << '|';
+        output << fields[i];
+    }
+
+    return output.str();
 }
 
 }
@@ -226,6 +280,172 @@ int main() {
     // 17. Logout should terminate the session.
     test("Logout terminates passenger session",
          !AuthManager::isSessionActive(2901));
+
+
+    // Additional registration validation cases.
+    test("Empty passenger name rejected",
+         !AuthManager::registerPassenger(
+             "", "emptyname@example.com",
+             "9876543212", "AnotherPass123", error));
+
+    test("Password longer than 128 characters rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "longpass@example.com",
+             "9876543212", std::string(129, 'A'), error));
+
+    test("Email without at sign rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "invalidemail.example.com",
+             "9876543212", "AnotherPass123", error));
+
+    test("Email with multiple at signs rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "bad@@example.com",
+             "9876543212", "AnotherPass123", error));
+
+    test("Email with missing domain rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "user@",
+             "9876543212", "AnotherPass123", error));
+
+    test("Email with missing domain extension rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "user@domain",
+             "9876543212", "AnotherPass123", error));
+
+    test("Email with consecutive domain dots rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "user@domain..com",
+             "9876543212", "AnotherPass123", error));
+
+    test("Email containing whitespace rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "bad email@example.com",
+             "9876543212", "AnotherPass123", error));
+
+    test("Email longer than 254 characters rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", std::string(245, 'a') + "@example.com",
+             "9876543212", "AnotherPass123", error));
+
+    test("Phone containing alphabetic characters rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "badphone1@example.com",
+             "98765abc10", "AnotherPass123", error));
+
+    test("Phone with fewer than seven digits rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "badphone2@example.com",
+             "123456", "AnotherPass123", error));
+
+    test("Phone with more than fifteen digits rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "badphone3@example.com",
+             "1234567890123456", "AnotherPass123", error));
+
+    test("Phone with plus sign in the middle rejected",
+         !AuthManager::registerPassenger(
+             "Test Passenger", "badphone4@example.com",
+             "98765+43210", "AnotherPass123", error));
+
+    // Unknown account and inactive session paths.
+    test("Login with unknown email rejected",
+         !AuthManager::login(
+             "unknown@example.com", password, error, 3000));
+
+    AuthManager::logout();
+
+    test("Activity update rejected without an active session",
+         !AuthManager::recordActivity(3001));
+
+    test("Current user email empty after logout",
+         AuthManager::getCurrentUserEmail().empty());
+
+
+    // Additional account-storage parsing and validation tests.
+    {
+        std::ifstream input("data/users.dat");
+        std::string header;
+        std::string validRecord;
+        std::getline(input, header);
+        std::getline(input, validRecord);
+
+        const auto originalFields = splitAccountRecord(validRecord);
+
+        if (originalFields.size() != 7) {
+            std::cerr << "Could not read the original valid account record.\n";
+            return 1;
+        }
+
+        const auto rejectModifiedRecord =
+            [&](const std::string& label,
+                const std::function<void(std::vector<std::string>&)>& modify) {
+                auto fields = originalFields;
+                modify(fields);
+
+                writeAccountFile({joinAccountFields(fields)});
+                const bool rejected =
+                    !AuthManager::login(email, password, error, 3000);
+
+                test(label, rejected);
+                writeAccountFile({validRecord});
+            };
+
+        rejectModifiedRecord("Account record with missing field rejected",
+            [](auto& fields) { fields.pop_back(); });
+
+        rejectModifiedRecord("Non-numeric failed login count rejected",
+            [](auto& fields) { fields[5] = "abc"; });
+
+        rejectModifiedRecord("Negative failed login count rejected",
+            [](auto& fields) { fields[5] = "-1"; });
+
+        rejectModifiedRecord("Failed login count at lockout limit rejected",
+            [](auto& fields) {
+                fields[5] = std::to_string(AuthManager::MAX_LOGIN_ATTEMPTS);
+            });
+
+        rejectModifiedRecord("Negative lockout timestamp rejected",
+            [](auto& fields) { fields[6] = "-1"; });
+
+        rejectModifiedRecord("Invalid hexadecimal password salt rejected",
+            [](auto& fields) { fields[3] = std::string(32, 'Z'); });
+
+        rejectModifiedRecord("Incorrect password salt length rejected",
+            [](auto& fields) { fields[3] = "abcd"; });
+
+        rejectModifiedRecord("Invalid hexadecimal password hash rejected",
+            [](auto& fields) { fields[4] = std::string(64, 'Z'); });
+
+        rejectModifiedRecord("Incorrect password hash length rejected",
+            [](auto& fields) { fields[4] = "abcd"; });
+
+        // Two records with the same email must be rejected.
+        writeAccountFile({validRecord, validRecord});
+        test("Duplicate email records in storage rejected",
+             !AuthManager::login(email, password, error, 3000));
+
+        // Restore valid storage for the remaining tests.
+        writeAccountFile({validRecord});
+
+        // A file without a header is invalid.
+        {
+            std::ofstream file("data/users.dat", std::ios::trunc);
+        }
+        test("Empty account storage file rejected",
+             !AuthManager::login(email, password, error, 3000));
+
+        // An empty record is rejected before checksum validation.
+        {
+            std::ofstream file("data/users.dat", std::ios::trunc);
+            file << "RRS_USERS_V1|1|invalid-checksum\n\n";
+        }
+        test("Empty account record rejected",
+             !AuthManager::login(email, password, error, 3000));
+
+        // Restore valid storage before continuing.
+        writeAccountFile({validRecord});
+    }
 
     // 18. Corrupted storage must be rejected.
     {

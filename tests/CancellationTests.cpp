@@ -509,6 +509,55 @@ int main() {
         );
     }
 
+
+    // Additional train-record and departure-time validation tests.
+    auto runInvalidTrainCase = [&](const std::string& trainRecord,
+                                   const std::string& description) {
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile << trainRecord << '\n';
+        }
+
+        {
+            std::ofstream bookingsFile("data/bookings.dat", std::ios::trunc);
+            bookingsFile
+                << "1234567894|TEST105|2026-12-15|Sleeper|"
+                << "Test Passenger,21,Other|1|500.00|Confirmed\n";
+        }
+
+        double testRefund = 100.0;
+        double testCharge = 100.0;
+        std::string testError;
+
+        const bool result = Cancellation::cancelBooking(
+            "1234567894", testRefund, testCharge, testError
+        );
+
+        check(!result, description);
+        check(testRefund == 0.0 && testCharge == 0.0,
+              "Reset refund and charge after invalid train data");
+    };
+
+    // Malformed train record: fewer than the required fields.
+    runInvalidTrainCase(
+        "TEST105|Malformed Train",
+        "Reject cancellation when the train record is malformed"
+    );
+
+    // Correct number of fields, but departure time has the wrong length.
+    runInvalidTrainCase(
+        "TEST105|Time Test|Bengaluru|Chennai|8:00|14:00|6h|"
+        "1000|1500|2000|800|10|10|10|10|2026-12-15",
+        "Reject cancellation when departure time has the wrong format"
+    );
+
+    // Correct length, but departure time contains non-numeric characters.
+    runInvalidTrainCase(
+        "TEST105|Time Test|Bengaluru|Chennai|ab:cd|14:00|6h|"
+        "1000|1500|2000|800|10|10|10|10|2026-12-15",
+        "Reject cancellation when departure time contains invalid characters"
+    );
+
     std::cout << "\nCancellation Test Results\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';
