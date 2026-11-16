@@ -6,12 +6,14 @@
 #include <string>
 #include <vector>
 
+// Stores the personal details of one passenger.
 struct Passenger {
     std::string name;
     int age;
     std::string gender;
 };
 
+// Collects and validates passenger information from an input stream.
 namespace PassengerDetails {
     bool collectPassengerDetails(
         int requestedSeatCount,

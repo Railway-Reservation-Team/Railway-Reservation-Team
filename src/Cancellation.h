@@ -4,6 +4,7 @@
 
 #include <string>
 
+// Handles booking cancellation and refund calculation.
 namespace Cancellation {
 
     bool cancelBooking(

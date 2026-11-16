@@ -1,4 +1,6 @@
+
 #include "TrainSearch.h"
+#include "Validation.h"
 
 #include <algorithm>
 #include <cctype>
@@ -44,11 +46,14 @@ std::vector<Train> searchTrains(
     std::vector<Train> results;
 
     const std::string requestedSource = normalizeText(source);
-    const std::string requestedDestination = normalizeText(destination);
+    const std::string requestedDestination =
+        normalizeText(destination);
+
+    std::string dateError;
 
     if (requestedSource.empty() ||
         requestedDestination.empty() ||
-        journeyDate.empty()) {
+        !Validation::isValidDate(journeyDate, dateError)) {
         return results;
     }
 

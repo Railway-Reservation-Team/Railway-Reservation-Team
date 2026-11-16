@@ -65,10 +65,10 @@ A green build does not mean all requirements have passed.
 
 ## CI/CD evidence and quality gaps
 
-Latest previously completed baseline run: [GitHub Actions run 43027487428](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43027487428). It reported:
+Latest completed feature-validation run: [GitHub Actions run 43073959982](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43073959982). It reported:
 - 20/20 registered CTest tests passing on Ubuntu and Windows.
 - Cppcheck passed.
-- Line coverage 79.7%; function coverage 96.9%; branch coverage 49.9%.
+- Line coverage 79.3%; function coverage 97.0%; branch coverage 50.0%.
 - Branch coverage remains below the 70% target stated in the Test Plan.
 - Existing performance checks use 200 seeded trains for search, booking and train-file read; they do not prove every SRS NFR.
 

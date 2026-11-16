@@ -55,6 +55,19 @@ int main() {
         assert(output.find("Invalid payment method.") != std::string::npos);
     }
 
+
+    // EOF before selecting a payment method.
+    assert(!runPayment(500.0, "", method, status, output));
+    assert(method.empty());
+    assert(status == "FAILED");
+    assert(output.find("Invalid payment method.") != std::string::npos);
+
+    // EOF while waiting for the payment result.
+    assert(!runPayment(500.0, "1", method, status, output));
+    assert(method == "UPI");
+    assert(status == "FAILED");
+    assert(output.find("Invalid payment result.") != std::string::npos);
+
     // All supported methods can complete a successful simulated payment.
     const std::pair<std::string, std::string> methods[] = {
         {"1 1", "UPI"},

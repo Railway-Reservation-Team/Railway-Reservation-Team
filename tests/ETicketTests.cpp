@@ -71,6 +71,19 @@ int main() {
 
     std::cout << "[PASS] Invalid passenger detail rejection\n";
 
+    // Test empty passenger details.
+    assert(!ETicketManager::decodePassengers(
+        "", passengers, error));
+
+    std::cout << "[PASS] Empty passenger detail rejection\n";
+
+    // Test incomplete passenger records.
+    assert(!ETicketManager::decodePassengers(
+        "Passenger Name,20",
+        passengers, error));
+
+    std::cout << "[PASS] Incomplete passenger record rejection\n";
+
     // Prepare isolated train data.
     const std::string trainRecord =
         "99999|Test Express|Bengaluru|Chennai|10:00|18:00|8h|"

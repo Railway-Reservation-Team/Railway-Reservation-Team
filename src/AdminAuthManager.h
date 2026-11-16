@@ -3,6 +3,7 @@
 
 #include <string>
 
+// Handles administrator account setup, login and session management.
 namespace AdminAuthManager {
 
 bool hasAdminAccount(std::string& errorMessage);

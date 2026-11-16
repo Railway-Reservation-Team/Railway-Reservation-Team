@@ -48,7 +48,7 @@ The application uses local data files for persistent storage and does not requir
 - E-ticket generation and local saving/printing
 
 ### Administrator Features
-- Separate administrator authentication (specified; implementation pending)
+- Separate administrator authentication and protected administrator operations
 - Add, edit and delete train schedules
 - Manage train fares
 - Configure seat quotas
@@ -339,7 +339,7 @@ Documentation:
 - FINAL_TEST_RESULTS.md
 - TEST_REPORT.md
 
-The passenger authentication module is implemented and integrated into the application. Administrator authentication is also implemented in the AdminAuthManager module, with an access check in the administrator train-management menu. The dedicated passenger and administrator authentication test suites are registered separately in CTest.
+Passenger and administrator authentication are implemented and integrated into the application. Administrator authentication is handled by AdminAuthManager, with access checks in the administrator train-management menu. The dedicated passenger and administrator authentication test suites are registered separately in CTest.
 
 ### Verified Automated Test Results
 
@@ -355,7 +355,7 @@ The passenger authentication module is implemented and integrated into the appli
 | Admin fare and reservations | 6 | 0 |
 | **Total** | **126** | **0** |
 
-The earlier verified GitHub Actions run passed all 12 CTest targets registered at that time. Two additional administrator-security suites have now been added to CMake; their results will be confirmed by the next workflow run. The complete application compiled successfully.
+The CI workflow runs the current CTest suite on Ubuntu and Windows. Consult the latest successful GitHub Actions run and its uploaded reports for the current test count and coverage; do not use historical totals as current results.
 
 ## 10.1 Continuous Integration and Delivery (GitHub Actions)
 
@@ -364,7 +364,7 @@ The workflow is defined in `.github/workflows/cpp-build.yml`.
 - Pull requests targeting `main` run the CI pipeline on every update; pushes to `main` and version tags also trigger the workflow. A manual run is available through GitHub Actions.
 - The application is configured and built with CMake, then all registered CTest suites are executed on Ubuntu and Windows.
 - The quality job runs Cppcheck and generates a gcovr coverage report from the test run.
-- The latest verified coverage report (workflow run 43026470906) measured **79.7% line coverage**, **96.9% function coverage**, and **49.9% branch coverage**. The required 70% branch-coverage target remains open; the report is published so the team can track improvements.
+- The latest verified coverage report (workflow run 43073959982) measured **79.3% line coverage**, **97.0% function coverage**, and **50.0% branch coverage**. The required 70% branch-coverage target remains open; the report is published so the team can track improvements.
 - The same run passed **20/20 registered CTest tests** on both Ubuntu and Windows, including full console booking/cancellation/admin flows, payment processing, input-validation boundaries, and performance checks for NFR-01, NFR-02 and NFR-04.
 - Successful platform builds are packaged with the sample train data, README and required OpenSSL runtime library, then uploaded as workflow artifacts. The Linux package includes a `run.sh` launcher that sets its bundled-library path.
 - Pushing a version tag such as `v1.0.0` runs the same build, test and quality gates. Only when those jobs pass does the release job publish the Windows and Ubuntu ZIP packages as a GitHub Release.

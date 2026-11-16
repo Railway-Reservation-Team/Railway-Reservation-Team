@@ -1,7 +1,10 @@
 
 #include "BookingManager.h"
+
+#include <algorithm>
 #include "TrainData.h"
 #include "AtomicFileReplace.h"
+#include "AdminAuditLog.h"
 
 #include <fstream>
 #include <sstream>
@@ -11,11 +14,13 @@
 #include <cmath>
 #include <string>
 #include <cctype>
+#include <mutex>
 
 namespace BookingManager {
 
 static const std::string BOOKING_FILE = "data/bookings.dat";
 static const std::string TRAIN_FILE = "data/trains.dat";
+static std::mutex bookingMutex;
 
 // Encode special characters in passenger details.
 std::string encodeField(const std::string& value) {
@@ -101,8 +106,25 @@ bool generateUniquePNR(std::string& pnr) {
     return false;
 }
 
+// Validate the format and existence of a PNR.
+bool validatePNR(const std::string& pnr) {
+    if (pnr.size() != 10 ||
+        !std::all_of(pnr.begin(), pnr.end(),
+            [](unsigned char c) { return std::isdigit(c); })) {
+        return false;
+    }
+
+    return isPNRUsed(pnr);
+}
+
 // Find a booking using its PNR.
 bool findBooking(const std::string& requestedPNR, Booking& booking) {
+    if (requestedPNR.size() != 10 ||
+        !std::all_of(requestedPNR.begin(), requestedPNR.end(),
+            [](unsigned char c) { return std::isdigit(c); })) {
+        return false;
+    }
+
     std::ifstream file(BOOKING_FILE);
 
     if (!file.is_open()) {
@@ -120,8 +142,9 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
             fields.push_back(field);
         }
 
-        // PNR|Train|Date|Class|PassengerDetails|Count|Fare|Status
-        if (fields.size() != 8 || fields[0] != requestedPNR) {
+        // Support both old 8-field and new 9-field records.
+        if ((fields.size() != 8 && fields.size() != 9) ||
+            fields[0] != requestedPNR) {
             continue;
         }
 
@@ -130,10 +153,17 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
             booking.trainNumber = fields[1];
             booking.journeyDate = fields[2];
             booking.travelClass = fields[3];
-            booking.passengerDetails = fields[4];
+            booking.passengerDetails = decodeField(fields[4]);
             booking.passengerCount = std::stoi(fields[5]);
             booking.totalFare = std::stod(fields[6]);
             booking.status = fields[7];
+
+            booking.waitlistPosition =
+                fields.size() == 9 ? std::stoi(fields[8]) : 0;
+
+            if (booking.waitlistPosition < 0) {
+                return false;
+            }
 
             return true;
         } catch (...) {
@@ -144,7 +174,98 @@ bool findBooking(const std::string& requestedPNR, Booking& booking) {
     return false;
 }
 
-// Create a booking and update seat inventory.
+std::string normalizeName(std::string name) {
+    std::transform(name.begin(), name.end(), name.begin(),
+        [](unsigned char ch) {
+            return static_cast<char>(std::tolower(ch));
+        });
+
+    return name;
+}
+
+std::vector<Booking> getBookingHistory(
+    const std::string& passengerName) {
+
+    std::vector<Booking> history;
+    std::ifstream file(BOOKING_FILE);
+    std::string line;
+
+    if (!file.is_open() || passengerName.empty()) {
+        return history;
+    }
+
+    while (std::getline(file, line)) {
+        std::stringstream stream(line);
+        std::vector<std::string> fields;
+        std::string field;
+
+        while (std::getline(stream, field, '|')) {
+            fields.push_back(field);
+        }
+
+        // Accept legacy 8-field and current 9-field records.
+        if (fields.size() != 8 && fields.size() != 9) {
+            continue;
+        }
+
+        try {
+            std::stringstream passengerStream(fields[4]);
+            std::string passenger;
+            bool found = false;
+
+            while (std::getline(passengerStream, passenger, ';')) {
+                std::size_t firstComma = passenger.find(',');
+                std::size_t secondComma =
+                    firstComma == std::string::npos
+                    ? std::string::npos
+                    : passenger.find(',', firstComma + 1);
+
+                if (firstComma == std::string::npos ||
+                    secondComma == std::string::npos) {
+                    continue;
+                }
+
+                std::string name =
+                    decodeField(passenger.substr(0, firstComma));
+
+                if (normalizeName(name) == normalizeName(passengerName)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                continue;
+            }
+
+            Booking booking;
+            booking.pnr = fields[0];
+            booking.trainNumber = fields[1];
+            booking.journeyDate = fields[2];
+            booking.travelClass = fields[3];
+            booking.passengerDetails = fields[4];
+            booking.passengerCount = std::stoi(fields[5]);
+            booking.totalFare = std::stod(fields[6]);
+            booking.status = fields[7];
+
+            // Old records do not contain a waitlist position.
+            booking.waitlistPosition =
+                fields.size() == 9 ? std::stoi(fields[8]) : 0;
+
+            if (booking.waitlistPosition < 0) {
+                continue;
+            }
+
+            history.push_back(booking);
+
+        } catch (...) {
+            continue;
+        }
+    }
+
+    return history;
+}
+
 bool createBooking(
     const Train& selectedTrain,
     const std::string& travelClass,
@@ -178,6 +299,9 @@ bool createBooking(
         }
     }
 
+    // Serialize booking creation so PNR checks and writes cannot race.
+    std::lock_guard<std::mutex> bookingGuard(bookingMutex);
+
     // Generate a unique PNR.
     if (!generateUniquePNR(pnr)) {
         errorMessage = "Could not generate a unique PNR.";
@@ -195,6 +319,8 @@ bool createBooking(
     std::vector<Train> trains;
     std::string line;
     bool found = false;
+    bool waitlisted = false;
+    int waitlistPosition = 0;
 
     while (std::getline(input, line)) {
         if (line.empty()) {
@@ -236,14 +362,18 @@ bool createBooking(
                 available = &train.chairCarSeatsAvailable;
             }
 
-            if (!available ||
-                *available < static_cast<int>(passengers.size())) {
-
-                errorMessage = "Invalid class or insufficient seats.";
+            if (!available) {
+                errorMessage = "Invalid travel class.";
                 return false;
             }
 
-            *available -= static_cast<int>(passengers.size());
+            // Insufficient seats place the booking on the waitlist.
+            if (*available < static_cast<int>(passengers.size())) {
+                waitlisted = true;
+            } else {
+                *available -= static_cast<int>(passengers.size());
+            }
+
             found = true;
         }
 
@@ -257,52 +387,104 @@ bool createBooking(
         return false;
     }
 
-    // Read original train data for rollback.
-    std::ifstream originalFile(TRAIN_FILE, std::ios::binary);
+    std::string originalTrainContent;
+    bool inventoryUpdated = false;
 
-    if (!originalFile.is_open()) {
-        errorMessage = "Cannot read original train data.";
-        return false;
-    }
+    if (waitlisted) {
+        // Find the next position in this train/date/class queue.
+        std::ifstream existingBookings(BOOKING_FILE);
+        int highestPosition = 0;
 
-    std::stringstream originalContent;
-    originalContent << originalFile.rdbuf();
-    originalFile.close();
+        if (existingBookings.is_open()) {
+            std::string bookingLine;
 
-    // Prepare updated train data.
-    std::ostringstream updatedData;
+            while (std::getline(existingBookings, bookingLine)) {
+                std::stringstream bookingStream(bookingLine);
+                std::vector<std::string> fields;
+                std::string field;
 
-    for (const Train& train : trains) {
-        updatedData << serializeTrainRecord(train) << '\n';
-    }
+                while (std::getline(bookingStream, field, '|')) {
+                    fields.push_back(field);
+                }
 
-    // Write updated train data to a temporary file.
-    const std::string TEMP_FILE = "data/trains.tmp";
+                if (fields.size() < 8 ||
+                    fields[1] != selectedTrain.trainNumber ||
+                    fields[2] != selectedTrain.journeyDate ||
+                    fields[3] != travelClass ||
+                    fields[7] != "Waitlisted") {
+                    continue;
+                }
 
-    {
-        std::ofstream temp(TEMP_FILE, std::ios::trunc);
+                int position = highestPosition + 1;
 
-        if (!temp.is_open()) {
-            errorMessage = "Cannot create temporary train data.";
+                if (fields.size() >= 9) {
+                    try {
+                        position = std::stoi(fields[8]);
+                    } catch (...) {
+                        errorMessage = "Invalid waitlist position in booking data.";
+                        return false;
+                    }
+                }
+
+                highestPosition = std::max(highestPosition, position);
+            }
+
+            if (existingBookings.bad()) {
+                errorMessage = "Could not read existing booking data.";
+                return false;
+            }
+        }
+
+        waitlistPosition = highestPosition + 1;
+
+    } else {
+        // Read original train data for rollback.
+        std::ifstream originalFile(TRAIN_FILE, std::ios::binary);
+
+        if (!originalFile.is_open()) {
+            errorMessage = "Cannot read original train data.";
             return false;
         }
 
-        temp << updatedData.str();
+        std::stringstream originalContent;
+        originalContent << originalFile.rdbuf();
+        originalTrainContent = originalContent.str();
+        originalFile.close();
 
-        if (!temp) {
-            temp.close();
+        // Prepare updated train data.
+        std::ostringstream updatedData;
+
+        for (const Train& train : trains) {
+            updatedData << serializeTrainRecord(train) << '\n';
+        }
+
+        const std::string TEMP_FILE = "data/trains.tmp";
+
+        {
+            std::ofstream temp(TEMP_FILE, std::ios::trunc);
+
+            if (!temp.is_open()) {
+                errorMessage = "Cannot create temporary train data.";
+                return false;
+            }
+
+            temp << updatedData.str();
+
+            if (!temp) {
+                temp.close();
+                std::remove(TEMP_FILE.c_str());
+                errorMessage = "Failed to write updated train data.";
+                return false;
+            }
+        }
+
+        if (!replaceFileAtomically(TEMP_FILE, TRAIN_FILE)) {
             std::remove(TEMP_FILE.c_str());
-
-            errorMessage = "Failed to write updated train data.";
+            errorMessage = "Could not update seat inventory.";
             return false;
         }
-    }
 
-    // Atomically replace train data.
-    if (!replaceFileAtomically(TEMP_FILE, TRAIN_FILE)) {
-        std::remove(TEMP_FILE.c_str());
-        errorMessage = "Could not update seat inventory.";
-        return false;
+        inventoryUpdated = true;
     }
 
     // Prepare passenger details.
@@ -332,14 +514,16 @@ bool createBooking(
                      << passengerData.str() << '|'
                      << passengers.size() << '|'
                      << std::fixed << std::setprecision(2)
-                     << totalFare << "|Confirmed\n";
+                     << totalFare << '|'
+                     << (waitlisted ? "Waitlisted" : "Confirmed") << '|'
+                     << waitlistPosition << '\n';
 
             saved = static_cast<bool>(bookings);
         }
     }
 
     // Restore train inventory if booking could not be saved.
-    if (!saved) {
+    if (!saved && inventoryUpdated) {
         const std::string ROLLBACK_FILE = "data/trains.rollback";
 
         {
@@ -354,7 +538,7 @@ bool createBooking(
                 return false;
             }
 
-            restore << originalContent.str();
+            restore << originalTrainContent;
             restore.close();
 
             if (!restore) {
@@ -375,6 +559,18 @@ bool createBooking(
 
         return false;
     }
+
+    if (!saved) {
+        errorMessage = "Could not save waitlisted booking.";
+        return false;
+    }
+
+    // Record only the transaction identifier and outcome.
+    AdminAuditLog::append(
+        waitlisted ? "PASSENGER_BOOKING_WAITLISTED"
+                   : "PASSENGER_BOOKING_CONFIRMED",
+        pnr
+    );
 
     return true;
 }

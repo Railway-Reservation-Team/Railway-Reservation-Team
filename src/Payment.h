@@ -84,6 +84,7 @@ inline bool isValidPaymentPNR(const std::string& pnr) {
     return true;
 }
 
+// Supported methods: UPI, Card, Net Banking and Cash.
 inline bool isValidPaymentMethod(const std::string& method) {
     return method == "UPI" ||
            method == "Card" ||
@@ -91,6 +92,7 @@ inline bool isValidPaymentMethod(const std::string& method) {
            method == "Cash";
 }
 
+// Accepted lifecycle states for a payment transaction.
 inline bool isValidPaymentStatus(const std::string& status) {
     return status == "PENDING" ||
            status == "SUCCESS" ||

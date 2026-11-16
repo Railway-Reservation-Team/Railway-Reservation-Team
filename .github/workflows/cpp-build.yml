@@ -30,6 +30,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Python for availability-monitor tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Test availability monitor
+        run: python -m unittest discover -s monitoring/tests -v
       - name: Install Linux build dependencies
         if: runner.os == 'Linux'
         run: |

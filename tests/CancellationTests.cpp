@@ -178,6 +178,102 @@ int main() {
 
     std::tm* localDeparture = std::localtime(&nearDeparture);
 
+    // Fill the remaining inventory, queue two passengers, then cancel a
+    // confirmed group. Both waitlisted bookings should be promoted FIFO.
+    std::vector<Passenger> sixPassengers(
+        6, {"Group Passenger", 25, "Other"}
+    );
+    std::vector<Passenger> fourPassengers(
+        4, {"Another Passenger", 26, "Other"}
+    );
+    std::string sixPnr;
+    std::string fourPnr;
+    std::string firstWaitlistPnr;
+    std::string secondWaitlistPnr;
+
+    const bool sixCreated = BookingManager::createBooking(
+        train, "Sleeper", sixPassengers, 6000.0, sixPnr, error
+    );
+    check(sixCreated, "Create first confirmed group before waitlist promotion");
+
+    const bool fourCreated = sixCreated && BookingManager::createBooking(
+        train, "Sleeper", fourPassengers, 4000.0, fourPnr, error
+    );
+    check(fourCreated, "Fill remaining seats with second confirmed group");
+
+    const bool firstWaitlistCreated = fourCreated &&
+        BookingManager::createBooking(
+            train, "Sleeper", passengers, 1000.0, firstWaitlistPnr, error
+        );
+    check(firstWaitlistCreated, "Queue first passenger group");
+
+    const bool secondWaitlistCreated = firstWaitlistCreated &&
+        BookingManager::createBooking(
+            train, "Sleeper", passengers, 1000.0, secondWaitlistPnr, error
+        );
+    check(secondWaitlistCreated, "Queue second passenger group");
+
+    if (secondWaitlistCreated) {
+        Booking firstWaiting;
+        Booking secondWaiting;
+        const bool firstFound =
+            BookingManager::findBooking(firstWaitlistPnr, firstWaiting);
+        const bool secondFound =
+            BookingManager::findBooking(secondWaitlistPnr, secondWaiting);
+
+        check(
+            firstFound && firstWaiting.status == "Waitlisted" &&
+                firstWaiting.waitlistPosition == 1,
+            "First waitlisted booking receives queue position 1"
+        );
+        check(
+            secondFound && secondWaiting.status == "Waitlisted" &&
+                secondWaiting.waitlistPosition == 2,
+            "Second waitlisted booking receives queue position 2"
+        );
+
+        const bool waitlistCancellation =
+            Cancellation::cancelBooking(sixPnr, refund, charge, error);
+        check(
+            waitlistCancellation,
+            "Cancellation releases seats and triggers waitlist promotion"
+        );
+
+        if (waitlistCancellation) {
+            Booking firstPromoted;
+            Booking secondPromoted;
+            const bool firstPromotedFound =
+                BookingManager::findBooking(firstWaitlistPnr, firstPromoted);
+            const bool secondPromotedFound =
+                BookingManager::findBooking(secondWaitlistPnr, secondPromoted);
+
+            check(
+                firstPromotedFound && firstPromoted.status == "Confirmed" &&
+                    firstPromoted.waitlistPosition == 0,
+                "Promote the first waitlisted booking"
+            );
+            check(
+                secondPromotedFound && secondPromoted.status == "Confirmed" &&
+                    secondPromoted.waitlistPosition == 0,
+                "Promote the second waitlisted booking in FIFO order"
+            );
+
+            Train afterPromotion;
+            bool trainParsed = false;
+            {
+                std::ifstream trains("data/trains.dat");
+                std::string line;
+                if (std::getline(trains, line)) {
+                    trainParsed = parseTrainRecord(line, afterPromotion);
+                }
+            }
+            check(
+                trainParsed && afterPromotion.sleeperSeatsAvailable == 2,
+                "Seat inventory reflects both FIFO promotions"
+            );
+        }
+    }
+
     char nearDate[11]{};
     char nearTime[6]{};
 
@@ -299,6 +395,117 @@ int main() {
                 departedError
             ),
             "Reject cancellation after train departure"
+        );
+    }
+
+    // Additional invalid PNR validation tests.
+    check(
+        !Cancellation::cancelBooking(
+            "not-a-pnr", refund, charge, error
+        ),
+        "Reject malformed PNR"
+    );
+
+    check(
+        !Cancellation::cancelBooking(
+            "", refund, charge, error
+        ),
+        "Reject empty PNR"
+    );
+
+    check(
+        !Cancellation::cancelBooking(
+            "12345", refund, charge, error
+        ),
+        "Reject PNR with incorrect numeric length"
+    );
+
+    check(
+        !Cancellation::cancelBooking(
+            "12345!@#$%", refund, charge, error
+        ),
+        "Reject PNR containing special characters"
+    );
+
+    // Successful cancellation must be auditable without passenger details.
+    {
+        std::ifstream auditFile("data/admin_audit.log");
+        std::string audit(
+            (std::istreambuf_iterator<char>(auditFile)),
+            std::istreambuf_iterator<char>()
+        );
+        check(
+            audit.find("PASSENGER_CANCELLATION_SUCCESS") != std::string::npos,
+            "Successful passenger cancellation is recorded in the audit log"
+        );
+        check(
+            audit.find("Alice Smith") == std::string::npos &&
+            audit.find("Bob Jones") == std::string::npos,
+            "Passenger names are not written to the cancellation audit log"
+        );
+    }
+
+
+    // Additional cancellation failure-path tests.
+
+    // Test: Reject cancellation when the train does not exist.
+    {
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "OTHER101|Other Express|Bengaluru|Chennai|08:00|14:00|6h|"
+                << "1000|1500|2000|800|10|10|10|10|2026-12-15\n";
+        }
+
+        {
+            std::ofstream bookingsFile(
+                "data/bookings.dat", std::ios::trunc
+            );
+            bookingsFile
+                << "1234567892|MISSING101|2026-12-15|Sleeper|"
+                << "Test Passenger,21,Other|1|500.00|Confirmed\n";
+        }
+
+        double testRefund = 0.0;
+        double testCharge = 0.0;
+        std::string testError;
+
+        check(
+            !Cancellation::cancelBooking(
+                "1234567892", testRefund, testCharge, testError
+            ),
+            "Reject cancellation when the train record is missing"
+        );
+    }
+
+    // Test: Reject cancellation when the booking has an invalid class.
+    {
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "TEST104|Class Test Express|Bengaluru|Chennai|"
+                << "08:00|14:00|6h|1000|1500|2000|800|"
+                << "10|10|10|10|2026-12-15\n";
+        }
+
+        {
+            std::ofstream bookingsFile(
+                "data/bookings.dat", std::ios::trunc
+            );
+            bookingsFile
+                << "1234567893|TEST104|2026-12-15|InvalidClass|"
+                << "Test Passenger,21,Other|1|500.00|Confirmed\n";
+        }
+
+        double testRefund = 0.0;
+        double testCharge = 0.0;
+        std::string testError;
+
+        check(
+            !Cancellation::cancelBooking(
+                "1234567893", testRefund, testCharge, testError
+            ),
+            "Reject cancellation for an invalid travel class"
         );
     }
 

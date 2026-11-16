@@ -50,12 +50,12 @@ See [REQUIREMENTS_GAP_REPORT.md](REQUIREMENTS_GAP_REPORT.md) for the full SRS ID
 
 ## Execution status
 
-Latest previously completed baseline run: [GitHub Actions run 43027487428](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43027487428). It passed all **20/20 registered CTest tests** on Ubuntu and Windows. Cppcheck and coverage generation completed.
+Latest completed feature-validation run: [GitHub Actions run 43073959982](https://github.com/Railway-Reservation-Team/Railway-Reservation-Team/actions/runs/43073959982). It passed all **20/20 registered CTest tests** on Ubuntu and Windows. Cppcheck and coverage generation completed.
 
 Measured baseline coverage:
-- Line coverage: **79.7%**
-- Function coverage: **96.9%**
-- Branch coverage: **49.9%**
+- Line coverage: **79.3%**
+- Function coverage: **97.0%**
+- Branch coverage: **50.0%**
 
 The Test Plan's 70% branch coverage target remains open. Passing registered tests do not prove every manual step in the 14 Test Plan cases or every SRS requirement.
 
