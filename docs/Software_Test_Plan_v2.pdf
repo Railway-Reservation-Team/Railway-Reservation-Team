@@ -1,0 +1,4223 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 9
+/Kids [ 4 0 R 9 0 R 16 0 R 20 0 R 24 0 R 29 0 R 33 0 R 37 0 R 41 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+4 0 obj
+<<
+/Contents 5 0 R
+/MediaBox [ 0 0 595.2756 841.8898 ]
+/Resources <<
+/Font 6 0 R
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/Parent 2 0 R
+>>
+endobj
+5 0 obj
+<<
+/Length 2088
+>>
+stream
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+q
+1 0 0 1 76.86614 679.9843 cm
+Q
+q
+1 0 0 1 76.86614 650.9843 cm
+q
+0 0 0 rg
+BT
+1 0 0 1 0 6 Tm
+/F2 23 Tf
+29 TL
+87.87765 0 Td
+(SOFTWARE TEST PLAN) Tj
+T*
+-87.87765 0 Td
+ET
+Q
+Q
+q
+1 0 0 1 76.86614 614.811 cm
+Q
+q
+1 0 0 1 76.86614 581.811 cm
+q
+0 0 0 rg
+BT
+1 0 0 1 0 5 Tm
+/F2 16 Tf
+21 TL
+112.2837 0 Td
+(Railway Reservation System) Tj
+T*
+-112.2837 0 Td
+ET
+Q
+Q
+q
+1 0 0 1 76.86614 519.811 cm
+q
+0 0 0 rg
+BT
+1 0 0 1 0 4 Tm
+/F2 14 Tf
+18 TL
+192.7577 0 Td
+(Team 12) Tj
+T*
+-192.7577 0 Td
+ET
+Q
+Q
+q
+1 0 0 1 85.03937 287.252 cm
+q
+1 1 1 rg
+n
+q
+0 127.5591 425.1969 -127.5591 re
+1 g
+f*
+Q
+0 0 0 rg
+BT
+/F2 11 Tf
+12 TL
+ET
+BT
+1 0 0 1 8 109.8031 Tm
+(SRN) Tj
+T*
+ET
+BT
+1 0 0 1 172.4094 109.8031 Tm
+(Name) Tj
+T*
+ET
+BT
+/F1 11 Tf
+12 TL
+ET
+BT
+1 0 0 1 8 84.29134 Tm
+(PES2UG24CS345) Tj
+T*
+ET
+BT
+1 0 0 1 172.4094 84.29134 Tm
+(Pavan Kumar H) Tj
+T*
+ET
+BT
+1 0 0 1 8 58.77953 Tm
+(PES2UG24CS351) Tj
+T*
+ET
+BT
+1 0 0 1 172.4094 58.77953 Tm
+(Pooja Kanakappanavara) Tj
+T*
+ET
+BT
+1 0 0 1 8 33.26772 Tm
+(PES2UG24CS352) Tj
+T*
+ET
+BT
+1 0 0 1 172.4094 33.26772 Tm
+(Pooja Koppad) Tj
+T*
+ET
+BT
+1 0 0 1 8 7.755906 Tm
+(PES2UG24CS354) Tj
+T*
+ET
+BT
+1 0 0 1 172.4094 7.755906 Tm
+(Pothineni Dinesh) Tj
+T*
+ET
+q
+1 J
+1 j
+0 0 0 RG
+0.8 w
+n
+0 127.5591 m
+425.1969 127.5591 l
+S
+n
+0 0 m
+425.1969 0 l
+S
+n
+0 0 m
+0 127.5591 l
+S
+n
+425.1969 0 m
+425.1969 127.5591 l
+S
+n
+0 102.0472 m
+425.1969 102.0472 l
+S
+n
+0 76.53543 m
+425.1969 76.53543 l
+S
+n
+0 51.02362 m
+425.1969 51.02362 l
+S
+n
+0 25.51181 m
+425.1969 25.51181 l
+S
+n
+164.4094 0 m
+164.4094 127.5591 l
+S
+Q
+Q
+Q
+q
+1 0 0 1 76.86614 253.2362 cm
+Q
+q
+1 0 0 1 76.86614 236.2362 cm
+q
+0 0 0 rg
+BT
+1 0 0 1 0 6 Tm
+/F1 11 Tf
+17 TL
+146.8957 0 Td
+(Revision 2\0560 \174 November 2026) Tj
+T*
+-146.8957 0 Td
+ET
+Q
+Q
+q
+1 0 0 1 76.86614 210.7244 cm
+Q
+q
+1 0 0 1 76.86614 193.7244 cm
+q
+0 0 0 rg
+BT
+1 0 0 1 0 6 Tm
+/F1 11 Tf
+17 TL
+155.9707 0 Td
+(PES University\054 Bangalore) Tj
+T*
+-155.9707 0 Td
+ET
+Q
+Q
+q
+1 0 0 1 76.86614 185.2205 cm
+Q
+q
+1 0 0 1 76.86614 168.2205 cm
+q
+0 0 0 rg
+BT
+1 0 0 1 0 6 Tm
+/F1 11 Tf
+17 TL
+97.57715 0 Td
+(Department of Computer Science and Engineering) Tj
+T*
+-97.57715 0 Td
+ET
+Q
+Q
+
+endstream
+endobj
+6 0 obj
+<<
+/F1 7 0 R
+/F2 8 0 R
+>>
+endobj
+7 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+8 0 obj
+<<
+/BaseFont /Helvetica-Bold
+/Encoding /WinAnsiEncoding
+/Name /F2
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+9 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 11 0 R
+/F1-0 12 0 R
+/R10 13 0 R
+/R11 14 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 15 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+10 0 obj
+<<
+/Type /ExtGState
+/SA false
+>>
+endobj
+11 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+12 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+13 0 obj
+<<
+/BaseFont /Helvetica
+/Type /Font
+/Encoding /WinAnsiEncoding
+/Subtype /Type1
+>>
+endobj
+14 0 obj
+<<
+/BaseFont /Helvetica-Bold
+/Type /Font
+/Encoding /WinAnsiEncoding
+/Subtype /Type1
+>>
+endobj
+15 0 obj
+<<
+/Length 7246
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 2) ] TJ
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 772.701 Tm
+(Document Control) Tj
+ET
+Q
+q
+570.234 7457.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 7117.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 6777.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 751.701 Tm
+[ (Item) -15062.9 (Details) ] TJ
+17 TL
+T*
+[ (Document) -12450.9 (Software Test Plan \226 Railway Reservation System) ] TJ
+T*
+[ (Version \057 Date) -10671.9 (2\0560 \057 16\055Nov\0552026) ] TJ
+T*
+[ (Project) -13895.9 (Team 12) ] TJ
+T*
+[ (Baseline) -13172.9 (SRS v1\0561 \05015\055Nov\0552026\051\073 SAD v2\0560 \050November 2026\051) ] TJ
+T*
+[ (Status) -14172.9 (Updated working version\073 team\057evaluator approval pending) ] TJ
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 7627.01 m
+5389.13 7627.01 l
+S
+570.234 6607.01 m
+5389.13 6607.01 l
+S
+570.234 6607.01 m
+570.234 7627.01 l
+S
+5389.13 6607.01 m
+5389.13 7627.01 l
+S
+570.234 7457.01 m
+5389.13 7457.01 l
+S
+570.234 7287.01 m
+5389.13 7287.01 l
+S
+570.234 7117.01 m
+5389.13 7117.01 l
+S
+570.234 6947.01 m
+5389.13 6947.01 l
+S
+570.234 6777.01 m
+5389.13 6777.01 l
+S
+1760.79 6607.01 m
+1760.79 7627.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 642.701 Tm
+(Revision History) Tj
+ET
+Q
+0.204 g
+q
+570.234 6187.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 5757.01 4818.9 260 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 624.701 Tm
+[ (Version) -3899.12 (Date) -8011.72 (Description) -33469.2 (Approval) ] TJ
+17 TL
+T*
+[ (1\0560) -5899.12 (16\055Sep\0552026) -4342.72 (Initial test plan\056) -31800.2 (Initial draft) ] TJ
+T*
+[ (2\0560) -5899.12 (16\055Nov\0552026) -4343.72 (Updated scope\054 requirement identifiers\054 architecture\054 test environment and actual) ] TJ
+121.89 -9 Td
+(execution\057coverage evidence\056) Tj
+269.291 9 Td
+(Pending review) Tj
+ET
+Q
+570.234 6357.01 m
+5389.13 6357.01 l
+S
+570.234 5757.01 m
+5389.13 5757.01 l
+S
+570.234 5757.01 m
+570.234 6357.01 l
+S
+5389.13 5757.01 m
+5389.13 6357.01 l
+S
+570.234 6187.01 m
+5389.13 6187.01 l
+S
+570.234 6017.01 m
+5389.13 6017.01 l
+S
+1080.47 5757.01 m
+1080.47 6357.01 l
+S
+1789.13 5757.01 m
+1789.13 6357.01 l
+S
+4482.05 5757.01 m
+4482.05 6357.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 557.701 Tm
+(Evidence policy) Tj
+ET
+Q
+0.961 g
+6 w
+0 J
+0 j
+0.796 G
+500.234 5167.01 4952.29 400 re
+B*
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 9 Tf
+1 0 0 1 57.0234 540.701 Tm
+(This plan distinguishes executed automated tests from planned or not\055yet\055demonstrated verification\056 A passing test suite) Tj
+13 TL
+(does not\054 by itself\054 prove every SRS requirement or non\055functional target\056) '
+/R11 15 Tf
+29 TL
+(1\056 Introduction) '
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 476.701 Tm
+(1\0561 Purpose) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 459.101 Tm
+(This Software Test Plan defines the objectives\054 scope\054 approach\054 environment\054 responsibilities\054 activities\054 traceability and) Tj
+12 TL
+(reporting for verification of the Team 12 Railway Reservation System against the current SRS\056 It records the evidence) '
+(available for this revision\056) '
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 413.701 Tm
+(1\0562 System Scope) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 396.101 Tm
+(The system is a standalone\054 menu\055driven C\053\05317 console application for a single local user session\056 It includes passenger) Tj
+12 TL
+(registration\057authentication\054 train search\054 class\055wise seat availability\054 passenger details\054 fare calculation\054 simulated payment\054) '
+(confirmed or waitlisted booking records\054 PNR generation\057enquiry\054 booking history\054 cancellation\057refund\054 administrator) '
+(authentication and local train\057fare\057reservation management\056 Booking\054 cancellation\054 receipt\054 e\055ticket and audit information is) '
+(maintained in local files\056) '
+18 TL
+(The system does not connect to railway infrastructure\054 live railway databases\054 external payment gateways or remote network) '
+12 TL
+(services\056 Payment is simulated\056 Multi\055machine concurrent access is outside the current standalone architecture\056) '
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 296.701 Tm
+(1\0563 References) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 280.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Team 12\054 Railway Reservation System SRS v1\0561\054 15\055Nov\0552026\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Team 12\054 Railway Reservation System Software Architecture and Design Specification v2\0560\054 November 2026\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Railway\055Reservation\055Team repository\072 source code\054 CMake configuration and test targets\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Supplied CTest and gcovr execution output dated 16\055Nov\0552026\056) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 203.701 Tm
+(1\0564 Terms) Tj
+ET
+Q
+0.204 g
+q
+570.234 1797.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 1457.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 1117.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 185.701 Tm
+[ (Term) -15889.8 (Meaning) ] TJ
+17 TL
+T*
+[ (SRS \057 SAD \057 STP \057 RTM) -7497.77 (Software Requirements \057 Architecture and Design \057 Test Plan \057 Requirements Traceability Matrix) ] TJ
+T*
+[ (PNR \057 RAC) -13166.8 (Passenger Name Record \057 Reservation Against Cancellation) ] TJ
+T*
+[ (FR \057 NFR \057 SR) -11777.8 (Functional \057 Non\055Functional \057 Security Requirement) ] TJ
+T*
+[ (CTest \057 gcovr) -12276.8 (CMake test runner \057 GCC coverage reporting tool) ] TJ
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 1967.01 m
+5389.13 1967.01 l
+S
+570.234 1117.01 m
+5389.13 1117.01 l
+S
+570.234 1117.01 m
+570.234 1967.01 l
+S
+5389.13 1117.01 m
+5389.13 1967.01 l
+S
+570.234 1797.01 m
+5389.13 1797.01 l
+S
+570.234 1627.01 m
+5389.13 1627.01 l
+S
+570.234 1457.01 m
+5389.13 1457.01 l
+S
+570.234 1287.01 m
+5389.13 1287.01 l
+S
+1845.83 1117.01 m
+1845.83 1967.01 l
+S
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 86.7008 Tm
+(2\056 Test Objectives) Tj
+ET
+Q
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 2) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 2) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+16 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 17 0 R
+/F1-0 18 0 R
+/R10 13 0 R
+/R11 14 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 19 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+17 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+18 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+19 0 obj
+<<
+/Length 7350
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 3) ] TJ
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 780.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Verify implemented functions against applicable SRS requirements and acceptance criteria\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Check interactions among booking\054 seat inventory\054 payment\054 cancellation and local persistence\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Verify input validation\054 authentication\054 authorization\054 credential protection\054 audit and data integrity\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Run regression tests after changes and retain reproducible build\054 test and coverage evidence\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Identify requirements and non\055functional targets that still need manual or measured evidence\056) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 685.701 Tm
+(2\0561 Test Principles) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 669.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Use current SRS identifiers RRS\055F\055xxx\054 RRS\055NF\055xxx and RRS\055SR\055xxx\073 the older FR\057SEC numbering in the initial STP is) Tj
+12 TL
+(superseded\056) '
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Do not mark a requirement passed solely because a module exists or a test executable succeeds\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Record actual results separately from planned tests and expected outcomes\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Do not alter coverage filters or exclude source files simply to increase coverage\056) Tj
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 573.701 Tm
+(3\056 Test Items and Features) Tj
+ET
+Q
+q
+570.234 5467.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 5127.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4787.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4447.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4107.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 3767.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 552.701 Tm
+[ (Component \057 area) -11433.6 (Primary test focus) ] TJ
+17 TL
+T*
+[ (Passenger AuthManager) -8376.61 (Registration\054 validation\054 password hashing\054 login\054 lockout\054 session timeout\054 logout and audit events\056) ] TJ
+T*
+[ (TrainSearch) -13991.6 (Search validation\054 route\057date matching\054 train details\054 classes\057fares and no\055results behaviour\056) ] TJ
+T*
+[ (SeatInventory) -13267.6 (Class normalization\054 availability\054 request validation\054 holds\054 allocation\057release\054 concurrency and boundaries\056) ] TJ
+T*
+[ (PassengerDetails \057 BookingManager) -3208.61 (Passenger input\054 booking creation\054 PNR assignment\054 booking status\054 seat integration and persistence\056) ] TJ
+T*
+[ (Payment \057 receipts) -11156.6 (Fare\057payment result handling\054 success\057failure\054 receipt data and refund calculations\056) ] TJ
+T*
+[ (CancellationManager) -9989.61 (PNR validation\054 eligibility\054 refund\054 cancellation persistence\054 seat release and waitlist promotion\056) ] TJ
+T*
+[ (PNR \057 History \057 E\055ticket) -9213.61 (PNR lookup\054 booking status\057history\054 ticket formatting and local output\056) ] TJ
+T*
+[ (Admin functions) -12323.6 (Admin login\057authorization\054 train\057fare\057quota management\054 reservation records and menu access\056) ] TJ
+T*
+[ (FileStore \057 persistence) -9489.61 (Read\057write\054 missing or malformed data\054 persistence\054 error handling and record integrity\056) ] TJ
+T*
+[ (Console integration) -10822.6 (Menu navigation\054 prompts\054 invalid input and end\055to\055end passenger\057admin workflows\056) ] TJ
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 5637.01 m
+5389.13 5637.01 l
+S
+570.234 3767.01 m
+5389.13 3767.01 l
+S
+570.234 3767.01 m
+570.234 5637.01 l
+S
+5389.13 3767.01 m
+5389.13 5637.01 l
+S
+570.234 5467.01 m
+5389.13 5467.01 l
+S
+570.234 5297.01 m
+5389.13 5297.01 l
+S
+570.234 5127.01 m
+5389.13 5127.01 l
+S
+570.234 4957.01 m
+5389.13 4957.01 l
+S
+570.234 4787.01 m
+5389.13 4787.01 l
+S
+570.234 4617.01 m
+5389.13 4617.01 l
+S
+570.234 4447.01 m
+5389.13 4447.01 l
+S
+570.234 4277.01 m
+5389.13 4277.01 l
+S
+570.234 4107.01 m
+5389.13 4107.01 l
+S
+570.234 3937.01 m
+5389.13 3937.01 l
+S
+1930.87 3767.01 m
+1930.87 5637.01 l
+S
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 351.701 Tm
+(4\056 Features Included and Excluded) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 329.701 Tm
+(4\0561 Included) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 313.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Passenger registration\054 login\057logout and protected access\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Train search\054 train details and class\055wise availability\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Passenger details\054 fare calculation\054 booking\054 confirmation and PNR\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Waitlist handling\057promotion where implemented\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Simulated payment\054 payment\057receipt records and refund calculation\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Cancellation\054 seat restoration\054 booking status and audit records\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(PNR enquiry\054 booking history and e\055ticket generation\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Administrator authentication\054 train\057fare management and reports where implemented\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Local persistence\054 malformed\055record handling and security validation\056) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 146.701 Tm
+(4\0562 Excluded) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 130.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Real payment gateway\054 banking settlement or real\055money transactions\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Live railway systems\054 signalling\054 train control or external railway databases\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Remote client\057server APIs and multi\055machine deployment\056) Tj
+ET
+Q
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 3) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 3) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+20 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 21 0 R
+/F1-0 22 0 R
+/R10 13 0 R
+/R11 14 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 23 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+21 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+22 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+23 0 obj
+<<
+/Length 7405
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 4) ] TJ
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 780.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(The 100\055concurrent\055reservation target\072 SRS v1\0561 identifies it as future scalability work outside the current single\055user) Tj
+12 TL
+(architecture unless scope is formally revised\056) '
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(The 99\0565\045 availability target as a proven result\073 this requires an agreed operating period and measured uptime evidence\056) Tj
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 720.701 Tm
+(5\056 Test Approach and Strategy) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 698.701 Tm
+(5\0561 Test Levels) Tj
+ET
+Q
+0.204 g
+q
+570.234 6747.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 6227.01 4818.9 260 re
+1 g
+f*
+Q
+q
+570.234 5707.01 4818.9 260 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 680.701 Tm
+[ (Level) -9758.49 (Purpose) -27862 (Evidence \057 execution) ] TJ
+17 TL
+T*
+[ (Unit\057module) -6813.49 (Verify individual functions and valid\054 invalid\054 boundary and error) ] TJ
+85.0395 -9 Td
+(paths\056) Tj
+221.102 9 Td
+(Dedicated CMake test executables run through) Tj
+9 TL
+(CTest\056) '
+-306.142 -17 Td
+[ (Integration) -7423.49 (Verify booking with seat inventory\054 payment and persistence\073) ] TJ
+85.0395 -9 Td
+(cancellation with refund\054 seat release and waitlist\056) Tj
+221.102 9 Td
+(Integration\057workflow test targets\056) Tj
+-306.142 -26 Td
+[ (System) -8814.49 (Verify complete console workflows across passenger and admin) ] TJ
+85.0395 -9 Td
+(functions\056) Tj
+221.102 9 Td
+(Console smoke test and manual end\055to\055end checks\056) Tj
+-306.142 -26 Td
+[ (Acceptance) -6923.49 (Assess user scenarios against SRS acceptance criteria\056) -6799.05 (Team\057evaluator walkthrough\073 not inferred from CTest) ] TJ
+306.142 -9 Td
+(alone\056) Tj
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 6917.01 m
+5389.13 6917.01 l
+S
+570.234 5707.01 m
+5389.13 5707.01 l
+S
+570.234 5707.01 m
+570.234 6917.01 l
+S
+5389.13 5707.01 m
+5389.13 6917.01 l
+S
+570.234 6747.01 m
+5389.13 6747.01 l
+S
+570.234 6487.01 m
+5389.13 6487.01 l
+S
+570.234 6227.01 m
+5389.13 6227.01 l
+S
+570.234 5967.01 m
+5389.13 5967.01 l
+S
+1420.63 5707.01 m
+1420.63 6917.01 l
+S
+3631.65 5707.01 m
+3631.65 6917.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 552.701 Tm
+(5\0562 Test Types) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 536.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Functional testing of implemented requirements\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+-0.01743 Tw
+(Negative and boundary testing of invalid credentials\054 malformed records\054 invalid classes\054 missing files and invalid requests\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+0 Tw
+(Security testing of password storage\054 authentication\054 lockout\054 timeout\054 authorization\054 audit and integrity\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Concurrency\057stress tests focused on seat\055inventory operations\073 these do not prove multi\055machine scalability\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Performance testing\072 a PerformanceTests target exists\054 but numerical NFR acceptance needs recorded measurements\054) Tj
+12 TL
+(sample size and environment\056) '
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Regression testing by rerunning the complete CTest suite\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Usability review of prompts and error messages through manual walkthroughs\056) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 393.701 Tm
+(5\0563 Entry Criteria) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 377.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Source and CMake build configuration are available\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(A C\053\05317 compiler and CMake environment are available\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Required test data is prepared or tests create isolated temporary data\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Relevant test targets compile successfully\056) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 300.701 Tm
+(5\0564 Exit Criteria) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 284.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(All planned automated tests for the release are executed and results recorded\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(No unresolved critical defect blocks the intended release scope\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(High\055priority requirements have test coverage or are explicitly marked Not Demonstrated\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Security\054 persistence\054 performance and manual acceptance evidence is reviewed\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(RTM and this plan reflect current requirement identifiers and implementation status\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(70\045 branch coverage is met with reproducible evidence or explicitly recorded as not met\056) Tj
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 164.701 Tm
+(6\056 Security and Data\055Integrity Validation) Tj
+ET
+Q
+q
+570.234 1377.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 857.008 4818.9 260 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 143.701 Tm
+[ (SRS ID) -6789.77 (Validation focus) -22502.3 (Evidence \057 status) ] TJ
+17 TL
+T*
+[ (RRS\055SR\055001) -4289.77 (Authentication before protected access\056) -11996.3 (Passenger\057admin authentication tests exist\073 map exact test) ] TJ
+277.795 -9 Td
+(IDs in RTM\056) Tj
+-277.795 -17 Td
+[ (RRS\055SR\055002) -4289.77 (Salted PBKDF2\055HMAC\055SHA\055256\073 no plaintext password) ] TJ
+70.8664 -9 Td
+(stored\057displayed\057logged\056) Tj
+206.929 9 Td
+(AuthManager tests inspect salt\057hash structure and plaintext) Tj
+9 TL
+(absence\056) '
+ET
+Q
+570.234 1547.01 m
+5389.13 1547.01 l
+S
+570.234 857.008 m
+570.234 1547.01 l
+S
+5389.13 857.008 m
+5389.13 1547.01 l
+S
+570.234 857.008 m
+5389.13 857.008 l
+S
+570.234 1377.01 m
+5389.13 1377.01 l
+S
+570.234 1117.01 m
+5389.13 1117.01 l
+S
+1278.9 857.008 m
+1278.9 1547.01 l
+S
+3348.19 857.008 m
+3348.19 1547.01 l
+S
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 4) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 4) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+24 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 25 0 R
+/F1-0 26 0 R
+/R10 13 0 R
+/R11 14 0 R
+/R32 27 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 28 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+25 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+26 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+27 0 obj
+<<
+/BaseFont /Courier
+/Type /Font
+/Encoding /WinAnsiEncoding
+/Subtype /Type1
+>>
+endobj
+28 0 obj
+<<
+/Length 7840
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 5) ] TJ
+ET
+Q
+0.204 g
+q
+570.234 7707.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 7187.01 4818.9 260 re
+1 g
+f*
+Q
+q
+570.234 6667.01 4818.9 260 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 776.701 Tm
+[ (SRS ID) -6789.77 (Validation focus) -22502.3 (Evidence \057 status) ] TJ
+17 TL
+T*
+[ (RRS\055SR\055003) -4289.77 (Role\055based restriction of administrator functions\056) -8109.27 (Admin authentication\057menu\055security targets are present\073) ] TJ
+277.795 -9 Td
+(review detailed assertions\056) Tj
+-277.795 -17 Td
+[ (RRS\055SR\055004) -4289.77 (Validate all input before processing\057storage\056) -10107.3 (Validation\054 passenger\054 search\054 admin and authentication tests) ] TJ
+277.795 -9 Td
+(are present\056) Tj
+-277.795 -17 Td
+[ (RRS\055SR\055005) -4289.77 (Transaction integrity and prevention of duplicate commitment\056) -2272.27 (Booking\054 cancellation\054 seat\055inventory and concurrency tests) ] TJ
+277.795 -9 Td
+(are present\056) Tj
+-277.795 -17 Td
+[ (RRS\055SR\055006) -4289.77 (Timestamped authentication\055failure and administrator audit) ] TJ
+70.8664 -9 Td
+(events\056) Tj
+206.929 9 Td
+(Lockout audit assertion exists\073 complete booking\057cancellation) Tj
+9 TL
+(audit coverage must be verified separately\056) '
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 7877.01 m
+5389.13 7877.01 l
+S
+570.234 7707.01 m
+570.234 7877.01 l
+S
+570.234 6667.01 m
+570.234 7707.01 l
+S
+5389.13 7707.01 m
+5389.13 7877.01 l
+S
+5389.13 6667.01 m
+5389.13 7707.01 l
+S
+570.234 6667.01 m
+5389.13 6667.01 l
+S
+570.234 7707.01 m
+5389.13 7707.01 l
+S
+1278.9 7707.01 m
+1278.9 7877.01 l
+S
+3348.19 7707.01 m
+3348.19 7877.01 l
+S
+570.234 7447.01 m
+5389.13 7447.01 l
+S
+570.234 7187.01 m
+5389.13 7187.01 l
+S
+570.234 6927.01 m
+5389.13 6927.01 l
+S
+1278.9 6667.01 m
+1278.9 7707.01 l
+S
+3348.19 6667.01 m
+3348.19 7707.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 648.701 Tm
+(6\0561 Data Integrity Scenarios) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 632.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Read missing\054 empty\054 malformed or corrupted files and verify controlled error\057recovery behaviour\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Verify account\055file integrity metadata and reject record\055count\057checksum mismatch\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Verify failed writes are not reported as successful transactions\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Verify booking status and seat inventory remain consistent after booking\057cancellation\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Verify representative booking\057cancellation records remain available after restart\056) Tj
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 530.701 Tm
+(7\056 Test Environment) Tj
+ET
+Q
+q
+570.234 5037.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 4697.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4357.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4017.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 509.701 Tm
+[ (Category) -15380.6 (Current \057 required environment) ] TJ
+17 TL
+T*
+[ (Reported operating environment) -5097.61 (Ubuntu under WSL\073 repository at \176\057Railway\055Reservation\055Team\056) ] TJ
+T*
+[ (Language) -14989.6 (C\053\05317\056) ] TJ
+T*
+[ (Build system) -13769.6 (CMake\073 coverage build directory build\055coverage\057\056) ] TJ
+T*
+[ (Test execution) -12934.6 (CTest\073 30 registered tests in the reported run\056) ] TJ
+T*
+[ (Coverage) -15102.6 (GCC coverage data and gcovr\073 source filter src\057\054 main\056cpp excluded as shown in the recorded command\056) ] TJ
+T*
+[ (Test data) -15268.6 (Local project files and isolated temporary directories where applicable\056) ] TJ
+T*
+[ (Source control) -12990.6 (Git\073 branch reported as feature\057member3\055menu\055coverage\056) ] TJ
+ET
+Q
+570.234 5207.01 m
+5389.13 5207.01 l
+S
+570.234 3847.01 m
+5389.13 3847.01 l
+S
+570.234 3847.01 m
+570.234 5207.01 l
+S
+5389.13 3847.01 m
+5389.13 5207.01 l
+S
+570.234 5037.01 m
+5389.13 5037.01 l
+S
+570.234 4867.01 m
+5389.13 4867.01 l
+S
+570.234 4697.01 m
+5389.13 4697.01 l
+S
+570.234 4527.01 m
+5389.13 4527.01 l
+S
+570.234 4357.01 m
+5389.13 4357.01 l
+S
+570.234 4187.01 m
+5389.13 4187.01 l
+S
+570.234 4017.01 m
+5389.13 4017.01 l
+S
+1930.87 3847.01 m
+1930.87 5207.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 366.701 Tm
+(7\0561 Reproducible Commands) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R32 7 Tf
+1 0 0 1 57.0234 350.701 Tm
+(cmake \055\055build build\055coverage \055j\044\050nproc\051) Tj
+12 TL
+(ctest \055\055test\055dir build\055coverage \055\055output\055on\055failure) '
+24 TL
+(find build\055coverage \055name \047\052\056gcda\047 \055delete) '
+12 TL
+(cmake \055\055build build\055coverage \055j\044\050nproc\051) '
+(ctest \055\055test\055dir build\055coverage \055\055output\055on\055failure) '
+24 TL
+(gcovr \055\055root \056 \055\055object\055directory build\055coverage \134) '
+12 TL
+(  \055\055filter \047src\057\047 \055\055exclude \047src\057main\056cpp\047 \134) '
+(  \055\055txt \055\055branches \055\055print\055summary) '
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 212.701 Tm
+(8\056 Roles and Responsibilities) Tj
+ET
+Q
+q
+570.234 1857.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 1337.01 4818.9 260 re
+1 g
+f*
+Q
+q
+570.234 817.008 4818.9 260 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 191.701 Tm
+[ (Team member) -9292.08 (SRN) -10847.4 (Module\057testing responsibility in initial team test plan) ] TJ
+17 TL
+T*
+[ (Pooja Koppad) -9511.08 (PES2UG24CS352) ] TJ
+201.26 0 Td
+-0.08818 Tw
+(AuthManager\054 AdminTrainManager\054 AdminFareManager\073 security validation\054 admin and) Tj
+9 TL
+0 Tw
+(authentication tests\056) '
+-201.26 -17 Td
+[ (Pooja Kanakappanavara) -4842.08 (PES2UG24CS351) -4732.37 (TrainSearch\054 SeatInventory\054 BookingManager\073 search\054 seat\055hold\054 booking and waitlist) ] TJ
+201.26 -9 Td
+(tests\056) Tj
+-201.26 -17 Td
+[ (Pavan Kumar H) -8735.08 (PES2UG24CS345) -4732.37 (PaymentModule\054 CancellationManager\054 ReportGenerator\073 payment\054 refund\054 report and) ] TJ
+201.26 -9 Td
+(performance tests\056) Tj
+-201.26 -17 Td
+[ (Pothineni Dinesh) -8234.08 (PES2UG24CS354) -4732.37 (PNRService\054 HistoryService\054 TicketPrinter\054 FileStore\073 PNR\057history\057e\055ticket\054) ] TJ
+201.26 -9 Td
+(data\055integrity tests\054 RTM and document assembly\056) Tj
+ET
+Q
+570.234 2027.01 m
+5389.13 2027.01 l
+S
+570.234 817.008 m
+5389.13 817.008 l
+S
+570.234 817.008 m
+570.234 2027.01 l
+S
+5389.13 817.008 m
+5389.13 2027.01 l
+S
+570.234 1857.01 m
+5389.13 1857.01 l
+S
+570.234 1597.01 m
+5389.13 1597.01 l
+S
+570.234 1337.01 m
+5389.13 1337.01 l
+S
+570.234 1077.01 m
+5389.13 1077.01 l
+S
+1675.75 817.008 m
+1675.75 2027.01 l
+S
+2582.84 817.008 m
+2582.84 2027.01 l
+S
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 5) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 5) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+29 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 30 0 R
+/F1-0 31 0 R
+/R10 13 0 R
+/R11 14 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 32 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+30 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+31 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+32 0 obj
+<<
+/Length 7942
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 6) ] TJ
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 779.101 Tm
+-0.004662 Tw
+(These are the team responsibilities recorded in the initial Software Test Plan\056 All members participate in integration\054 regression) Tj
+12 TL
+0 Tw
+(and final acceptance review\056) '
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 738.701 Tm
+(9\056 Schedule and Risks) Tj
+ET
+Q
+q
+570.234 7117.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 6777.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 6437.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 6097.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 717.701 Tm
+[ (Milestone) -15158.6 (Current evidence\057status) ] TJ
+17 TL
+T*
+[ (Automated build) -12211.6 (CMake build completed successfully for the reported run\056) ] TJ
+T*
+[ (Regression execution) -9822.61 (30 of 30 CTest tests passed\056) ] TJ
+T*
+[ (Coverage measurement) -8711.61 (gcovr report generated after resetting \056gcda files and rerunning the suite\056) ] TJ
+T*
+[ (Requirement traceability) -8656.61 (Requires final alignment with SRS v1\0561 identifiers and RTM\056md\056) ] TJ
+T*
+[ (Manual acceptance \057 NFR evidence) -3597.61 (Not fully demonstrated by the supplied automated test log\056) ] TJ
+T*
+[ (Final review) -14103.6 (Pending team\057evaluator review\056) ] TJ
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 7287.01 m
+5389.13 7287.01 l
+S
+570.234 6097.01 m
+5389.13 6097.01 l
+S
+570.234 6097.01 m
+570.234 7287.01 l
+S
+5389.13 6097.01 m
+5389.13 7287.01 l
+S
+570.234 7117.01 m
+5389.13 7117.01 l
+S
+570.234 6947.01 m
+5389.13 6947.01 l
+S
+570.234 6777.01 m
+5389.13 6777.01 l
+S
+570.234 6607.01 m
+5389.13 6607.01 l
+S
+570.234 6437.01 m
+5389.13 6437.01 l
+S
+570.234 6267.01 m
+5389.13 6267.01 l
+S
+1930.87 6097.01 m
+1930.87 7287.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 591.701 Tm
+(9\0561 Risks and Mitigation) Tj
+ET
+Q
+0.204 g
+q
+570.234 5677.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 5337.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4997.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 573.701 Tm
+[ (Risk) -21543.1 (Mitigation) ] TJ
+17 TL
+T*
+[ (Different local build\057test environments) -6814.11 (Document compiler\054 CMake and test commands\073 run the same CTest suite\056) ] TJ
+T*
+[ (Coverage target not achieved) -10369.1 (Prioritize meaningful uncovered branches\073 do not manipulate filters\056) ] TJ
+T*
+[ (Automated tests do not cover manual acceptance) -1531.11 (Maintain manual test records with inputs\054 expected\057actual results and screenshots\056) ] TJ
+T*
+[ (Test data affects reproducibility) -9648.11 (Use isolated directories or reset controlled data before execution\056) ] TJ
+T*
+[ (Requirement identifiers changed) -9092.11 (Use SRS v1\0561 IDs and update RTM mappings\056) ] TJ
+ET
+Q
+570.234 5847.01 m
+5389.13 5847.01 l
+S
+570.234 4827.01 m
+5389.13 4827.01 l
+S
+570.234 4827.01 m
+570.234 5847.01 l
+S
+5389.13 4827.01 m
+5389.13 5847.01 l
+S
+570.234 5677.01 m
+5389.13 5677.01 l
+S
+570.234 5507.01 m
+5389.13 5507.01 l
+S
+570.234 5337.01 m
+5389.13 5337.01 l
+S
+570.234 5167.01 m
+5389.13 5167.01 l
+S
+570.234 4997.01 m
+5389.13 4997.01 l
+S
+2214.33 4827.01 m
+2214.33 5847.01 l
+S
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 457.701 Tm
+(10\056 Test Execution Summary and Metrics) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 435.701 Tm
+(10\0561 Verified Automated Run) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 418.101 Tm
+(The following figures are taken from the supplied terminal output for the 16\055Nov\0552026 run\056 The coverage counters were reset) Tj
+12 TL
+(before the complete coverage run\056) '
+ET
+Q
+0.204 g
+q
+570.234 3807.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 3467.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 3127.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 2787.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 386.701 Tm
+[ (Metric) -12666.1 (Observed result) -11974.6 (Interpretation) ] TJ
+17 TL
+T*
+[ (CTest tests) -10331.1 (30\05730 passed\073 0 failed) -9248.59 (Automated suite passed for this run\056) ] TJ
+T*
+[ (Line coverage) -9107.11 (88\0564\045 \0502\054571 \057 2\054909\051) -9415.59 (Measured line coverage for configured gcovr source scope\056) ] TJ
+T*
+[ (Branch coverage) -7829.11 (59\0569\045 \0502\054971 \057 4\054959\051) -9415.59 (Measured branch coverage\073 below 70\045 target\056) ] TJ
+T*
+[ (70\045 target) -10552.1 (Not achieved) -13196.6 (3\054472 covered branches are needed\073 current count is 2\054971 \050501 short\051\056) ] TJ
+T*
+[ (AuthManager\056cpp) -7495.11 (351 \057 582 branches \05060\045\051) -7526.59 (Earlier recorded run\072 328\057582 \05056\045\051\056) ] TJ
+T*
+[ (Cancellation\056cpp) -7996.11 (347 \057 621 branches \05055\045\051) -7526.59 (Measured result in this run\056) ] TJ
+ET
+Q
+570.234 3977.01 m
+5389.13 3977.01 l
+S
+570.234 2787.01 m
+5389.13 2787.01 l
+S
+570.234 2787.01 m
+570.234 3977.01 l
+S
+5389.13 2787.01 m
+5389.13 3977.01 l
+S
+570.234 3807.01 m
+5389.13 3807.01 l
+S
+570.234 3637.01 m
+5389.13 3637.01 l
+S
+570.234 3467.01 m
+5389.13 3467.01 l
+S
+570.234 3297.01 m
+5389.13 3297.01 l
+S
+570.234 3127.01 m
+5389.13 3127.01 l
+S
+570.234 2957.01 m
+5389.13 2957.01 l
+S
+1647.4 2787.01 m
+1647.4 3977.01 l
+S
+2979.68 2787.01 m
+2979.68 3977.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 260.701 Tm
+(10\0562 CTest Targets Reported Passing) Tj
+ET
+Q
+0.204 g
+q
+570.234 2367.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 2027.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 1687.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 1347.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 1007.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 242.701 Tm
+[ (\043) -4303.43 (CTest target) -41067.2 (Result) ] TJ
+17 TL
+T*
+[ (1) -4303.43 (ConsoleMenuSmoke) -37288.2 (Passed) ] TJ
+T*
+[ (2) -4303.43 (TrainSearchTests) -38678.2 (Passed) ] TJ
+T*
+[ (3) -4303.43 (SeatInventoryConcurrencyTests) -32286.2 (Passed) ] TJ
+T*
+[ (4) -4303.43 (SeatInventoryStressTests) -35120.2 (Passed) ] TJ
+T*
+[ (5) -4303.43 (SeatInventoryReleaseConcurrencyTests) -28618.2 (Passed) ] TJ
+T*
+[ (6) -4303.43 (SeatInventoryConfirmConcurrencyTests) -28786.2 (Passed) ] TJ
+T*
+[ (7) -4303.43 (SeatInventoryBoundaryTests) -33674.2 (Passed) ] TJ
+T*
+[ (8) -4303.43 (AdminAuthManagerTests) -35287.2 (Passed) ] TJ
+T*
+[ (9) -4303.43 (AdminFareReservationTests) -33899.2 (Passed) ] TJ
+ET
+Q
+570.234 2537.01 m
+5389.13 2537.01 l
+S
+570.234 837.008 m
+570.234 2537.01 l
+S
+5389.13 837.008 m
+5389.13 2537.01 l
+S
+570.234 837.008 m
+5389.13 837.008 l
+S
+570.234 2367.01 m
+5389.13 2367.01 l
+S
+570.234 2197.01 m
+5389.13 2197.01 l
+S
+570.234 2027.01 m
+5389.13 2027.01 l
+S
+570.234 1857.01 m
+5389.13 1857.01 l
+S
+570.234 1687.01 m
+5389.13 1687.01 l
+S
+570.234 1517.01 m
+5389.13 1517.01 l
+S
+570.234 1347.01 m
+5389.13 1347.01 l
+S
+570.234 1177.01 m
+5389.13 1177.01 l
+S
+570.234 1007.01 m
+5389.13 1007.01 l
+S
+910.395 837.008 m
+910.395 2537.01 l
+S
+4170.24 837.008 m
+4170.24 2537.01 l
+S
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 6) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 6) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+33 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 34 0 R
+/F1-0 35 0 R
+/R10 13 0 R
+/R11 14 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 36 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+34 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+35 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+36 0 obj
+<<
+/Length 7608
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 7) ] TJ
+ET
+Q
+0.204 g
+q
+570.234 7707.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 7537.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 7197.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 6857.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 6517.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 6177.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 5837.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 5497.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 5157.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4817.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4477.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 4137.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 776.701 Tm
+[ (\043) -4303.43 (CTest target) -41067.2 (Result) ] TJ
+17 TL
+T*
+[ (10) -3747.43 (AdminTrainMenuSecurityTests) -32899.2 (Passed) ] TJ
+T*
+[ (11) -3747.43 (AdminTrainMenuTests) -36511.2 (Passed) ] TJ
+T*
+[ (12) -3747.43 (AdminTrainManagerTests) -35066.2 (Passed) ] TJ
+T*
+[ (13) -3747.43 (AuthManagerTests) -38121.2 (Passed) ] TJ
+T*
+[ (14) -3747.43 (BookingIntegrationTest) -36286.2 (Passed) ] TJ
+T*
+[ (15) -3747.43 (BookingHistoryTests) -37400.2 (Passed) ] TJ
+T*
+[ (16) -3747.43 (CancellationTests) -38622.2 (Passed) ] TJ
+T*
+[ (17) -3747.43 (CancellationWaitlistTests) -35400.2 (Passed) ] TJ
+T*
+[ (18) -3747.43 (BookingManagerTests) -36565.2 (Passed) ] TJ
+T*
+[ (19) -3747.43 (FileStoreTests) -40123.2 (Passed) ] TJ
+T*
+[ (20) -3747.43 (PaymentProcessTests) -36566.2 (Passed) ] TJ
+T*
+[ (21) -3747.43 (PerformanceTests) -38400.2 (Passed) ] TJ
+T*
+[ (22) -3747.43 (PaymentStructureTests) -36121.2 (Passed) ] TJ
+T*
+[ (23) -3747.43 (ETicketTests) -40790.2 (Passed) ] TJ
+T*
+[ (24) -3747.43 (PaymentReceiptTests) -36788.2 (Passed) ] TJ
+T*
+[ (25) -3747.43 (SeatInventoryTests) -37954.2 (Passed) ] TJ
+T*
+[ (26) -3747.43 (US05Tests) -41623.2 (Passed) ] TJ
+T*
+[ (27) -3747.43 (US13Tests) -41623.2 (Passed) ] TJ
+T*
+[ (28) -3747.43 (ValidationTests) -39733.2 (Passed) ] TJ
+T*
+[ (29) -3747.43 (test\137modules) -40622.2 (Passed) ] TJ
+T*
+[ (30) -3747.43 (TrainDataFileTests) -38123.2 (Passed) ] TJ
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 7877.01 m
+5389.13 7877.01 l
+S
+570.234 7707.01 m
+570.234 7877.01 l
+S
+570.234 4137.01 m
+570.234 7707.01 l
+S
+5389.13 7707.01 m
+5389.13 7877.01 l
+S
+5389.13 4137.01 m
+5389.13 7707.01 l
+S
+570.234 4137.01 m
+5389.13 4137.01 l
+S
+570.234 7707.01 m
+5389.13 7707.01 l
+S
+910.395 7707.01 m
+910.395 7877.01 l
+S
+4170.24 7707.01 m
+4170.24 7877.01 l
+S
+570.234 7537.01 m
+5389.13 7537.01 l
+S
+570.234 7367.01 m
+5389.13 7367.01 l
+S
+570.234 7197.01 m
+5389.13 7197.01 l
+S
+570.234 7027.01 m
+5389.13 7027.01 l
+S
+570.234 6857.01 m
+5389.13 6857.01 l
+S
+570.234 6687.01 m
+5389.13 6687.01 l
+S
+570.234 6517.01 m
+5389.13 6517.01 l
+S
+570.234 6347.01 m
+5389.13 6347.01 l
+S
+570.234 6177.01 m
+5389.13 6177.01 l
+S
+570.234 6007.01 m
+5389.13 6007.01 l
+S
+570.234 5837.01 m
+5389.13 5837.01 l
+S
+570.234 5667.01 m
+5389.13 5667.01 l
+S
+570.234 5497.01 m
+5389.13 5497.01 l
+S
+570.234 5327.01 m
+5389.13 5327.01 l
+S
+570.234 5157.01 m
+5389.13 5157.01 l
+S
+570.234 4987.01 m
+5389.13 4987.01 l
+S
+570.234 4817.01 m
+5389.13 4817.01 l
+S
+570.234 4647.01 m
+5389.13 4647.01 l
+S
+570.234 4477.01 m
+5389.13 4477.01 l
+S
+570.234 4307.01 m
+5389.13 4307.01 l
+S
+910.395 4137.01 m
+910.395 7707.01 l
+S
+4170.24 4137.01 m
+4170.24 7707.01 l
+S
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 395.701 Tm
+(10\0563 Coverage interpretation) Tj
+ET
+Q
+0.961 g
+6 w
+0 J
+0 j
+0.796 G
+500.234 3417.01 4952.29 530 re
+B*
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 9 Tf
+1 0 0 1 57.0234 378.701 Tm
+(The measured branch coverage is 59\0569\045\054 below the 70\045 project target\056 The 30\05730 passing result confirms that the) Tj
+13 TL
+(registered automated tests passed\073 it does not establish that every requirement or non\055functional acceptance criterion) '
+(has passed\056) '
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 330.701 Tm
+(10\0564 Performance and availability) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 313.101 Tm
+-0.038832 Tw
+(The supplied run shows that PerformanceTests passed\054 but no numerical response\055time\054 memory\054 sample\055size or environment) Tj
+12 TL
+0 Tw
+(values were supplied\056 Therefore RRS\055NF\055001 is not marked passed here\056 RRS\055NF\055002 requires an approved operating period) '
+(and uptime evidence\073 it is also not marked passed without that record\056) '
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 260.701 Tm
+(11\056 Representative Test Scenarios) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 242.101 Tm
+(The following checklist summarizes representative scenarios\056 The detailed assertions remain in the repository test sources\056) Tj
+12 TL
+(Inclusion here does not imply every scenario has been executed and accepted\056) '
+ET
+Q
+0.204 g
+q
+570.234 2047.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 1617.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 1277.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 937.008 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 210.701 Tm
+[ (Scenario) -11442.1 (Requirement area) -7790.02 (Expected result \057 evidence status) ] TJ
+17 TL
+T*
+[ (Passenger registration\057login) -2994.11 (RRS\055F\055001\057002\073) ] TJ
+107.717 -9 Td
+(RRS\055SR\055001\057002) Tj
+110.551 9 Td
+(Valid account\057login\073 invalid credentials rejected\073 protected credentials\056 Automated) Tj
+9 TL
+(tests present\056) '
+-218.268 -17 Td
+[ (Train search\057details) -6663.11 (RRS\055F\055003\057004) -8791.03 (Matching trains and required details\073 TrainSearchTests passed\056) ] TJ
+17 TL
+T*
+[ (Availability\057class selection) -3885.11 (RRS\055F\055005\057006) -8791.03 (Availability and selection reflect inventory\073 seat tests passed\056) ] TJ
+T*
+[ (Passenger details\057fare) -5439.11 (RRS\055F\055007\057008) -8791.03 (Valid passenger details and configured fare\073 verify exact mapping in RTM\056) ] TJ
+T*
+[ (Booking\057PNR) -9386.11 (RRS\055F\055009 to 011) -7679.02 (Unique PNR and correct confirmation\073 booking\057integration targets passed\056) ] TJ
+T*
+[ (Booking retrieval) -7941.11 (RRS\055F\055012) -10737 (Correct booking retrieved by PNR\057account\073 confirm explicit test evidence\056) ] TJ
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 2217.01 m
+5389.13 2217.01 l
+S
+570.234 937.008 m
+570.234 2217.01 l
+S
+5389.13 937.008 m
+5389.13 2217.01 l
+S
+570.234 937.008 m
+5389.13 937.008 l
+S
+570.234 2047.01 m
+5389.13 2047.01 l
+S
+570.234 1787.01 m
+5389.13 1787.01 l
+S
+570.234 1617.01 m
+5389.13 1617.01 l
+S
+570.234 1447.01 m
+5389.13 1447.01 l
+S
+570.234 1277.01 m
+5389.13 1277.01 l
+S
+570.234 1107.01 m
+5389.13 1107.01 l
+S
+1647.4 937.008 m
+1647.4 2217.01 l
+S
+2752.91 937.008 m
+2752.91 2217.01 l
+S
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 7) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 7) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+37 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 38 0 R
+/F1-0 39 0 R
+/R10 13 0 R
+/R11 14 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 40 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+38 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+39 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+40 0 obj
+<<
+/Length 7907
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 8) ] TJ
+ET
+Q
+0.204 g
+q
+570.234 7707.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 7187.01 4818.9 260 re
+1 g
+f*
+Q
+q
+570.234 6757.01 4818.9 260 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 776.701 Tm
+[ (Scenario) -11442.1 (Requirement area) -7790.02 (Expected result \057 evidence status) ] TJ
+17 TL
+(Cancellation\057refund\057seat) '
+9 TL
+(restoration) '
+107.717 9 Td
+[ (RRS\055F\055013 to 015) -7679.02 (Eligible booking cancelled\054 refund calculated\054 seats restored\073 cancellation tests) ] TJ
+110.551 -9 Td
+(passed\056) Tj
+-218.268 -17 Td
+(Admin) Tj
+(management\057transactions) '
+107.717 9 Td
+[ (RRS\055F\055016 to 020) -7679.02 (Authorized changes and transaction records\073 admin test targets passed\056) ] TJ
+-107.717 -26 Td
+[ (Reservation status) -7107.11 (RRS\055F\055021) -10737 (Displayed status matches stored status\073 verify explicit assertion\056) ] TJ
+17 TL
+T*
+[ (Security\057audit) -9330.11 (RRS\055SR\055001 to 006) -6901.03 (Authentication\054 password protection\054 authorization\054 validation\054 transaction integrity) ] TJ
+218.268 -9 Td
+(and audit\073 partial evidence\054 review each ID\056) Tj
+-218.268 -17 Td
+[ (Performance\057persistence) -4273.11 (RRS\055NF\055001\057002\057006) -6123.03 (Measured timing\054 uptime and restart persistence\073 not demonstrated by summary) ] TJ
+218.268 -9 Td
+(alone\056) Tj
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 7877.01 m
+5389.13 7877.01 l
+S
+570.234 7707.01 m
+570.234 7877.01 l
+S
+570.234 6497.01 m
+570.234 7707.01 l
+S
+5389.13 7707.01 m
+5389.13 7877.01 l
+S
+5389.13 6497.01 m
+5389.13 7707.01 l
+S
+570.234 6497.01 m
+5389.13 6497.01 l
+S
+570.234 7707.01 m
+5389.13 7707.01 l
+S
+1647.4 7707.01 m
+1647.4 7877.01 l
+S
+2752.91 7707.01 m
+2752.91 7877.01 l
+S
+570.234 7447.01 m
+5389.13 7447.01 l
+S
+570.234 7187.01 m
+5389.13 7187.01 l
+S
+570.234 7017.01 m
+5389.13 7017.01 l
+S
+570.234 6757.01 m
+5389.13 6757.01 l
+S
+1647.4 6497.01 m
+1647.4 7707.01 l
+S
+2752.91 6497.01 m
+2752.91 7707.01 l
+S
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 624.701 Tm
+(12\056 Defect Management) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 606.101 Tm
+(Record each defect with an identifier\054 description\054 reproduction steps\054 expected and actual result\054 severity\054 priority\054 owner\054) Tj
+12 TL
+(status and verification evidence\056 A fix is verified only after the relevant test and regression suite are rerun\056) '
+ET
+Q
+0.204 g
+q
+570.234 5687.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 5347.01 4818.9 170 re
+1 g
+f*
+Q
+q
+570.234 5007.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 574.701 Tm
+[ (Severity) -10561.3 (Definition) ] TJ
+17 TL
+T*
+[ (Critical) -11118.3 (Crash\054 data loss\057corruption\054 unauthorized protected access or transaction inconsistency blocking core use\056) ] TJ
+T*
+[ (High) -12117.3 (Major functional requirement fails without a reasonable workaround\056) ] TJ
+T*
+[ (Medium) -10617.3 (Feature is partially incorrect or a workaround exists\056) ] TJ
+T*
+[ (Low) -12339.3 (Minor display\054 wording or usability issue with limited functional impact\056) ] TJ
+ET
+Q
+570.234 5857.01 m
+5389.13 5857.01 l
+S
+570.234 5007.01 m
+5389.13 5007.01 l
+S
+570.234 5007.01 m
+570.234 5857.01 l
+S
+5389.13 5007.01 m
+5389.13 5857.01 l
+S
+570.234 5687.01 m
+5389.13 5687.01 l
+S
+570.234 5517.01 m
+5389.13 5517.01 l
+S
+570.234 5347.01 m
+5389.13 5347.01 l
+S
+570.234 5177.01 m
+5389.13 5177.01 l
+S
+1562.36 5007.01 m
+1562.36 5857.01 l
+S
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 486.101 Tm
+(No defect count or closure claim is included because a verified defect log was not supplied with the execution output\056 Attach) Tj
+12 TL
+(repository issue references or the defect log before final approval\056) '
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 445.701 Tm
+(13\056 Requirements Traceability and Reporting) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 427.101 Tm
+(SRS v1\0561 defines RRS\055F\055001 through RRS\055F\055021\054 RRS\055NF\055001 through RRS\055NF\055006 and RRS\055SR\055001 through) Tj
+12 TL
+(RRS\055SR\055006\056 The SRS identifies RTM\056md in the repository as the authoritative implementation\055aligned matrix\056 The RTM) '
+(should map each requirement to its component\054 test identifier\054 evidence location and status\056) '
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 381.701 Tm
+(13\0561 Status Values) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 365.701 Tm
+<7f> Tj
+/R11 8.6 Tf
+15 -1.6 Td
+(Pass\072) Tj
+/R10 8.6 Tf
+22.9449 0 Td
+( acceptance criteria satisfied and evidence attached\056) Tj
+/R10 7 Tf
+-37.9449 -16.4 Td
+<7f> Tj
+/R11 8.6 Tf
+15 -1.6 Td
+(Partial\072) Tj
+/R10 8.6 Tf
+29.1539 0 Td
+( some\054 but not all\054 acceptance criteria demonstrated\056) Tj
+/R10 7 Tf
+-44.1539 -16.4 Td
+<7f> Tj
+/R11 8.6 Tf
+15 -1.6 Td
+(Not Demonstrated\072) Tj
+/R10 8.6 Tf
+77.4 0 Td
+( sufficient evidence is unavailable\056) Tj
+/R10 7 Tf
+-92.4 -16.4 Td
+<7f> Tj
+/R11 8.6 Tf
+15 -1.6 Td
+(Fail\072) Tj
+/R10 8.6 Tf
+17.6816 0 Td
+( executed verification shows the requirement is not satisfied\056) Tj
+/R10 7 Tf
+-32.6816 -16.4 Td
+<7f> Tj
+/R11 8.6 Tf
+15 -1.6 Td
+(Approved Scope Change\072) Tj
+/R10 8.6 Tf
+105.127 0 Td
+( requirement formally changed or excluded by an approved decision\056) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 270.701 Tm
+(13\0562 RTM Maintenance Checklist) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 254.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Replace obsolete FR\057SEC references from the initial STP with current RRS\055F\057RRS\055NF\057RRS\055SR identifiers\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Map every functional requirement to relevant tests and implementation components\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Map security requirements separately\073 an audit file alone does not prove RRS\055SR\055006\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Record timing\054 uptime and restart\055persistence evidence\054 or mark the requirement Not Demonstrated\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Attach dated test logs\054 coverage report and manual screenshots\056) Tj
+ET
+Q
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 152.701 Tm
+(14\056 Deliverables and Approval) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 135.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Updated Software Test Plan \050this document\051\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Automated test sources and CMake\057CTest targets in the repository\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Test execution log showing 30\05730 passing tests for the reported run\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(gcovr branch and line coverage report\056) Tj
+ET
+Q
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 8) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 8) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+41 0 obj
+<<
+/Type /Page
+/MediaBox [ 0 0 595.28 841.89 ]
+/Rotate 0
+/Resources <<
+/ExtGState <<
+/R9 10 0 R
+>>
+/Font <<
+/F1 42 0 R
+/F1-0 43 0 R
+/R10 13 0 R
+/R11 14 0 R
+>>
+/ProcSet [ /ImageB /ImageC /ImageI /PDF /Text ]
+>>
+/Contents 44 0 R
+/Annots [ ]
+/Parent 2 0 R
+>>
+endobj
+42 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+43 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+44 0 obj
+<<
+/Length 3206
+>>
+stream
+q
+q
+q
+0.1 0 0 0.1 0 0 cm
+/R9 gs
+10 w
+0.867 G
+510.234 425.195 m
+5442.52 425.195 l
+S
+0.388 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 51.0234 28.3465 Tm
+[ (Team 12 \174 Railway Reservation System \174 STP v2\0560) -44876.2 (Page 9) ] TJ
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 57.0234 780.701 Tm
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Updated RTM\056md aligned with SRS v1\0561\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Manual acceptance and non\055functional evidence where applicable\056) Tj
+/R10 7 Tf
+-15 -16.4 Td
+<7f> Tj
+/R10 8.6 Tf
+15 -1.6 Td
+(Defect log\057issue references and final Test Summary Report\056) Tj
+ET
+Q
+0.29 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 11 Tf
+1 0 0 1 57.0234 721.701 Tm
+(14\0561 Approval) Tj
+ET
+Q
+0.204 g
+q
+570.234 6977.01 4818.9 170 re
+1 g
+f*
+Q
+0.965 g
+q
+570.234 6637.01 4818.9 170 re
+1 g
+f*
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 7 Tf
+1 0 0 1 62.0234 703.701 Tm
+[ (Role) -18191.5 (Name) -19605.2 (Signature \057 Date) ] TJ
+17 TL
+T*
+[ (Team representative) -11077.5 (Team 12) ] TJ
+(Course instructor \057 evaluator) '
+ET
+Q
+3.5 w
+1 J
+1 j
+0.753 G
+570.234 7147.01 m
+5389.13 7147.01 l
+S
+570.234 6637.01 m
+5389.13 6637.01 l
+S
+570.234 6637.01 m
+570.234 7147.01 l
+S
+5389.13 6637.01 m
+5389.13 7147.01 l
+S
+570.234 6977.01 m
+5389.13 6977.01 l
+S
+570.234 6807.01 m
+5389.13 6807.01 l
+S
+1987.56 6637.01 m
+1987.56 7147.01 l
+S
+3546.61 6637.01 m
+3546.61 7147.01 l
+S
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 15 Tf
+1 0 0 1 57.0234 638.701 Tm
+(Conclusion) Tj
+ET
+Q
+0 g
+q
+10 0 0 10 0 0 cm
+BT
+/R10 8.6 Tf
+1 0 0 1 57.0234 620.101 Tm
+-0.052983 Tw
+(This revision updates the original Software Test Plan to match the current system scope described by SRS v1\0561 and SAD v2\0560\056) Tj
+12 TL
+-0.033547 Tw
+(The supplied automated regression run completed with 30 of 30 tests passing\056 Measured line coverage was 88\0564\045 and branch) '
+0 Tw
+(coverage was 59\0569\045\073 therefore\054 the 70\045 branch\055coverage target remains open\056 Performance\054 availability\054 manual acceptance) '
+(and complete requirements traceability require their own evidence before the project is declared fully verified\056) '
+ET
+Q
+0.961 g
+6 w
+0 J
+0 j
+0.796 G
+500.234 5557.01 4952.29 270 re
+B*
+0.204 g
+q
+10 0 0 10 0 0 cm
+BT
+/R11 9 Tf
+1 0 0 1 57.0234 566.701 Tm
+(Document status\072) Tj
+/R10 9 Tf
+76.0051 0 Td
+( Updated working version \227 pending team review and evaluator approval\056) Tj
+ET
+Q
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 9) Tj
+T*
+ET
+Q
+Q
+q
+0.0 0.0 595.2756 841.8898 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1-0 12 Tf
+14.4 TL
+ET
+1 1 1 rg
+n
+q
+0 0 595.2756 42.51969 re
+1 g
+f*
+Q
+0.501961 0.501961 0.501961 rg
+BT
+/F1-0 8 Tf
+9.6 TL
+ET
+BT
+1 0 0 1 45.35433 816.378 Tm
+(Team 12 \174 Railway Reservation System \174 STP v2\0560) Tj
+T*
+ET
+0.501961 0.501961 0.501961 RG
+0.5 w
+n
+45.35433 810.7087 m
+549.9213 810.7087 l
+S
+BT
+1 0 0 1 524.5693 22.67717 Tm
+(Page 9) Tj
+T*
+ET
+Q
+
+endstream
+endobj
+xref
+0 45
+0000000000 65535 f 
+0000000015 00000 n 
+0000000054 00000 n 
+0000000168 00000 n 
+0000000217 00000 n 
+0000000416 00000 n 
+0000002556 00000 n 
+0000002597 00000 n 
+0000002704 00000 n 
+0000002816 00000 n 
+0000003087 00000 n 
+0000003136 00000 n 
+0000003244 00000 n 
+0000003352 00000 n 
+0000003450 00000 n 
+0000003553 00000 n 
+0000010852 00000 n 
+0000011124 00000 n 
+0000011232 00000 n 
+0000011340 00000 n 
+0000018743 00000 n 
+0000019015 00000 n 
+0000019123 00000 n 
+0000019231 00000 n 
+0000026689 00000 n 
+0000026973 00000 n 
+0000027081 00000 n 
+0000027189 00000 n 
+0000027285 00000 n 
+0000035178 00000 n 
+0000035450 00000 n 
+0000035558 00000 n 
+0000035666 00000 n 
+0000043661 00000 n 
+0000043933 00000 n 
+0000044041 00000 n 
+0000044149 00000 n 
+0000051810 00000 n 
+0000052082 00000 n 
+0000052190 00000 n 
+0000052298 00000 n 
+0000060258 00000 n 
+0000060530 00000 n 
+0000060638 00000 n 
+0000060746 00000 n 
+trailer
+<<
+/Size 45
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+64005
+%%EOF
+3 1 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+ /AF [46 0 R] /Names << /EmbeddedFiles << /Names [(Content Credentials) 46 0 R] >> >> >>
+endobj
+45 0 obj
+<< /Length 24276 /Type /EmbeddedFile /Subtype /application#2Fc2pa >>
+stream
+  ^‘jumb   jumdc2pa  Ä  ™ 8õqc2pa   ^Æjumb   Gjumdc2ma  Ä  ™ 8õqurn:c2pa:ea2d9654-8410-4f72-a323-efe01f76c589   ûjumb   )jumdc2as  Ä  ™ 8õqc2pa.assertions   	πjumb   #jumd@À2ªäHùß*÷ÙCic2pa.icon    bfdb image/svg+xml   	wbidb<svg width="716" height="716" viewBox="0 0 716 716" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M508.749 317.399C516.777 287.314 508.991 253.884 485.389 230.282C461.788 206.681 428.36 198.895 398.273 206.923C376.231 184.928 343.39 174.956 311.148 183.596C278.906 192.234 255.45 217.292 247.36 247.361C217.291 255.451 192.233 278.91 183.595 311.149C174.957 343.391 184.927 376.232 206.924 398.274C198.896 428.359 206.683 461.789 230.284 485.391C253.885 508.992 287.313 516.779 317.401 508.75C339.442 530.745 372.286 540.717 404.525 532.079C436.767 523.441 460.223 498.384 468.313 468.315C498.383 460.224 523.44 436.766 532.078 404.526C540.716 372.285 530.747 339.443 508.749 317.402V317.399ZM470.899 244.776C486.892 260.77 493.488 282.601 490.687 303.412L415.577 260.046C412.411 258.218 408.509 258.218 405.345 260.046L317.401 310.82V277.526C317.401 275.191 318.652 273.005 320.676 271.837L387.644 233.174C414.178 218.353 448.346 222.223 470.901 244.776H470.899ZM357.837 311.144L398.275 334.491V381.185L357.837 404.532L317.398 381.185V334.491L357.837 311.144ZM264.776 269.693C265.207 239.305 285.644 211.649 316.453 203.393C338.3 197.54 360.505 202.744 377.127 215.573L302.014 258.937C298.848 260.764 296.898 264.144 296.898 267.798V369.346L268.065 352.699C266.043 351.531 264.776 349.353 264.776 347.017V269.691V269.693ZM203.391 316.454C209.244 294.608 224.854 277.978 244.276 269.999V356.73C244.276 360.384 246.226 363.763 249.392 365.591L337.337 416.365L308.503 433.013C306.481 434.181 303.961 434.188 301.939 433.02L234.971 394.357C208.868 378.789 195.138 347.261 203.391 316.454ZM244.775 470.9C228.781 454.906 222.186 433.075 224.986 412.264L300.096 455.63C303.263 457.457 307.164 457.457 310.328 455.63L398.273 404.856V438.149C398.273 440.485 397.022 442.671 394.997 443.839L328.029 482.502C301.495 497.322 267.327 493.452 244.772 470.9H244.775ZM450.897 445.982C450.466 476.371 430.029 504.027 399.22 512.283C377.373 518.136 355.168 512.932 338.547 500.102L413.659 456.738C416.826 454.911 418.775 451.532 418.775 447.877V346.329L447.609 362.977C449.631 364.145 450.897 366.323 450.897 368.659V445.985V445.982ZM512.282 399.221C506.429 421.068 490.819 437.697 471.397 445.676V358.946C471.397 355.292 469.448 351.912 466.281 350.085L378.336 299.311L407.17 282.663C409.192 281.495 411.712 281.487 413.734 282.655L480.702 321.318C506.805 336.887 520.536 368.415 512.282 399.221Z" fill="black"/>
+</svg>
+  jumb   )jumdcbor  Ä  ™ 8õqc2pa.actions.v2    ﬂcbor¢gactionsÅ§factionlc2pa.createdqdigitalSourceTypexFhttp://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMediamsoftwareAgent¢dnameegpt-6gversionegpt-6dwhenx2026-11-15T19:53:29.650223ZrallActionsIncludedÙ   §jumb   (jumdcbor  Ä  ™ 8õqc2pa.hash.data    tcbor•jexclusionsÅ¢estart˛¥flength^‘dnamenjumbf manifestcalgfsha256dhashX ·Ü∆ìΩ´ªç’CÇ—xâ*Sdj§|—}1SXä√üf◊cpad@  âjumb   'jumdc2cl  Ä  ™ 8õqc2pa.claim.v2   Zcbor¶jinstanceIDx,xmp:iid:09f28f5a-8f59-45e8-8ed3-3f839669db44tclaim_generator_info£dnamegChatGPTdicon¢curlx$self#jumbf=c2pa.assertions/c2pa.icondhashX u>=W1í≥®NÎL˚¡åt∑'w÷–6«e6„ÒkspecVersione2.2.0isignaturexMself#jumbf=/c2pa/urn:c2pa:ea2d9654-8410-4f72-a323-efe01f76c589/c2pa.signaturercreated_assertionsÉ¢curlx$self#jumbf=c2pa.assertions/c2pa.icondhashX u>=W1í≥®NÎL˚¡åt∑'w÷–6«e6„Ò¢curlx*self#jumbf=c2pa.assertions/c2pa.actions.v2dhashX <Äç!æ≤Ãk«4Ó Û4"*Nï]ƒ>,êkÍˇe{¢curlx)self#jumbf=c2pa.assertions/c2pa.hash.datadhashX ,föÍr¥ç1Ÿ¸/“ÿ÷,:“
+‚Zt˚{Y•2≠ú†hdc:titleiimage.pdfcalgfsha256  P8jumb   (jumdc2cs  Ä  ™ 8õqc2pa.signature   Pcbor“ÑYË¢8$!ÇYà0ÇÑ0Çl†•¸ÈpåÚÄ1ÓDds0	*ÜHÜ˜ 0J1!0USSL.com C2PA ICA R1 202510U
+SSL Corporation10	UUS0260422155105Z270423155104Z0G10	UUS10U
+OpenAI OpCo, LLC10UOpenAI Media Service0Ç"0	*ÜHÜ˜ Ç 0Ç
+Ç ù∫jLMóÍÅâ∂—æ^XNr°ôﬂiq|Â!#”Å¢5úL£J<Ôn+øÊdÆ◊ÑKi$ZcœÍv
+ê≤e€|<ç·˛¡3wØ'ﬁ; :¥cáòÕMúø¥3D™T07F∏˝öyDsWU£c|›¨X/ÊzÆﬁ•ò√ìNHZ¯‡|§íK’l∫ ¬*»íæu‘îgµW™jöm00,◊Uaåj“S∂ x^ECûNí£ÄÒØ[—≤Î˛ãÔ∫◊7	ï´d-ô…áö¯ø.–ÁcÄñöy†7ì6£5…H…,òcÈDõ5¨πßSlúhs»
+9ÃIÛ £Çg0Çc0Uˇ0 0U#0Ä9=G‹óèØà{MsÕÂÓ§•*0o+c0a09+0Ü-http://crt-c2pa.ssl.com/SSL.com-C2PA-I-R1.cer0$+0Ühttp://ocsp-c2pa.ssl.com0U 00
++ÉË^0)U%"0 ++$
++ÉË^0UÛùM‘Àùr¯F
+vG•hOt0Uˇ¿0	+ÉË^
++ÉË^
+03	+ÉË^&$019bc403-5cd7-7669-afe6-fdb17177d4280	*ÜHÜ˜ Ç Ç8óle°7 Ò˘Ìt∫’¶[5ıglœ+fi@Õı¸“rVﬂ ï(Í¯fﬁBC=¯x†h(â≠µÓ¸ı2“å∏_ÁlÄnÎ[|ó[0Á.B∏∆pö˛˛ 	¨5F’†åIEÄ√∫íU«Zùo“Îÿyõñ:ºDê44}ÙA•3ó/.lQR
+m=I∞À«ÜXÃ‹Óû.È∆9∏3\ ⁄Ó W3T.p(J%)Oí|.“˙›g.zËPx9Q∫É:⁄à~ê#êíıbXöÂ¬®sÜû≈ÿqÈÔ\d{ëÓ7/vòxVdÁoB—}íºÖjomdÖÿˇ"ñÌπÔ≤–\Ñ}h]5[K±≈iHyÊhé†ƒaò:L¯¿$yÂ¶h‡Ô˝÷ê÷.-AduV_ìî∂°úä<∂¿ËmÛ≈CÁv,h§ÚÊÀãàïË{*r$Å=!∆cm/%Ä£ô[™)•˝GÍ·˜kÂ˚[P&m+°Ç]1ı›b®|2‹L«•,r0PÄWìÇ‚ËÆ≥ßØY4ÆrÔ*ùÆx¨‚3ÏSµ…ô“(®*7°N´¸Ã~Xõ'mE·¥*úΩ0W°1. .…‚»T€°íOæ$5ò˛/i‹∏M„ﬁ/Ëlı¡ä‚”˛rw”®+‘WóÆáÿ æì∂âYS0ÇO0Ç7†'+c»ÃM-õÑQrlÙú^2QÆﬁ0	*ÜHÜ˜ 0O1&0$USSL.com C2PA RSA Root CA 202510U
+SSL Corporation10	UUS0251222181730Z301221181730Z0J1!0USSL.com C2PA ICA R1 202510U
+SSL Corporation10	UUS0Ç"0	*ÜHÜ˜ Ç 0Ç
+Ç À:¥Õ∏úÀ)V∏yß¯kˆ˘ÿèr√¶ò≠*A⁄a.GRΩtQæ]ÏzÇ∂¿˚˙Ë'•ãË˛bÛ`Ò_H ssï‰NnÃNz5ﬁX·◊Ç‹“GCwõﬂHàyü£9§YN^‡NGóÚuB◊v=∂§"‹Ì∆o‘rFå÷Q«µ∑zÚì˘#'’ÄPuäp†hÈÁºÑ(|ú*Í)©¿/˛…vFU∞/cÍ}ûÙ∞D§@ﬁ@6\DäTkWHˇªo§’Íé¬◊|ÿºŒiø† MìE;ô.y“œûü)ªFŸxc0ñ3Qú^ìm˙Â4JXx≥)l]|∏uï<ôw!{ÿ¥JÎ⁄Õ«
+÷…¢ﬁÆó≥∂Qñ⁄íõ√≤ªPƒ˛∂§Lï]-íjObÂ‡*˜i†ú’πì ⁄—ª^O∆Ø˘)L–…ÏÎÛ≤qP{v'hë˘Pà∏w5ÿÕ°·◊”)ÁJ∆áTY$¬g≤m	5€∫Œ∏F•‡ã⁄·ßüjŒ`“ƒ˜¡ﬁsyU‡p¥ÔÍÃ«˛vâNf
+ià-Ì√F¢*‰å‘úWF-Xb’ ®˙~¯¬ŸajÀ5]†ì£≤e®/ÌÔòÁ¸~∫HÙ™°q¸ìØÍßNsài’B¿˘ÑíÖOÀT≥=:¯›)ey Cûñ∏áXñ!Ô—ë{ £Ç&0Ç"0Uˇ0ˇ 0Uˇ0)U%"0 ++$
++ÉË^0U9=G‹óèØà{MsÕÂÓ§•*0U 00
++ÉË^0U#0Ä¸*Ju:Ä˙ôcìsWÏæì∞}√{0x+l0j0$+0Ühttp://ocsp-c2pa.ssl.com0B+0Ü6http://crt-c2pa.ssl.com/SSL.com-C2PA-Root-2025-RSA.cer0	*ÜHÜ˜ Ç Œ6˙>Ôñ6-éØUfˇ{+ kVıÀ≠Ω*Å≠•¶–M£>ì‰ìi’‰å®nÊ7T‚%úÏef(<3=¢ö¢ªÕgdJÁæt!°n√´&ƒ;,⁄Uπ˝GN‡çxõ7Éƒt;≈GaÔmAr§€]CS…ñNÂ‡:ﬂ®›.—ØXó÷ÁÙ_r#<kœΩ9´åì®èßvY>·íı˜Ÿ˚Fb´nn‘àF†≥/*j_•N⁄¯‘¸ÃŸ£<©wE
+¡˘òπ9ÀÃ°q¿*Çq”‰ˆ%‚Q!m÷ﬂ‰SçoJ}é^¿∫’wy!ÅzŒÌ˜õé∂≤äBVùèkA*˛kúãÓ£(œ_ÛÈ–d÷Ó¬âKÎíœıØ¬'M∏ë°7%ôÊ˝Ä‹Ùº«7{æ¥-gX/Á√≥ãqÂDz0∂•≤u>[#~;”T¶:π«Ã3’j5zÅv/˛W⁄i¯>?ÔTèã{F√cû˙Ìƒ/pÑ+ˆVÇÙßÀ$◊l^${:Ω©X;i≥úè“ptˇãn&ª√´E«SñúGµ∆F´^ı¸àãh£5Â|jïeµ´Îπˇ∫∏‡õJG≤ŒÏ/â}ÓØúMƒ…Œı2=è˜&4˛"ãzÌ˘^^g_Q[€$V˚—Y°∑ﬁöf	∂—Ü.˙}~ïyõDf|6Öˆı£gsigTst2°itstTokensÅ°cvalYã0Çá	*ÜHÜ˜†Çx0Çt10	`ÜHe 0Åá*ÜHÜ˜	†xv0t
++Éø0010	`ÜHe  çÀxéÆè‡ªä}Dá±(¿86√TJ—mnß%q>ÀøJKPÑ’π≤&20261115195333.664631Z0Ä	 “«ˇ˘)€«Z†Çf0Çˆ0Ç^†a€F(2äåçJ∑ø˛`„l?q∑0	*ÜHÜ˜ 0{10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Issuing CA0260408174626Z370709174626Z0u10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Leaf0Ç¢0	*ÜHÜ˜ Çè 0ÇäÇÅ Í ≈≠î˝˝'ü«xßa ˇ)a*˚°àÕ_®¢óùâ/ãë»º∞ñê=UÇ¡ñé6j≠âiËê€,D2É®
+ÕwÂ5ËÓ®d[˛∏‡éùÁ °(√5›ß7È"˜	Móö¥Ñs¿.|©PG(†¥i∞á)zY˛5B˘ŸiRJ 7ÚhÃÒ-∑Çñ KF\=§Ü∏KEf8¢NM' ï∫uÃNájüt√ $_ƒ~\Æ˛ÛïÌ ëﬂ<ıÜõ*^÷–›…˙»M√…ÑZI,‰8s`R∏LÓ∆Û∑∂ÿ›j©Œ ∫]÷ƒ\5dÚ#S?bée]p+‘…k	ÅERËWÌZF]⁄]vú%yhÉQ§òÑuëròUˇÿ„Cb±Ìig'Aº≈èÚj+ÉIË·-4ª9ØgΩ¥ï»≤ΩEgÕràî_UK,≠ØÌ•Ù$Øw>ÉädQèëå9ñK∞=Æ˙ô°>å=æ6°.ıcµ £x0v0Uˇ0 0Uˇ¿0U%ˇ0
++0U§'TÇ¢äÄ{=≈ÜÕ?pŸ¬ÉôQx0U#0ÄÚ∞«T=#CÖ‹ s–rÄ=∏®0	*ÜHÜ˜ ÇÅ  ˚$OA¿¿ºò≤2 ç ôH5OƒFV~ß>?∂•#˘*H>‡QùE@x¡ªÉNìP…õ'ñhﬂMŒÚˆ“y´ÔÍ¡⁄?ıòYÊpÕâÙÓGã™ÀÏˇå~·FÿëÊú∏‰4Fˇa“x¯}89„RÌ_fËs¿ r;‰®´éÜ*£7!˘;ﬂ{\TÿL«j*KœCt`Äs£…—wØá©˝µ±Ñjnøà*Œö°ö´¢ûÇH7≈cQó€R|og…iB’œı˚≠^ãê‚‡y<.Éjû•Ë%AèÖÌ‰¡†:ç˛ùRPÔáﬁ·dÕU˘! ﬂ∂)Ôü'n—∫4F´J"OÁbw›E#›a-¬1)èƒπ~y´¥W‘¡Ïœ·\{eI∞ÎM´§«'@N¶¥µèœ|√¥Cßv”^0cÓ®Æ5(td´Z5„[/:>N
+a÷0MCõˇN.∆!π>:, W0ujédK¢–	—◊†g&Amg¯pv∏%&V˘ë&'√KI0Ç~0Çf†ç ∆≈≈⁄∞ºÒNï•Íº0	*ÜHÜ˜ 0x10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Root CA0 260408174626Z21260409174626Z0{10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Issuing CA0Ç¢0	*ÜHÜ˜ Çè 0ÇäÇÅ âº‘π‚»°æaªﬁ<df~ßæúm”©0&<Ù‡k 9ﬂï4Ì©¢eH€7Ü2ÉéÃ
+J†¿Û4l†¿òÕ+ü•ÙÀ|Ÿ&ﬁ~…M¢Ôc[ëÊˆY®“˙N˘Ÿ8+ZÕ`ZòÅò®◊S∆„÷.H¨CW	ÈîÚG˘lEä`∑˜Æ/^¢5NÖ8Öiü4ù–MÿC=Õ4m¸cì¸”pªJËvËjNfI†Ì¸¯æÔö∑®w¨Ô∑8Ãπ‘*3ƒv÷@wÀ˛«]-@”ﬁã<¿÷@AôÀî?,} kR¸û P∑	GE·#U˙±OoTòïÙ}∫¯h·"z‹äëCã∂.C±b†æ $é.Ôø§—MË∏?1œ&=≈ PÍÚŸ$ dÌ’sû.px™ﬁV<˘‘Ä¢Ë≠Øˆ˚®£\Àh´D€0wÚƒ4tkUm∆á˚Ú2<ûqE˜ÏP˚˛÷1&ª–ƒMa‚B€Ø√+n_+Ê‚∞Ôç\DÕ¿s}è¢ÈΩmÇº%eÑ0iÌ £{0y0Uˇ0ˇ 0Uˇ0U%0
++0UÚ∞«T=#CÖ‹ s–rÄ=∏®0U#0ÄX¬@†<Gv+®Ên®ëñéñ»∑Ÿ‰0	*ÜHÜ˜ Ç íÏ7\ﬁlÎd⁄Æ°	0rÆ‹rı;ºz=÷∆·/ˆÉ3}ËW@NLô™k‘ôŸã€k÷L¯ –Y3”°†8\#àD$˚á·ˆì'º°ÌL_g]ˇ5´1“Ï{‘@C7O¬Ñú∫d»∞¢~ö6¯·–Ç≥PC≤‡UΩÄî»YRNJtﬁ]«EXõ∑˙0™;‹Gº’.,π8c,yZ∑›U≠=BﬂàœÒh˛s ‘Z∑ﬁ$óë¿Ág˛‹¶
+Û•F≥QœçØ_„»∏@∆Ω„˘÷Kq–d]Âd¬K¿^w—=«[ûœ{˝îîÁKQ⁄˚dÙ´5îÒˆæ~+›≤ö=P›P√ñdém´sü(;w–óÌoEO±3._FÎÉ∂©aº◊ÇÆ¯Äo¬„i0Êm|:Dí+ò-Ø‹4¡æ•*HÁá»ﬁ8µ3 „ÑPpÒ≤KﬁçOˆë‹_Ö˙ÒÊ—◊ ßÓ¥üˆ!x)Å„pXwÜ§:KóÉFË⁄¬jv…©À!Eæe±†Ü.ÄºYKMõCm¥◊Ñ‡¸’»aêCéjù√Ò!<Ñ]˛;÷ÿ#9E_q˙2˝†ÄïDµO Â√t˝‚NárÜÙQáΩ‘µ+5lí§;kjù∫˝¿;úv¬’9I⁄„î>Pj◊L‚âaùÔÎœ≈√@npz80ÇÊ0ÇŒ†P;lâå$3,è˜Oé˚}ÇÏ0	*ÜHÜ˜ 0x10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Root CA0 260408174625Z21260409174625Z0x10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Root CA0Ç"0	*ÜHÜ˜ Ç 0Ç
+Ç ˆíÈ“∫≠û·¨u®Vÿ™±≥jí_ñyıí∑-$¯ø¿Ø`æ¡öÕyö‹lö˛6ö¡ò§?‰,ù∫••Ps≥
+¬˘ÛƒI/xΩ“ÏºÁ?Ùõ—Ú†a¢,â% Q˘%ú“∆/ÙâƒA˛&”m5ÕÏª5`@®ÖQæˆÓêòÒ*ÿùzkjŸ.ŸcÛÂ\)≈Ü"¡ähÕÎ8û©Pñ[#C˚8ˇB|;:°Q/%…H‹1ˇPrÓ|°wÕoÅaÛ?ønË“±¶6‰k2˚˛w®^õ\››1êLéeˇÅÀAŒ(1S CŒHn}÷d≥)‰¥.:∑TZrVWÛ®j}ÔÊa›e»H	Iô2t
+¢Ã›ì S¨#ΩÇÖ ±ÔæÌ°w Ó:F3¢ûÏØÈ1f¥fo≤âì†~ï!ŒA¯^éÈÕπ¿’3]x––'1œP0rs⁄j¬¿ìœ≠‹dáˆ˚Nàvı>Ôˇí,ôw.ˆ‹ò∂ù	:˝Ù	«è_ZÈ~H	+µäÉÚ[<,Øë¢ùA∑Rh—ø∞¿⁄O`ΩÓ)™Ìáçq\(åçà£%cEÿ¸{aèlFT;\…∞ÇØÉ»±#?ü[Ó¢◊Tµ*SÆªÖ€¶˙óûÏÑârÛz@…∂ÖXG[Ò$a9¢Lﬁÿ∆®"Úûø[L,À £f0d0Uˇ0ˇ0Uˇ0UX¬@†<Gv+®Ên®ëñéñ»∑Ÿ‰0U#0ÄX¬@†<Gv+®Ên®ëñéñ»∑Ÿ‰0	*ÜHÜ˜ Ç X¯ÅëòÚla˛»Ü÷[Ñ¶÷æ∏¶]]IÀ∏°)Õ-ù∏X˘Ñâ=<¯o’j¥*¢UígÅô^µT˚öFÄ„Q S¿¡àWﬁÔÇU~„Ù}Î&¸Éˇ!®¡¨ﬁ€ì´Õ–0v:ìùŒ™g9.Ätﬂm~v/ÈÍPAã8=lÂ‡>Ó/€dT6^æbE∂—!¥Ä<åÎ⁄ú÷J©’Te[k—X~¿IáÎÎK_í;î◊öÜˆ°YŒG8¨√∞td—¿R;°±{(k·ió¯(;'ˇÆ§û˜eÀ†ÙÍπΩîŒD‚ò±
+HhÓU©!•`è˛ ÷}—{Ü úÛ®x–∆⁄@.»Å\b®*¡˚VÁyéØÏÂ€”p˛FÃc®dÒ<ÈØ•dº^øÖ-∞Œ„π”§◊RªpãÜù˚.ø
+ˆ“U+#B+C\Ï°Ça?œqÌ∞˜óÈ‰À¬<¸¨w∑∂‹ ¡LÈâ≤≤/√~ídúµÑﬁÃñ˝â∞KµC}“È≠Ü˝Ÿ-üΩ Ó¿¥GV#|HëNgâ {b¡…^UÒˆ∆Q#WoÔáæ Fyæî±» (ùïäà&UfRÔŸK∫®ZÈ¬,≠ü√\BÛ°ı'dyqå
+Zû˝π˘Eyp·jµ7ñéX˝EøT%åÉ=Ÿ&3#–Xw¶∏1Çh0Çd0Åì0{10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Issuing CAa€F(2äåçJ∑ø˛`„l?q∑0	`ÜHe †Ç%0	*ÜHÜ˜	1*ÜHÜ˜	0/	*ÜHÜ˜	1" ƒ˝˙ÎTTrÙÀkƒµ÷Ó,ãÇP&lú 4çÚ$'#˘0Å’*ÜHÜ˜	/1Å≈0Å¬0Åø0Åº ΩOπ≤êLÅ6gànÔA·m˛Ÿ"ùø[íJ–¢ƒ`F"z0Åó0§}0{10	UUS10	UCA10USan Francisco10U
+OpenAI OpCo, LLC10
+UTSA10UOpenAI TSA Issuing CAa€F(2äåçJ∑ø˛`„l?q∑0	*ÜHÜ˜ ÇÄ[”˝+∑/›%õ[|Ä¯ç®<ïUµ√v µûãÓÒ(£ õ∑u‰b$>^£yÁKÓÇBW÷iª‰±´àŒŒS‰¬Í≈¸à6+x◊`∞á?Î£ìecyÌ›`ÿfÖ¿ò4î¢Á‹YùyÊ≥vVM÷ñ4:"¢Ë,,iˇÕˆC˚,ÇµÓ°U¨g…ÑS0ß€ttü®…".›r)ûo÷g∏Á7iF&√h«…kú»xvñPÎÇLm#{∆L®ÖΩ÷•¿7gTÉ*{ın.ùFÎlã›é
+àæ;êê4u˙)Î$“¿wZ?âêˆŸÉ´ ”‹Ö†êœ„ó·W’HR)1¥H¡Ó}›ﬂπWçôÚÉ1#Ù€ø≥ÉÏÏÇÜ=u-Dû˛∆æﬁnŸŒ'«‚˙◊˙—ŸÆ¢Ö°π©«e··_ Ωò(ÂÔåP+.∂ÿ‹	ùQ
+èπbÔOñÅÇÔÔ…ö|ùâç4;YºzÌJwøÅª¸◊?=ãäî+©ÌÇerVals°hocspValsÅY◊0Ç”
+ †ÇÃ0Ç»	+0Çπ0Çµ0ÅÈ¢-“Ä3óç∂û¸∏5A“§:÷20261115181324Z0Åò0Åï0I0	+ ﬂÇ7S^Sÿ3±‡=$5ÒuÊ·
+9=G‹óèØà{MsÕÂÓ§•*•¸ÈpåÚÄ1ÓDdsÄ 20261115181324Z†20261122181323Z°"0 0	+020161117181324Z°#0!0	+0‚˚Ÿ√Õ	o≈cG`VRN0	*ÜHÜ˜ ÇÅ cS7y_M”Mg°∞ú‡e¿·XZQ¶3lõ1_º’˙ôÍyÓ÷txèT´Uó¬ƒÏ°Wë·LO–õﬁ‘=?¨πZa-õ¸%2´ √níå‚jÆ^K=√∫ @b[å<5v¸ÆC%e Ÿ"∂3Í Es,Ω´ø*ÊÍqˇ&]‚ñêxüzá¸∏dÅË¬˚&Æ‚wn3ZΩÊ8T4+¢<ÒÇ$ ⁄ÒnπéÊ0Æ.nqπKY5*O@ù(‘'ôÛŸ€ÀX∏}=Ïµ“ŒO¯»T%f¸%Áqáç≥wü≥¨j9ãN®Ä5ΩNıπÉ¢ÀN…SÙr¸“Ÿ5ﬁ¨÷„-∑…‰-/y¨ŒÉe_XF∆≈î$’†ÜÃ&´¿„TI9Oó k(†Aœ3]∫D;iGŒ–⁄ÕPë5ë7®¿z*†a;˛˙Ós¯ˇ! ‘W2NËù´„Ê<ã∆„ñÈ67WöYèyeÇ#v˘)h›Ó›+(ÔŸ¬f.çh¨±4Cﬂ0†Ç10Ç-0Ç)0Ç†S!22y[<W3◊;]0	*ÜHÜ˜ 0J1!0USSL.com C2PA ICA R1 202510U
+SSL Corporation10	UUS0261104111800Z271104111759Z0M10	UUS10U
+SSL Corp1+0)U"SSL.com C2PA ICA R1 OCSP Responder0Ç¢0	*ÜHÜ˜ Çè 0ÇäÇÅ ∫#è05p!"ﬁ-3•.h€ﬁXB´8;˛Õæ9÷åo¿ÆsXè•vÃqmÔL»/”†|lH)Aƒ§y«êæÖ∆ZztOÓ0[õ:í›ïCÊü¨›6çú ïàäÜ:Âœ£Jˆ8µíˆï[”rç`\F∞˘˘¥€,8’é  0QÂ¢ìã¯,êÒ{å’é`ÏHÏŒ£/≠¥àcgˇΩn*Ó´Dk–x•-y„˛£4 ‡îÚ/:jXf˚J◊›vù≤ﬁy‰™√à`6OqÂêÂZ/^•DïÒ§!fmSªÿv. ·‘a⁄™»¬∏ãL])[ÌVÉÈ;€≠}º!œX…‹<1pﬂqâä~æ>Ü^ﬁL›‹ÃÙÁÅ>Û»m˛ìrÆ‹Ú€Æ_√ q≤$Axﬂ?Q!¨Û≤<PÌ1ƒ≠(èÇf ø7#‹c÷|ËzÆgÌ∆π¯ã¨ÈîäXMπ)P—bXØ^ÜR ˚~åOC⁄Dípê~°øò„ £Åá0ÅÑ0Uˇ0 0U#0Ä9=G‹óèØà{MsÕÂÓ§•*0	+0 0U%0
++	0U-“Ä3óç∂û¸∏5A“§:÷0UˇÄ0	*ÜHÜ˜ Ç √ú‹U‰qú/ﬁz˛Aõ‘9†e8§–J=‡≤¶#{v(iOíênaΩˆœËÅÏ
+ˆép˛‹Ÿ7∂g	ÆcÒ¸í∫A"ZDi…4’Æ)[ÿ3ó®bb'R˘;6ï"cf√e+‰rf;=A»sòßØ{òejæX˚æN “_˘ßæˆT8“÷˝F•'üê“–âjp^ºYìÄZM;Háº3°Ô@~ˆÛäµ[ﬁ~Æ$75â§!—VÔp§Ï€‘<@ºC«√%Bç˜˙?·;;Dﬁõ1Xá#‰Ë”K£àóKÿ¶©ø/´N‹˛Gs	n)M# ÈIlK0äOÌ„ﬁFGÎ |Î“âÇÜ˙‹ D†T†Û–+â∞ﬂZ∞8Y`Ú@JÕ_œ¨’†¨Ms√¶Ïø°a#ﬂ9ækﬂTÓ…ÑÏAvôa÷®ù“['©PäÈ_Ò¡ï1≈˙|bˇÏÓ—Z	]ò÷+Qôßmô{~&”}?üÈ’∑©‡ iß‡*»$bï0j/dê—Ò4£©u
+Ò*Óî|v$˚npÃ€…È§ñ>Qßá?}„îe`K}∑Ïß÷Ωòö¥™¸GËx«éTı≤À˝9ìª4%À‘≈∂OÆ•)äHaâ∑PàˆxQ‘®5Œ1v¿•∞ìüÙ≠?≠R¯Ÿ\ó∏ÌLª&cpadY&u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ˆY C˚'úA_N∏^B'm>bË[o13ÈÈU6éWíù∆fúœŒóT»¸r⁄„Û~PË‹<óÁò2K`üîØ™Ø‡QÊ¥üúã?QO9®ùÓæâ‹€YµB©“Æ∫Û;ıHóÓ·ä´ê4O¶·±á€OΩr'π%Î%©K‘0ëˆo^'ÿ…\z ŒÅ’˛Ÿhírå˘π§ï„–6GÑEπKåZgö%Q[ŸØË∂≠ÔºÌ'mÓ˜"¢W{Ò}ú§©,`ìK∑HÙÊí∫qp¡!î±≤Ú¨\á˘âpÇ˙)`ÈªQò‰ücPï∆Ä·4(¡¡Ã$Oäı
+endstream
+endobj
+46 0 obj
+<< /AFRelationship /C2PA_Manifest /Desc (Content Credentials) /F (Content Credentials) /EF << /F 45 0 R >> /Subtype (application/c2pa) /Type /Filespec /UF (Content Credentials) >>
+endobj
+xref
+3 1
+0000064984 00001 n 
+45 2
+0000065119 00000 n 
+0000089498 00000 n 
+trailer
+<< /Size 47 /Root 3 1 R /Prev 64005 >>
+startxref
+89694
+%%EOF
