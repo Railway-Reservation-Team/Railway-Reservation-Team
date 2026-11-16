@@ -11,7 +11,7 @@ file(WRITE "${WORK_DIR}/data/bookings.dat"
 
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
-"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n6\n5\n6\n8\n")
+"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nWrongPassword123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n7\nTest Passenger\n7\nNo Such Passenger\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n4\nrailadmin\nWrongAdminPass123\n4\nrailadmin\nSecureRailwayPass123\n6\n5\n6\n6\n8\n")
 
 execute_process(
     COMMAND "${APP}"
@@ -30,14 +30,14 @@ endif()
 foreach(expected_text
     "Invalid choice"
     "Please register and log in before booking"
-    "Registration successful"
+    "Registration successful"\n    "Registration failed"\n    "Login failed"
     "Login successful"
-    "BOOKING CONFIRMED"
+    "BOOKING CONFIRMED"\n    "Found 1 booking(s)"\n    "No bookings found for No Such Passenger"
     "Payment Status: SUCCESS"
     "TICKET CANCELLED SUCCESSFULLY"
     "Administrator account created"
-    "Administrator login successful"
-    "No active administrator session"
+    "Administrator login successful"\n    "Administrator login failed"
+    "No active administrator session"\n    "No active passenger session"
     "Passenger logged out successfully"
     "Exiting system")
     string(FIND "${app_output}" "${expected_text}" found_at)
