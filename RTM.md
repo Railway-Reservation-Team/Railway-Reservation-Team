@@ -1,7 +1,10 @@
+
 # Requirements Traceability Matrix (RTM) — Current Implementation Baseline
+
 ## Railway Reservation System | Team 12
 
-**Authoritative requirements baseline:** Submitted SRS v1.0 (06-Sep-2026).  
+**Authoritative requirements baseline:** Submitted SRS v1.0 (06-Sep-2026).
+
 **Status rule:** A requirement is not Passed merely because a related module exists or CI is green. See the detailed evidence and limitations in [docs/REQUIREMENTS_GAP_REPORT.md](docs/REQUIREMENTS_GAP_REPORT.md) and [docs/TEST_TRACEABILITY.md](docs/TEST_TRACEABILITY.md).
 
 ## 1. Functional requirements
