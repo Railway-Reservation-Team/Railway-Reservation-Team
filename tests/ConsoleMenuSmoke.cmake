@@ -11,7 +11,7 @@ file(WRITE "${WORK_DIR}/data/bookings.dat"
 
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
-"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n6\n5\n6\n8\n")
+"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n7\nSeed Passenger\n7\nNo Such Passenger\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n6\n5\n6\n8\n")
 
 execute_process(
     COMMAND "${APP}"
@@ -32,6 +32,8 @@ foreach(expected_text
     "Please register and log in before booking"
     "Registration successful"
     "Login successful"
+    "Found 1 booking(s)."
+    "No bookings found for No Such Passenger."
     "BOOKING CONFIRMED"
     "Payment Status: SUCCESS"
     "TICKET CANCELLED SUCCESSFULLY"

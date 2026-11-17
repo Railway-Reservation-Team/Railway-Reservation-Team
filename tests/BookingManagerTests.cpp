@@ -192,6 +192,255 @@ int main() {
              audit.find("Test Passenger") == std::string::npos);
     }
 
+
+    // BATCH: BookingManager edge cases
+
+    std::vector<Passenger> emptyPassengers;
+    std::vector<Passenger> sevenPassengers(
+        7, {"Extra Passenger", 25, "Other"}
+    );
+
+    test("Reject booking with no passengers",
+         !BookingManager::createBooking(
+             train, "Sleeper", emptyPassengers, 1000, invalidPNR, error));
+
+    test("Reject booking with more than six passengers",
+         !BookingManager::createBooking(
+             train, "Sleeper", sevenPassengers, 7000, invalidPNR, error));
+
+    test("Reject zero booking fare",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers, 0, invalidPNR, error));
+
+    test("Reject negative booking fare",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers, -100, invalidPNR, error));
+
+    test("Reject NaN booking fare",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers,
+             std::stod("nan"), invalidPNR, error));
+
+    test("Reject infinite booking fare",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers,
+             std::stod("inf"), invalidPNR, error));
+
+    test("Reject whitespace-only passenger name",
+         !BookingManager::createBooking(
+             train, "Sleeper",
+             {{"   ", 25, "Male"}}, 1000, invalidPNR, error));
+
+    test("Reject passenger age zero",
+         !BookingManager::createBooking(
+             train, "Sleeper",
+             {{"Invalid Age", 0, "Male"}}, 1000, invalidPNR, error));
+
+    test("Reject passenger age above 120",
+         !BookingManager::createBooking(
+             train, "Sleeper",
+             {{"Invalid Age", 121, "Male"}}, 1000, invalidPNR, error));
+
+    test("Reject invalid passenger gender",
+         !BookingManager::createBooking(
+             train, "Sleeper",
+             {{"Invalid Gender", 25, "Unknown"}}, 1000,
+             invalidPNR, error));
+
+    test("Reject invalid travel class",
+         !BookingManager::createBooking(
+             train, "General", passengers, 1000, invalidPNR, error));
+
+    Train missingTrain = train;
+    missingTrain.trainNumber = "NOTFOUND";
+
+    test("Reject booking for a train that does not exist",
+         !BookingManager::createBooking(
+             missingTrain, "Sleeper", passengers, 1000,
+             invalidPNR, error));
+
+    // Booking history supports case-insensitive passenger matching.
+    const auto history =
+        BookingManager::getBookingHistory("dInEsH, kUmAr");
+
+    test("Find passenger booking history without case sensitivity",
+         !history.empty());
+
+    test("Empty passenger name returns empty booking history",
+         BookingManager::getBookingHistory("").empty());
+
+    // Check compatibility with legacy eight-field booking records.
+    const std::string legacyPNR = "1234567892";
+    {
+        std::ofstream file("data/bookings.dat", std::ios::app);
+        file << legacyPNR
+             << "|12627|2026-11-15|Sleeper|Legacy Passenger,30,Male"
+             << "|1|1200.00|Confirmed\n";
+    }
+
+    Booking legacyBooking;
+    test("Read legacy eight-field booking record",
+         BookingManager::findBooking(legacyPNR, legacyBooking) &&
+         legacyBooking.waitlistPosition == 0);
+
+    // A malformed record should not prevent searching later valid records.
+    const std::string malformedPNR = "1234567893";
+    {
+        std::ofstream file("data/bookings.dat", std::ios::app);
+        file << malformedPNR
+             << "|12627|2026-11-15|Sleeper|Bad Passenger,XX,Male"
+             << "|bad|1200.00|Confirmed|0\n";
+    }
+
+    Booking malformedBooking;
+    test("Reject booking record with invalid passenger count",
+         !BookingManager::findBooking(malformedPNR, malformedBooking));
+
+    // A zero-seat train causes a valid booking to enter the waitlist.
+    {
+        std::ofstream file("data/trains.dat", std::ios::trunc);
+        file << "12627|Karnataka Express|Bengaluru|New Delhi|20:00|10:30|14h 30m"
+             << "|1200|1800|2400|900|0|0|0|0|2026-11-15\n";
+    }
+
+    std::string waitlistedPNR;
+    const bool waitlistedCreated = BookingManager::createBooking(
+        train, "Sleeper", passengers, 2400, waitlistedPNR, error);
+
+    Booking waitlistedBooking;
+    test("Create booking when seats are unavailable",
+         waitlistedCreated &&
+         BookingManager::findBooking(waitlistedPNR, waitlistedBooking) &&
+         waitlistedBooking.status == "Waitlisted");
+
+    test("First waitlisted booking receives position one",
+         waitlistedCreated && waitlistedBooking.waitlistPosition == 1);
+
+    // Invalid stored queue positions must be rejected.
+    {
+        std::ofstream file("data/bookings.dat", std::ios::app);
+        file << "1234567894|12627|2026-11-15|Sleeper|Queue Passenger,25,Other"
+             << "|1|1000.00|Waitlisted|invalid\n";
+    }
+
+    test("Reject malformed existing waitlist position",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers, 2400, invalidPNR, error));
+
+
+    // BATCH 2: BookingManager uncovered branches
+
+    // A missing train data file must reject booking creation.
+    fs::remove("data/trains.dat");
+    test("Reject booking when train data file is missing",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers, 2400, invalidPNR, error));
+
+    // Malformed train records must be rejected.
+    {
+        std::ofstream file("data/trains.dat", std::ios::trunc);
+        file << "BROKEN|TRAIN|RECORD\n";
+    }
+    test("Reject booking when train data contains malformed record",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers, 2400, invalidPNR, error));
+
+    // A deactivated train must not accept bookings.
+    {
+        std::ofstream file("data/trains.dat", std::ios::trunc);
+        file << "12627|Karnataka Express|Bengaluru|New Delhi|"
+             << "20:00|10:30|14h 30m|1200|1800|2400|900|"
+             << "100|80|60|50|2026-11-15|0\n";
+    }
+    test("Reject booking on a deactivated train",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers, 2400, invalidPNR, error));
+
+    // Duplicate matching train records must be rejected.
+    {
+        std::ofstream file("data/trains.dat", std::ios::trunc);
+        const std::string record =
+            "12627|Karnataka Express|Bengaluru|New Delhi|"
+            "20:00|10:30|14h 30m|1200|1800|2400|900|"
+            "100|80|60|50|2026-11-15\n";
+        file << record << record;
+    }
+    test("Reject duplicate matching train records",
+         !BookingManager::createBooking(
+             train, "Sleeper", passengers, 2400, invalidPNR, error));
+
+    // Restore a valid train record for the remaining tests.
+    {
+        std::ofstream file("data/trains.dat", std::ios::trunc);
+        file << "12627|Karnataka Express|Bengaluru|New Delhi|"
+             << "20:00|10:30|14h 30m|1200|1800|2400|900|"
+             << "100|80|60|50|2026-11-15\n";
+    }
+
+    // findBooking rejects a negative stored waitlist position.
+    {
+        std::ofstream file("data/bookings.dat", std::ios::app);
+        file << "1234567895|12627|2026-11-15|Sleeper|"
+             << "Negative Queue,25,Other|1|1000.00|Waitlisted|-1\n";
+    }
+    Booking negativePositionBooking;
+    test("Reject booking with negative stored waitlist position",
+         !BookingManager::findBooking(
+             "1234567895", negativePositionBooking));
+
+    // Booking history should skip malformed records and continue parsing.
+    {
+        std::ofstream file("data/bookings.dat", std::ios::trunc);
+        file << "MALFORMED|RECORD\n";
+        file << "1234567896|12627|2026-11-15|Sleeper|"
+             << "Dinesh%2C Kumar,20,Male|bad|1200.00|Confirmed|0\n";
+        file << "1234567897|12627|2026-11-15|Sleeper|"
+             << "Dinesh%2C Kumar,20,Male|1|1200.00|Confirmed|-2\n";
+        file << "1234567898|12627|2026-11-15|Sleeper|"
+             << "Dinesh%2C Kumar,20,Male|1|1200.00|Confirmed|0\n";
+    }
+
+    const auto cleanedHistory =
+        BookingManager::getBookingHistory("Dinesh, Kumar");
+    test("Booking history skips malformed and invalid records",
+         cleanedHistory.size() == 1 &&
+         cleanedHistory[0].pnr == "1234567898");
+
+    // Empty or missing booking data returns no history.
+    fs::remove("data/bookings.dat");
+    test("Missing booking file returns empty history",
+         BookingManager::getBookingHistory("Dinesh, Kumar").empty());
+
+    // Invalid PNR format must be rejected before opening the file.
+    Booking invalidLookup;
+    test("Reject alphabetic PNR in booking lookup",
+         !BookingManager::findBooking("ABCDEFGHIJ", invalidLookup));
+    test("Reject short PNR in booking lookup",
+         !BookingManager::findBooking("12345", invalidLookup));
+
+    // Check each supported travel class can allocate seats.
+    const std::vector<std::string> classes = {
+        "AC 3-Tier", "AC 2-Tier", "Chair Car"
+    };
+
+    for (const std::string& travelClass : classes) {
+        {
+            std::ofstream file("data/trains.dat", std::ios::trunc);
+            file << "12627|Karnataka Express|Bengaluru|New Delhi|"
+                 << "20:00|10:30|14h 30m|1200|1800|2400|900|"
+                 << "100|80|60|50|2026-11-15\n";
+        }
+        {
+            std::ofstream file("data/bookings.dat", std::ios::trunc);
+        }
+
+        std::string classPNR;
+        const bool classCreated = BookingManager::createBooking(
+            train, travelClass, passengers, 2400, classPNR, error);
+
+        test("Create booking for class " + travelClass, classCreated);
+    }
+
     std::cout << "\n========== PNR TEST SUMMARY ==========\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';

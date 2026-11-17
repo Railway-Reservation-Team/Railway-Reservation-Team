@@ -84,6 +84,31 @@ int main() {
 
     std::cout << "[PASS] Incomplete passenger record rejection\n";
 
+
+    // Additional passenger decoding edge cases.
+    assert(!ETicketManager::decodePassengers(
+        "A%XZ,20,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "A%2,20,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "Name,abc,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "Name,20years,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        ",20,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "Name,0,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "Name,121,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "Name,20,Unknown", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "A,20,Male;B,21,Female;C,22,Male;"
+        "D,23,Female;E,24,Male;F,25,Female;G,26,Male",
+        passengers, error));
+
+    std::cout << "[PASS] Additional passenger validation cases\n";
+
     // Prepare isolated train data.
     const std::string trainRecord =
         "99999|Test Express|Bengaluru|Chennai|10:00|18:00|8h|"
@@ -197,6 +222,97 @@ int main() {
         pnr, ticket, error));
 
     std::cout << "[PASS] Waitlisted booking ticket rejection\n";
+
+
+    // Test ticket formatting validation branches.
+    ETicket invalidTicket = ticket;
+
+    invalidTicket.bookingStatus = "Cancelled";
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.pnr = "INVALID";
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.trainNumber.clear();
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.trainName.clear();
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.source.clear();
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.destination.clear();
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.travelClass.clear();
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.passengers.clear();
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.passengers.resize(7);
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.totalFare = 0;
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    invalidTicket = ticket;
+    invalidTicket.totalFare = -1;
+    assert(!ETicketManager::formatTicket(invalidTicket, ticketText, error));
+
+    std::cout << "[PASS] Ticket formatting validation cases\n";
+
+    // A valid-looking PNR that does not exist.
+    assert(!ETicketManager::generateTicket(
+        "1111111111", ticket, error));
+
+    // Test train file missing.
+    fs::remove("data/trains.dat");
+    assert(!ETicketManager::generateTicket(pnr, ticket, error));
+
+    // Test malformed train record.
+    {
+        std::ofstream trainFile("data/trains.dat");
+        assert(trainFile.is_open());
+        trainFile << "malformed train record\n";
+    }
+    assert(!ETicketManager::generateTicket(pnr, ticket, error));
+
+    // Test valid train file with no matching train.
+    {
+        std::ofstream trainFile("data/trains.dat");
+        assert(trainFile.is_open());
+        trainFile << "88888|Other Express|Delhi|Mumbai|10:00|18:00|8h|"
+                     "500|800|1000|400|20|20|20|20|2026-11-01\n";
+    }
+    assert(!ETicketManager::generateTicket(pnr, ticket, error));
+
+    std::cout << "[PASS] Ticket generation failure cases\n";
+
+    // Restore the train file before cleanup.
+    {
+        std::ofstream trainFile("data/trains.dat");
+        assert(trainFile.is_open());
+        trainFile << trainRecord << '\n';
+    }
+
+    // Invalid ticket cannot be exported.
+    filePath.clear();
+    invalidTicket = ticket;
+    invalidTicket.bookingStatus = "Cancelled";
+    assert(!ETicketManager::exportTicket(invalidTicket, filePath, error));
+
+    std::cout << "[PASS] Invalid ticket export rejection\n";
 
     // Restore the original working directory.
     fs::current_path(originalDirectory);

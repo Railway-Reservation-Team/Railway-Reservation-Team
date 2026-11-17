@@ -80,7 +80,9 @@ if(BUILD_TESTING)
         tests/BookingHistoryTests.cpp
         tests/CancellationTests.cpp
         tests/CancellationWaitlistTests.cpp
+        tests/CancellationCoverageExtraTests.cpp
         tests/BookingManagerTests.cpp
+        tests/BookingManagerCoverageExtraTests.cpp
         tests/FileStoreTests.cpp
         tests/PaymentProcessTests.cpp
         tests/PerformanceTests.cpp
@@ -93,6 +95,7 @@ if(BUILD_TESTING)
         tests/ValidationTests.cpp
         tests/test_modules.cpp
         tests/TrainDataFileTests.cpp
+tests/TrainDataCoverageExtraTests.cpp
     )
 
     add_test(NAME ConsoleMenuSmoke
@@ -103,7 +106,14 @@ if(BUILD_TESTING)
     )
 
     set_tests_properties(ConsoleMenuSmoke PROPERTIES TIMEOUT 30)
+add_test(NAME ConsoleMenuCoverageExtra
+    COMMAND ${CMAKE_COMMAND}
+        "-DAPP=$<TARGET_FILE:railway>"
+        "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/test-work/ConsoleMenuCoverageExtra"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/ConsoleMenuCoverageExtra.cmake"
+)
 
+set_tests_properties(ConsoleMenuCoverageExtra PROPERTIES TIMEOUT 60)
     foreach(test_source IN LISTS RRS_TEST_SOURCES)
 
         get_filename_component(test_name "${test_source}" NAME_WE)
