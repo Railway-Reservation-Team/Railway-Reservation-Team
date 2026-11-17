@@ -5,13 +5,13 @@ endif()
 file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}/data")
 file(WRITE "${WORK_DIR}/data/trains.dat"
-"77777|Smoke Test Express|Bengaluru|Chennai|10:00|18:00|8h|500|800|1000|400|20|20|20|20|2099-12-31\n")
+"77777|Smoke Test Express|Bengaluru|Chennai|10:00|18:00|8h|500|800|1000|400|1|20|20|20|2099-12-31\n")
 file(WRITE "${WORK_DIR}/data/bookings.dat"
 "1234567890|77777|2099-12-31|Sleeper|Seed Passenger,30,Male|1|500.00|Confirmed\n")
 
 set(input_file "${WORK_DIR}/menu-input.txt")
 file(WRITE "${input_file}"
-"9\n3\n1\nTest Passenger\ntest@example.com\n9876543210\nRailwayPass123\n2\ntest@example.com\nRailwayPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nTest Passenger\n20\nFemale\nY\n1\n1\n3\n2\n1234567890\nY\n4\nrailadmin\nSecureRailwayPass123\n6\n5\n6\n8\n")
+"9\n1\nBob Tester\nbob@test.com\n9999999999\nBobPass123\n2\nbob@test.com\nBobPass123\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nBob Tester\n30\nFemale\nN\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nBob Tester\n30\nFemale\nY\n1\n2\n3\n1\nBengaluru\nChennai\n2099-12-31\n1\n1\n1\nBob Tester\n30\nFemale\nY\n1\n1\n7\nBob Tester\n3\n2\n\n3\n2\n1234567890\nN\n3\n2\n1234567890\nY\n6\n8\n")
 
 execute_process(
     COMMAND "${APP}"
@@ -29,15 +29,17 @@ endif()
 
 foreach(expected_text
     "Invalid choice"
-    "Please register and log in before booking"
     "Registration successful"
     "Login successful"
+    "Booking cancelled. No seats allocated."
+    "Failed payment receipt recorded."
     "BOOKING CONFIRMED"
     "Payment Status: SUCCESS"
+    "E-ticket saved successfully"
+    "Found 1 booking(s)"
+    "Error: PNR cannot be empty."
+    "Cancellation request stopped"
     "TICKET CANCELLED SUCCESSFULLY"
-    "Administrator account created"
-    "Administrator login successful"
-    "No active administrator session"
     "Passenger logged out successfully"
     "Exiting system")
     string(FIND "${app_output}" "${expected_text}" found_at)

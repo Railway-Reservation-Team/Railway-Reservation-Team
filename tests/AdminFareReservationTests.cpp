@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 const std::string TRAIN_FILE = "admin_test_trains.dat";
@@ -131,6 +132,77 @@ void testRejectInvalidStatus() {
     std::cout << "PASS: Reject invalid reservation status\n";
 }
 
+
+void testAdditionalFailurePaths() {
+    std::string error;
+    std::vector<Booking> bookings;
+    Booking booking;
+
+    // Empty booking store is a valid empty result.
+    {
+        std::ofstream empty(BOOKING_FILE, std::ios::trunc);
+    }
+    assert(AdminFareReservationManager::viewReservations(BOOKING_FILE, bookings, error));
+    assert(bookings.empty());
+
+    // Malformed booking record is rejected.
+    {
+        std::ofstream malformed(BOOKING_FILE, std::ios::trunc);
+        malformed << "not|enough|fields\\n";
+    }
+    assert(!AdminFareReservationManager::viewReservations(BOOKING_FILE, bookings, error));
+
+    // Missing booking file and malformed record are rejected by lookup.
+    assert(!AdminFareReservationManager::searchReservation(
+        "missing_admin_bookings.dat", "1234567890", booking, error));
+    assert(!AdminFareReservationManager::searchReservation(
+        BOOKING_FILE, "1234567890", booking, error));
+
+    // Invalid non-finite fare values are rejected.
+    assert(!AdminFareReservationManager::updateFares(
+        TRAIN_FILE, "12345", "2026-12-01",
+        std::numeric_limits<double>::quiet_NaN(), 1000, 1400, 500, error));
+    assert(!AdminFareReservationManager::updateFares(
+        TRAIN_FILE, "12345", "2026-12-01",
+        600, std::numeric_limits<double>::infinity(), 1400, 500, error));
+
+    // Missing train file and malformed train records are rejected.
+    assert(!AdminFareReservationManager::updateFares(
+        "missing_admin_trains.dat", "12345", "2026-12-01",
+        600, 1000, 1400, 500, error));
+    {
+        std::ofstream malformed(TRAIN_FILE, std::ios::trunc);
+        malformed << "broken train record\\n";
+    }
+    assert(!AdminFareReservationManager::updateFares(
+        TRAIN_FILE, "12345", "2026-12-01",
+        600, 1000, 1400, 500, error));
+
+    // Reservation status transitions reject missing PNR and invalid current states.
+    prepareFiles();
+    assert(!AdminFareReservationManager::updateReservationStatus(
+        BOOKING_FILE, TRAIN_FILE, "9999999999", "Cancelled", error));
+    assert(!AdminFareReservationManager::updateReservationStatus(
+        BOOKING_FILE, TRAIN_FILE, "1234567890", "Confirmed", error));
+    assert(!AdminFareReservationManager::updateReservationStatus(
+        BOOKING_FILE, TRAIN_FILE, "1234567890", "Pending", error));
+
+    // Invalid travel class and missing train are rejected before inventory update.
+    {
+        std::ofstream bookings(BOOKING_FILE, std::ios::trunc);
+        bookings << "1234567890|12345|2026-12-01|InvalidClass|Test User,20,Male|2|1000.00|Confirmed\\n";
+    }
+    assert(!AdminFareReservationManager::updateReservationStatus(
+        BOOKING_FILE, TRAIN_FILE, "1234567890", "Cancelled", error));
+
+    prepareFiles();
+    {
+        std::ofstream trains(TRAIN_FILE, std::ios::trunc);
+    }
+    assert(!AdminFareReservationManager::updateReservationStatus(
+        BOOKING_FILE, TRAIN_FILE, "1234567890", "Cancelled", error));
+}
+
 int main() {
     std::error_code auditFsError;
     std::filesystem::create_directories("data", auditFsError);
@@ -145,6 +217,7 @@ int main() {
     testCancelReservation();
     testRejectRepeatedCancellation();
     testRejectInvalidStatus();
+    testAdditionalFailurePaths();
 
     {
         std::ifstream auditFile("data/admin_audit.log");

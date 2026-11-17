@@ -446,6 +446,103 @@ int main() {
     }
 
 
+    // Partial waitlist promotion: release enough seats for only the first
+    // waitlisted group; the second group must remain waitlisted.
+    {
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "PART101|Partial Express|Bengaluru|Chennai|08:00|14:00|6h|"
+                << "1000|1500|2000|800|10|10|10|10|2026-12-25\n";
+        }
+
+        std::vector<Passenger> sixPassengers(
+            6, {"Group Passenger", 25, "Other"});
+        std::vector<Passenger> fourPassengers(
+            4, {"Another Passenger", 26, "Other"});
+        std::vector<Passenger> twoPassengers(
+            2, {"Waitlist One", 27, "Male"});
+        std::vector<Passenger> threePassengers(
+            3, {"Waitlist Two", 28, "Female"});
+
+        std::string sixPnr, fourPnr, wl1Pnr, wl2Pnr;
+        std::string partError;
+
+        Train partTrain{};
+        partTrain.trainNumber = "PART101";
+        partTrain.trainName = "Partial Express";
+        partTrain.source = "Bengaluru";
+        partTrain.destination = "Chennai";
+        partTrain.departureTime = "08:00";
+        partTrain.arrivalTime = "14:00";
+        partTrain.journeyDuration = "6h";
+        partTrain.sleeperFare = 1000;
+        partTrain.ac3TierFare = 1500;
+        partTrain.ac2TierFare = 2000;
+        partTrain.chairCarFare = 800;
+        partTrain.sleeperSeatsAvailable = 10;
+        partTrain.ac3TierSeatsAvailable = 10;
+        partTrain.ac2TierSeatsAvailable = 10;
+        partTrain.chairCarSeatsAvailable = 10;
+        partTrain.journeyDate = "2026-12-25";
+
+        bool sixCreated = BookingManager::createBooking(
+            partTrain, "Sleeper", sixPassengers, 6000.0, sixPnr, partError);
+        check(sixCreated, "Create confirmed group of 6 for partial promotion");
+
+        bool fourCreated = sixCreated && BookingManager::createBooking(
+            partTrain, "Sleeper", fourPassengers, 4000.0, fourPnr, partError);
+        check(fourCreated, "Fill remaining seats with confirmed group of 4");
+
+        bool wl1Created = fourCreated && BookingManager::createBooking(
+            partTrain, "Sleeper", twoPassengers, 1000.0, wl1Pnr, partError);
+        check(wl1Created, "Queue first waitlisted group of 2");
+
+        bool wl2Created = wl1Created && BookingManager::createBooking(
+            partTrain, "Sleeper", threePassengers, 1000.0, wl2Pnr, partError);
+        check(wl2Created, "Queue second waitlisted group of 3");
+
+        if (wl2Created) {
+            Booking wl1, wl2;
+            bool wl1Found = BookingManager::findBooking(wl1Pnr, wl1);
+            bool wl2Found = BookingManager::findBooking(wl2Pnr, wl2);
+            check(wl1Found && wl1.status == "Waitlisted" &&
+                      wl1.waitlistPosition == 1,
+                  "First waitlisted group at position 1");
+            check(wl2Found && wl2.status == "Waitlisted" &&
+                      wl2.waitlistPosition == 2,
+                  "Second waitlisted group at position 2");
+
+            // Cancel the group of 4: releases 4 seats. Enough for group of 2
+            // (promoted, 2 left) but not for group of 3 (stays waitlisted).
+            double partRefund = 0.0;
+            double partCharge = 0.0;
+            bool partCancelled = Cancellation::cancelBooking(
+                fourPnr, partRefund, partCharge, partError);
+            check(partCancelled, "Cancel group of 4 to trigger partial promotion");
+
+            if (partCancelled) {
+                Booking promoted, remaining;
+                bool promFound = BookingManager::findBooking(wl1Pnr, promoted);
+                bool remFound = BookingManager::findBooking(wl2Pnr, remaining);
+                check(promFound && promoted.status == "Confirmed",
+                      "First waitlisted group promoted");
+                check(remFound && remaining.status == "Waitlisted",
+                      "Second waitlisted group stays waitlisted (partial promotion)");
+
+                std::ifstream trains("data/trains.dat");
+                Train after;
+                std::string trainLine;
+                bool parsed = false;
+                if (std::getline(trains, trainLine)) {
+                    parsed = parseTrainRecord(trainLine, after);
+                }
+                check(parsed && after.sleeperSeatsAvailable == 2,
+                      "Seat inventory after partial promotion is 2");
+            }
+        }
+    }
+
     // Additional cancellation failure-path tests.
 
     // Test: Reject cancellation when the train does not exist.

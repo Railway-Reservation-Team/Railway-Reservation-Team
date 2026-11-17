@@ -84,6 +84,21 @@ int main() {
 
     std::cout << "[PASS] Incomplete passenger record rejection\n";
 
+    // Exercise malformed percent escapes and passenger validation branches.
+    assert(!ETicketManager::decodePassengers("Bad%2,20,Male", passengers, error));
+    assert(passengers.empty());
+    assert(!ETicketManager::decodePassengers("Bad%GG,20,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers("Bad%2G,20,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers("Passenger,x,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers("Passenger,20x,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers("Passenger,0,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers("Passenger,121,Male", passengers, error));
+    assert(!ETicketManager::decodePassengers("Passenger,20,Unknown", passengers, error));
+    assert(!ETicketManager::decodePassengers(
+        "A,20,Male;B,20,Male;C,20,Male;D,20,Male;E,20,Male;F,20,Male;G,20,Male",
+        passengers, error));
+    std::cout << "[PASS] Malformed encoding, age, gender and passenger-limit cases\n";
+
     // Prepare isolated train data.
     const std::string trainRecord =
         "99999|Test Express|Bengaluru|Chennai|10:00|18:00|8h|"
@@ -175,6 +190,16 @@ int main() {
     exportedTicket.close();
 
     std::cout << "[PASS] Ticket file export\n";
+
+    // Reject a correctly sized PNR containing non-digits.
+    assert(!ETicketManager::generateTicket(
+        "12345ABCDE", ticket, error));
+    std::cout << "[PASS] Non-numeric PNR rejection\n";
+
+    // A syntactically valid PNR with no matching booking is rejected.
+    assert(!ETicketManager::generateTicket(
+        "0000000000", ticket, error));
+    std::cout << "[PASS] Unknown booking PNR rejection\n";
 
     // Test invalid PNR.
     assert(!ETicketManager::generateTicket(

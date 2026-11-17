@@ -1,4 +1,3 @@
-
 #include "PaymentReceiptManager.h"
 
 #include <cassert>
@@ -6,13 +5,13 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
 int main() {
     const std::string testFile = "data/payment_receipts.dat";
 
-    // Start with an isolated receipt file.
     std::remove(testFile.c_str());
 
     std::string error;
@@ -105,10 +104,111 @@ int main() {
 
     std::cout << "[PASS] Invalid date/time rejection\n";
 
+    // Additional transaction ID validation.
+    invalid = valid;
+    invalid.transactionId.clear();
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    invalid = valid;
+    invalid.transactionId = "TXN|INVALID";
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    invalid = valid;
+    invalid.transactionId = "TXN\nINVALID";
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    invalid = valid;
+    invalid.transactionId = "TXN\rINVALID";
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    std::cout << "[PASS] Transaction ID validation\n";
+
+    // Failed receipts may have an empty or valid PNR.
+    invalid = valid;
+    invalid.status = "FAILED";
+    invalid.pnr.clear();
+
+    assert(PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    invalid.pnr = "1234567890";
+
+    assert(PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    invalid.pnr = "INVALID";
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    std::cout << "[PASS] Failed receipt PNR validation\n";
+
+    // Reject invalid payment methods.
+    invalid = valid;
+    invalid.paymentMethod = "Crypto";
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    std::cout << "[PASS] Invalid payment method rejection\n";
+
+    // Additional amount validation.
+    invalid = valid;
+    invalid.amount = 0.0;
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    invalid.amount = std::nan("");
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    invalid.amount = std::numeric_limits<double>::infinity();
+
+    assert(!PaymentReceiptManager::serializeReceipt(
+        invalid, record, error));
+
+    std::cout << "[PASS] Zero and non-finite amount rejection\n";
+
+    // Additional parsing validation.
+    assert(!PaymentReceiptManager::parseReceipt(
+        "", restored, error));
+
+    assert(!PaymentReceiptManager::parseReceipt(
+        "TXN|123", restored, error));
+
+    assert(!PaymentReceiptManager::parseReceipt(
+        "TXN1001|1234567890|ABC|UPI|SUCCESS|2026-11-11 16:30:00",
+        restored, error));
+
+    assert(!PaymentReceiptManager::parseReceipt(
+        "TXN1001|1234567890|2500ABC|UPI|SUCCESS|2026-11-11 16:30:00",
+        restored, error));
+
+    std::cout << "[PASS] Malformed receipt parsing rejection\n";
+
     // Test persistent receipt storage.
     assert(PaymentReceiptManager::saveReceipt(valid, error));
 
     std::cout << "[PASS] Receipt persistence\n";
+
+    // Reject saving a duplicate receipt.
+    duplicate = valid;
+    duplicate.amount = 3000.0;
+
+    assert(!PaymentReceiptManager::saveReceipt(
+        duplicate, error));
+
+    std::cout << "[PASS] Duplicate receipt saving rejection\n";
 
     // Test retrieval using PNR.
     PaymentReceipt retrieved;
@@ -125,7 +225,11 @@ int main() {
     assert(!PaymentReceiptManager::findReceiptByPNR(
         "INVALID", retrieved, error));
 
-    std::cout << "[PASS] Invalid PNR rejection\n";
+    // Test valid PNR with no matching receipt.
+    assert(!PaymentReceiptManager::findReceiptByPNR(
+        "9999999999", retrieved, error));
+
+    std::cout << "[PASS] Invalid and unmatched PNR rejection\n";
 
     // Verify stored record exists.
     std::ifstream file(testFile);
