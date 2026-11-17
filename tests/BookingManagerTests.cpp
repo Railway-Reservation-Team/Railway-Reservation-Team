@@ -192,6 +192,83 @@ int main() {
              audit.find("Test Passenger") == std::string::npos);
     }
 
+    // Waitlisted booking and deactivated-train rejection.
+    {
+        // Deactivated train (active flag "0") must be rejected.
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "WAIT100|Waitlist Express|Bengaluru|Chennai|08:00|14:00|6h|"
+                << "1000|1500|2000|800|2|2|2|2|2026-12-20|0\n";
+        }
+        Train deactivatedTrain;
+        deactivatedTrain.trainNumber = "WAIT100";
+        deactivatedTrain.trainName = "Waitlist Express";
+        deactivatedTrain.source = "Bengaluru";
+        deactivatedTrain.destination = "Chennai";
+        deactivatedTrain.journeyDate = "2026-12-20";
+
+        std::vector<Passenger> twoPassengers = {
+            {"Wait One", 25, "Male"},
+            {"Wait Two", 26, "Female"}
+        };
+        std::string deactivatedPNR;
+        std::string deactivatedError;
+
+        test("Deactivated train booking rejected",
+             !BookingManager::createBooking(
+                 deactivatedTrain, "Sleeper", twoPassengers,
+                 2000.0, deactivatedPNR, deactivatedError));
+
+        // Reactivate the train with only 2 sleeper seats.
+        {
+            std::ofstream trainFile("data/trains.dat", std::ios::trunc);
+            trainFile
+                << "WAIT100|Waitlist Express|Bengaluru|Chennai|08:00|14:00|6h|"
+                << "1000|1500|2000|800|2|2|2|2|2026-12-20|1\n";
+        }
+        Train activeTrain = deactivatedTrain;
+        activeTrain.active = true;
+
+        std::string firstPnr;
+        std::string firstError;
+        bool firstCreated = BookingManager::createBooking(
+            activeTrain, "Sleeper", twoPassengers, 2000.0, firstPnr, firstError);
+        test("First booking on 2-seat train confirmed", firstCreated);
+
+        Booking firstBooking;
+        test("First booking retrieved",
+             firstCreated && BookingManager::findBooking(firstPnr, firstBooking));
+        test("First booking status Confirmed",
+             firstCreated && firstBooking.status == "Confirmed");
+
+        // Second booking of 2 passengers exhausts seats -> waitlisted.
+        std::string secondPnr;
+        std::string secondError;
+        bool secondCreated = BookingManager::createBooking(
+            activeTrain, "Sleeper", twoPassengers, 2000.0, secondPnr, secondError);
+        test("Second booking waitlisted when seats exhausted",
+             secondCreated && !secondPnr.empty());
+
+        Booking secondBooking;
+        test("Waitlisted booking retrieved",
+             secondCreated && BookingManager::findBooking(secondPnr, secondBooking));
+        test("Waitlisted booking status is Waitlisted",
+             secondCreated && secondBooking.status == "Waitlisted");
+        test("Waitlisted booking has queue position 1",
+             secondCreated && secondBooking.waitlistPosition == 1);
+
+        test("Waitlisted booking recorded in audit log",
+             []{
+                 std::ifstream auditFile("data/admin_audit.log");
+                 std::string audit(
+                     (std::istreambuf_iterator<char>(auditFile)),
+                     std::istreambuf_iterator<char>()
+                 );
+                 return audit.find("PASSENGER_BOOKING_WAITLISTED") != std::string::npos;
+             }());
+    }
+
     std::cout << "\n========== PNR TEST SUMMARY ==========\n";
     std::cout << "Passed: " << passed << '\n';
     std::cout << "Failed: " << failed << '\n';

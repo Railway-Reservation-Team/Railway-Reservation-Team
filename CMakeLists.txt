@@ -76,6 +76,7 @@ if(BUILD_TESTING)
         tests/AdminTrainMenuTests.cpp
         tests/AdminTrainManagerTests.cpp
         tests/AuthManagerTests.cpp
+        tests/AuthManagerEdgeTests.cpp
         tests/BookingIntegrationTest.cpp
         tests/BookingHistoryTests.cpp
         tests/CancellationTests.cpp
@@ -103,6 +104,14 @@ if(BUILD_TESTING)
     )
 
     set_tests_properties(ConsoleMenuSmoke PROPERTIES TIMEOUT 30)
+    add_test(NAME MainMenuEdgeCases
+    COMMAND ${CMAKE_COMMAND}
+        "-DAPP=$<TARGET_FILE:railway>"
+        "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/test-work/MainMenuEdgeCases"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/MainMenuEdgeCases.cmake"
+)
+
+set_tests_properties(MainMenuEdgeCases PROPERTIES TIMEOUT 30)
 
     foreach(test_source IN LISTS RRS_TEST_SOURCES)
 
